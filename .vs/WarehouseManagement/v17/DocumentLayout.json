@@ -1,0 +1,73 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\Intercars Bulgaria\\warehouse.management.be\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5DAF866A-80F2-48C6-88D4-FC6E3377C494}|WarehouseManagement.Infrastructure\\WarehouseManagement.Infrastructure.csproj|c:\\users\\user\\desktop\\intercars bulgaria\\warehouse.management.be\\warehousemanagement.infrastructure\\data\\common\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5DAF866A-80F2-48C6-88D4-FC6E3377C494}|WarehouseManagement.Infrastructure\\WarehouseManagement.Infrastructure.csproj|solutionrelative:warehousemanagement.infrastructure\\data\\common\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5DAF866A-80F2-48C6-88D4-FC6E3377C494}|WarehouseManagement.Infrastructure\\WarehouseManagement.Infrastructure.csproj|c:\\users\\user\\desktop\\intercars bulgaria\\warehouse.management.be\\warehousemanagement.infrastructure\\data\\warehousemanagementdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5DAF866A-80F2-48C6-88D4-FC6E3377C494}|WarehouseManagement.Infrastructure\\WarehouseManagement.Infrastructure.csproj|solutionrelative:warehousemanagement.infrastructure\\data\\warehousemanagementdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5DAF866A-80F2-48C6-88D4-FC6E3377C494}|WarehouseManagement.Infrastructure\\WarehouseManagement.Infrastructure.csproj|c:\\users\\user\\desktop\\intercars bulgaria\\warehouse.management.be\\warehousemanagement.infrastructure\\data\\configurations\\deliveryconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5DAF866A-80F2-48C6-88D4-FC6E3377C494}|WarehouseManagement.Infrastructure\\WarehouseManagement.Infrastructure.csproj|solutionrelative:warehousemanagement.infrastructure\\data\\configurations\\deliveryconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Repository.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Intercars Bulgaria\\warehouse.management.be\\WarehouseManagement.Infrastructure\\Data\\Common\\Repository.cs",
+              "RelativeDocumentMoniker": "WarehouseManagement.Infrastructure\\Data\\Common\\Repository.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Intercars Bulgaria\\warehouse.management.be\\WarehouseManagement.Infrastructure\\Data\\Common\\Repository.cs",
+              "RelativeToolTip": "WarehouseManagement.Infrastructure\\Data\\Common\\Repository.cs",
+              "ViewState": "AQIAAEkAAAAAAAAAAAA8wAYAAAArAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-18T17:49:56.386Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WarehouseManagementDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Intercars Bulgaria\\warehouse.management.be\\WarehouseManagement.Infrastructure\\Data\\WarehouseManagementDbContext.cs",
+              "RelativeDocumentMoniker": "WarehouseManagement.Infrastructure\\Data\\WarehouseManagementDbContext.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Intercars Bulgaria\\warehouse.management.be\\WarehouseManagement.Infrastructure\\Data\\WarehouseManagementDbContext.cs",
+              "RelativeToolTip": "WarehouseManagement.Infrastructure\\Data\\WarehouseManagementDbContext.cs",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAABUAAABEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-18T15:24:32.929Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "DeliveryConfiguration.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Intercars Bulgaria\\warehouse.management.be\\WarehouseManagement.Infrastructure\\Data\\Configurations\\DeliveryConfiguration.cs",
+              "RelativeDocumentMoniker": "WarehouseManagement.Infrastructure\\Data\\Configurations\\DeliveryConfiguration.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Intercars Bulgaria\\warehouse.management.be\\WarehouseManagement.Infrastructure\\Data\\Configurations\\DeliveryConfiguration.cs",
+              "RelativeToolTip": "WarehouseManagement.Infrastructure\\Data\\Configurations\\DeliveryConfiguration.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAABAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-18T15:21:34.312Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
