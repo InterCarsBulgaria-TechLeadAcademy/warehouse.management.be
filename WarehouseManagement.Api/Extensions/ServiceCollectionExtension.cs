@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.Services;
 using WarehouseManagement.Infrastructure.Data;
 using WarehouseManagement.Infrastructure.Data.Common;
 
@@ -10,6 +12,7 @@ namespace WarehouseManagement.Api.Extensions
         public static IServiceCollection AddApplicationService(this IServiceCollection services)
         {
             //Here we add services
+            services.AddScoped<IMarkerService, MarkerService>();
             return services;
         }
 
