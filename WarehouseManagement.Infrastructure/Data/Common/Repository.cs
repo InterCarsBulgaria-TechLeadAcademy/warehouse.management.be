@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data.Common
 {
     public class Repository : IRepository
     {
-        private readonly DbContext context;
+        private readonly WarehouseManagementDbContext context;
 
         /// <summary>
         /// Initializes a new instance of the Repository class with the specified database context.
@@ -46,6 +47,18 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             return DbSet<T>().AsNoTracking();
         }
 
+        public IQueryable<T> AllWithDeleted<T>()
+            where T : BaseClass
+        {
+            return DbSet<T>().IgnoreQueryFilters();
+        }
+
+        public IQueryable<T> AllWithDeletedReadOnly<T>()
+            where T : BaseClass
+        {
+            return DbSet<T>().IgnoreQueryFilters().AsNoTracking();
+        }
+
         /// <summary>
         /// Asynchronously retrieves an entity of type T from the database based on the specified id.
         /// </summary>
@@ -55,6 +68,12 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             where T : class
         {
             return await DbSet<T>().FindAsync(id);
+        }
+
+        public async Task<T?> GetByIdWithDeletedAsync<T>(int id)
+            where T : BaseClass
+        {
+            return await DbSet<T>().IgnoreQueryFilters().FirstAsync(x => x.Id == id);
         }
 
         /// <summary>
@@ -109,6 +128,41 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             where T : class
         {
             DbSet<T>().RemoveRange(entities);
+        }
+
+        public void SoftDelete<T>(T entity, string userId)
+            where T : BaseClass
+        {
+            entity.IsDeleted = true;
+            entity.DeletedAt = DateTime.UtcNow;
+            entity.DeletedByUserId = userId;
+        }
+
+        public async Task SoftDeleteById<T>(object id, string userId)
+            where T : BaseClass
+        {
+            var entity = await GetByIdAsync<T>(id);
+            if (entity != null)
+            {
+                entity.IsDeleted = true;
+                entity.DeletedAt = DateTime.UtcNow;
+                entity.DeletedByUserId = userId;
+            }
+        }
+
+        public void UnDelete<T>(T entity)
+            where T : BaseClass
+        {
+            entity.IsDeleted = false;
+            entity.DeletedAt = null;
+            entity.DeletedByUserId = null;
+        }
+
+        public async Task<int> SaveChangesWithLogAsync(
+            CancellationToken cancellationToken = default
+        )
+        {
+            return await context.SaveChangesWithLogAsync();
         }
     }
 }
