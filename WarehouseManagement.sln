@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManagement.Api", "WarehouseManagement.Api\WarehouseManagement.Api.csproj", "{D34FEE48-7E10-40AB-B848-2B65AD61B2CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WarehouseManagement.Api", "WarehouseManagement.Api\WarehouseManagement.Api.csproj", "{D34FEE48-7E10-40AB-B848-2B65AD61B2CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManagement.Core", "WarehouseManagement.Core\WarehouseManagement.Core.csproj", "{B0AD4A80-3BF2-4853-9F69-48EAC796F69E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WarehouseManagement.Core", "WarehouseManagement.Core\WarehouseManagement.Core.csproj", "{B0AD4A80-3BF2-4853-9F69-48EAC796F69E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManagement.Infrastructure", "WarehouseManagement.Infrastructure\WarehouseManagement.Infrastructure.csproj", "{5DAF866A-80F2-48C6-88D4-FC6E3377C494}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WarehouseManagement.Infrastructure", "WarehouseManagement.Infrastructure\WarehouseManagement.Infrastructure.csproj", "{5DAF866A-80F2-48C6-88D4-FC6E3377C494}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarehouseManagement.Common", "WarehouseManagement.Common\WarehouseManagement.Common.csproj", "{4E315029-755B-477D-BB08-CB1851427BD4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{5DAF866A-80F2-48C6-88D4-FC6E3377C494}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DAF866A-80F2-48C6-88D4-FC6E3377C494}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DAF866A-80F2-48C6-88D4-FC6E3377C494}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E315029-755B-477D-BB08-CB1851427BD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E315029-755B-477D-BB08-CB1851427BD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E315029-755B-477D-BB08-CB1851427BD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E315029-755B-477D-BB08-CB1851427BD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
