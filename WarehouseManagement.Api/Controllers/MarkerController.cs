@@ -30,4 +30,14 @@ public class MarkerController : ControllerBase
 
         return Ok(model);
     }
+
+    [HttpGet]
+    [Route("all")]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<MarkerDto>))]
+    public async Task<IActionResult> GetAll()
+    {
+        var model = await markerService.GetAllAsync();
+
+        return Ok(model);
+    }
 }

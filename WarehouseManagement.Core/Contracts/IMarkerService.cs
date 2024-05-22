@@ -5,4 +5,5 @@ namespace WarehouseManagement.Core.Contracts;
 public interface IMarkerService
 {
     Task<MarkerDto?> GetByIdAsync(int id);
+    Task<IEnumerable<MarkerDto>> GetAllAsync();
 }
