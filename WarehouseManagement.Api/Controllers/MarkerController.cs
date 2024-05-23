@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Marker;
@@ -39,5 +40,22 @@ public class MarkerController : ControllerBase
         var model = await markerService.GetAllAsync();
 
         return Ok(model);
+    }
+
+    [HttpPost]
+    [Route("add")]
+    public async Task<IActionResult> Add([FromBody] MarkerFormDto marker)
+    {
+        if (await markerService.ExistByNameAsync(marker.Name) == true)
+        {
+            ModelState.AddModelError("Name", "A marker with the same name already exists.");
+            return BadRequest(ModelState); //TODO: Ask how to return the error
+        }
+
+        var userId = "userId";
+
+        await markerService.AddAsync(marker, userId);
+
+        return Ok("");
     }
 }

@@ -140,7 +140,8 @@ namespace WarehouseManagement.Infrastructure.Data
         private string GetEntityId(EntityEntry entry)
         {
             var primaryKey = entry.Metadata.FindPrimaryKey();
-            if (primaryKey != null)
+
+            if (primaryKey != null) //TODO: Check why the id is magic numbers (like -14329842)
             {
                 var keyValues = primaryKey
                     .Properties.Select(p => entry.CurrentValues[p]?.ToString())

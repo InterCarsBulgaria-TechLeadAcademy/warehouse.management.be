@@ -15,6 +15,28 @@ public class MarkerService : IMarkerService
         this.repository = repository;
     }
 
+    public async Task AddAsync(MarkerFormDto model, string userId)
+    {
+        if (model != null)
+        {
+            var marker = new Marker
+            {
+                Name = model.Name,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+            };
+            await repository.AddAsync(marker);
+            await repository.SaveChangesWithLogAsync();
+        }
+    }
+
+    public async Task<bool> ExistByNameAsync(string name)
+    {
+        return await repository
+            .AllReadOnly<Marker>()
+            .AnyAsync(m => m.Name.ToLower() == name.ToLower());
+    }
+
     public async Task<IEnumerable<MarkerDto>> GetAllAsync()
     {
         return await repository
