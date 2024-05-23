@@ -92,6 +92,11 @@ namespace WarehouseManagement.Infrastructure.Data
                     }
                     else if (entry.State == EntityState.Modified && property.IsModified)
                     {
+                        var action =
+                            entry.Entity is BaseClass baseEntity && baseEntity.IsDeleted
+                                ? "SoftDelete"
+                                : "Modified";
+
                         changes.Add(
                             new EntityChange
                             {
@@ -102,7 +107,7 @@ namespace WarehouseManagement.Infrastructure.Data
                                 NewValue = property.CurrentValue?.ToString(),
                                 ChangedAt = now,
                                 ChangedByUserId = userId,
-                                Action = entry.State.ToString()
+                                Action = action
                             }
                         );
                     }
