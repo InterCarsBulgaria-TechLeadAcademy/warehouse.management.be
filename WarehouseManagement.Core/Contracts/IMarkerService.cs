@@ -13,4 +13,5 @@ public interface IMarkerService
     Task RestoreAsync(int id, string userId);
     Task<bool> IsDeletedById(int id);
     Task<IEnumerable<MarkerDto>> GetDeletedMarkersAsync();
+    Task<List<string>> IsMarkerInUseAsync(int markerId);
 }

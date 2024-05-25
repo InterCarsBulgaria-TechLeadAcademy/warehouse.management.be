@@ -104,7 +104,7 @@ namespace WarehouseManagement.Infrastructure.Data
         {
             var primaryKey = entry.Metadata.FindPrimaryKey();
 
-            if (primaryKey != null) //TODO: Check why the id is magic numbers (like -14329842)
+            if (primaryKey != null)
             {
                 var keyValues = primaryKey
                     .Properties.Select(p => entry.CurrentValues[p]?.ToString())

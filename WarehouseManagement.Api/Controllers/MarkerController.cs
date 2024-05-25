@@ -83,12 +83,21 @@ public class MarkerController : ControllerBase
 
     [HttpDelete("delete/{id}")]
     [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(int id)
     {
         if (await markerService.GetByIdAsync(id) == null)
         {
             return NotFound();
+        }
+
+        var usages = await markerService.IsMarkerInUseAsync(id);
+        if (usages.Any())
+        {
+            return BadRequest(
+                $"Cannot delete this marker because it is used in: {string.Join(", ", usages)}"
+            );
         }
 
         var userId = User.Id();

@@ -26,35 +26,39 @@ public class MarkerService : IMarkerService
                 CreatedByUserId = userId,
             };
             await repository.AddAsync(marker);
-            await repository.SaveChangesWithLogAsync();
+            await repository.SaveChangesAsync();
         }
     }
 
     public async Task DeleteAsync(int id, string userId)
     {
         var marker = await repository.GetByIdAsync<Marker>(id);
-        if (marker != null)
+        if (marker == null)
         {
-            marker.IsDeleted = true;
-            marker.DeletedAt = DateTime.UtcNow;
-            marker.DeletedByUserId = userId;
-
-            repository.SoftDelete(marker);
-            await repository.SaveChangesWithLogAsync();
+            throw new KeyNotFoundException($"Marker with ID {id} not found.");
         }
+
+        marker.IsDeleted = true;
+        marker.DeletedAt = DateTime.UtcNow;
+        marker.DeletedByUserId = userId;
+
+        repository.SoftDelete(marker);
+        await repository.SaveChangesAsync();
     }
 
     public async Task EditAsync(int id, MarkerFormDto model, string userId)
     {
         var marker = await repository.GetByIdAsync<Marker>(id);
-        if (marker != null)
+        if (marker == null)
         {
-            marker.Name = model.Name;
-            marker.LastModifiedAt = DateTime.UtcNow;
-            marker.LastModifiedByUserId = userId;
-
-            await repository.SaveChangesWithLogAsync();
+            throw new KeyNotFoundException($"Marker with ID {id} not found.");
         }
+
+        marker.Name = model.Name;
+        marker.LastModifiedAt = DateTime.UtcNow;
+        marker.LastModifiedByUserId = userId;
+
+        await repository.SaveChangesWithLogAsync();
     }
 
     public async Task<bool> ExistByNameAsync(string name)
@@ -134,13 +138,16 @@ public class MarkerService : IMarkerService
     public async Task RestoreAsync(int id, string userId)
     {
         var marker = await repository.GetByIdWithDeletedAsync<Marker>(id);
-        if (marker != null)
-        {
-            marker.LastModifiedByUserId = userId; //TODO: Should the user that undeleted be assigned to LastModified user ?
-            repository.UnDelete(marker);
 
-            await repository.SaveChangesWithLogAsync();
+        if (marker == null)
+        {
+            throw new KeyNotFoundException($"Marker with ID {id} not found.");
         }
+
+        marker.LastModifiedByUserId = userId; //TODO: Should the user that undeleted be assigned to LastModified user ?
+        repository.UnDelete(marker);
+
+        await repository.SaveChangesWithLogAsync(); //TODO: Should we log the Undeletion process or not ?
     }
 
     public async Task<bool> IsDeletedById(int id)
@@ -180,5 +187,27 @@ public class MarkerService : IMarkerService
                     .ToList()
             })
             .ToListAsync();
+    }
+
+    public async Task<List<string>> IsMarkerInUseAsync(int markerId)
+    {
+        var usages = new List<string>();
+
+        if (await repository.AllReadOnly<DeliveryMarker>().AnyAsync(dm => dm.MarkerId == markerId))
+        {
+            usages.Add("DeliveryMarkers");
+        }
+
+        if (await repository.AllReadOnly<VendorMarker>().AnyAsync(vm => vm.MarkerId == markerId))
+        {
+            usages.Add("VendorMarkers");
+        }
+
+        if (await repository.AllReadOnly<ZoneMarker>().AnyAsync(zm => zm.MarkerId == markerId))
+        {
+            usages.Add("ZoneMarkers");
+        }
+
+        return usages;
     }
 }
