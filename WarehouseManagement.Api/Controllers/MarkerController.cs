@@ -46,8 +46,7 @@ public class MarkerController : ControllerBase
     {
         if (await markerService.ExistByNameAsync(marker.Name) == true)
         {
-            ModelState.AddModelError("Name", "A marker with the same name already exists.");
-            return BadRequest(ModelState); //TODO: Ask how to return the error
+            return BadRequest("A marker with the same name already exists.");
         }
 
         var userId = User.Id();
@@ -70,8 +69,7 @@ public class MarkerController : ControllerBase
 
         if (await markerService.ExistByNameAsync(marker.Name))
         {
-            ModelState.AddModelError("Name", "A marker with the same name already exists.");
-            return BadRequest(ModelState);
+            return BadRequest("A marker with the same name already exists.");
         }
 
         var userId = User.Id();
@@ -92,7 +90,7 @@ public class MarkerController : ControllerBase
             return NotFound();
         }
 
-        var usages = await markerService.IsMarkerInUseAsync(id);
+        var usages = await markerService.GetMarkerUsagesAsync(id);
         if (usages.Any())
         {
             return BadRequest(
@@ -112,12 +110,21 @@ public class MarkerController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> Restore(int id)
     {
-        if (await markerService.IsDeletedById(id) == false)
+        if (await markerService.IsDeletedByIdAsync(id) == false)
         {
-            return BadRequest();
+            return BadRequest("The marker is not deleted.");
         }
 
-        //TODO: If we restore entity with name already existing.
+        var deletedMarkerName = await markerService.GetDeletedMarkerNameByIdAsync(id);
+        if (string.IsNullOrEmpty(deletedMarkerName))
+        {
+            return BadRequest("Marker not found.");
+        }
+
+        if (await markerService.ExistByNameAsync(deletedMarkerName))
+        {
+            return BadRequest($"A marker with the name '{deletedMarkerName}' already exists.");
+        }
 
         var userId = User.Id();
 

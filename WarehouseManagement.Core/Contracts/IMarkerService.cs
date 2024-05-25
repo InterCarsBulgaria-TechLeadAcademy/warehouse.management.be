@@ -11,7 +11,8 @@ public interface IMarkerService
     Task EditAsync(int id, MarkerFormDto model, string userId);
     Task DeleteAsync(int id, string userId);
     Task RestoreAsync(int id, string userId);
-    Task<bool> IsDeletedById(int id);
+    Task<bool> IsDeletedByIdAsync(int id);
     Task<IEnumerable<MarkerDto>> GetDeletedMarkersAsync();
-    Task<List<string>> IsMarkerInUseAsync(int markerId);
+    Task<List<string>> GetMarkerUsagesAsync(int markerId);
+    Task<string?> GetDeletedMarkerNameByIdAsync(int id);
 }

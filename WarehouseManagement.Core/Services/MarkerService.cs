@@ -17,17 +17,14 @@ public class MarkerService : IMarkerService
 
     public async Task AddAsync(MarkerFormDto model, string userId)
     {
-        if (model != null)
+        var marker = new Marker
         {
-            var marker = new Marker
-            {
-                Name = model.Name,
-                CreatedAt = DateTime.UtcNow,
-                CreatedByUserId = userId,
-            };
-            await repository.AddAsync(marker);
-            await repository.SaveChangesAsync();
-        }
+            Name = model.Name,
+            CreatedAt = DateTime.UtcNow,
+            CreatedByUserId = userId,
+        };
+        await repository.AddAsync(marker);
+        await repository.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id, string userId)
@@ -144,15 +141,15 @@ public class MarkerService : IMarkerService
             throw new KeyNotFoundException($"Marker with ID {id} not found.");
         }
 
-        marker.LastModifiedByUserId = userId; //TODO: Should the user that undeleted be assigned to LastModified user ?
+        marker.LastModifiedByUserId = userId;
         repository.UnDelete(marker);
 
-        await repository.SaveChangesWithLogAsync(); //TODO: Should we log the Undeletion process or not ?
+        await repository.SaveChangesAsync();
     }
 
-    public async Task<bool> IsDeletedById(int id)
+    public async Task<bool> IsDeletedByIdAsync(int id)
     {
-        return await repository.AllWithDeleted<Marker>().AnyAsync(m => m.Id == id);
+        return await repository.AllWithDeleted<Marker>().AnyAsync(m => m.Id == id && m.IsDeleted);
     }
 
     public async Task<IEnumerable<MarkerDto>> GetDeletedMarkersAsync()
@@ -189,7 +186,7 @@ public class MarkerService : IMarkerService
             .ToListAsync();
     }
 
-    public async Task<List<string>> IsMarkerInUseAsync(int markerId)
+    public async Task<List<string>> GetMarkerUsagesAsync(int markerId)
     {
         var usages = new List<string>();
 
@@ -209,5 +206,22 @@ public class MarkerService : IMarkerService
         }
 
         return usages;
+    }
+
+    public async Task<string?> GetDeletedMarkerNameByIdAsync(int id)
+    {
+        var marker = await repository.GetByIdWithDeletedAsync<Marker>(id);
+
+        if (marker == null)
+        {
+            throw new KeyNotFoundException($"Marker with ID {id} not found.");
+        }
+
+        if (marker.IsDeleted)
+        {
+            return marker.Name;
+        }
+
+        return null;
     }
 }
