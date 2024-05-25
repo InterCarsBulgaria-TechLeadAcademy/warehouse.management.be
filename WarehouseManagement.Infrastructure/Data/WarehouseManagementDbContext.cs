@@ -103,6 +103,7 @@ namespace WarehouseManagement.Infrastructure.Data
         private string GetEntityId(EntityEntry entry)
         {
             var primaryKey = entry.Metadata.FindPrimaryKey();
+
             if (primaryKey != null)
             {
                 var keyValues = primaryKey

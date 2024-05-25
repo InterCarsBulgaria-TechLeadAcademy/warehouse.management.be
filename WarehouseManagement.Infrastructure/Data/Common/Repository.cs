@@ -47,12 +47,20 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             return DbSet<T>().AsNoTracking();
         }
 
+        /// <summary>
+        /// Retrieves all records of type T, including soft-deleted entities, from the database.
+        /// </summary>
+        /// <returns>An IQueryable representing the queryable expression tree.</returns>
         public IQueryable<T> AllWithDeleted<T>()
             where T : BaseClass
         {
             return DbSet<T>().IgnoreQueryFilters();
         }
 
+        /// <summary>
+        /// Retrieves all records of type T, including soft-deleted entities, from the database without tracking changes.
+        /// </summary>
+        /// <returns>An IQueryable representing the queryable expression tree without change tracking.</returns>
         public IQueryable<T> AllWithDeletedReadOnly<T>()
             where T : BaseClass
         {
@@ -70,6 +78,11 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             return await DbSet<T>().FindAsync(id);
         }
 
+        /// <summary>
+        /// Asynchronously retrieves an entity of type T, including soft-deleted entities, from the database based on the specified id.
+        /// </summary>
+        /// <param name="id">The id of the entity to retrieve.</param>
+        /// <returns>Returns the retrieved entity or null if not found.</returns>
         public async Task<T?> GetByIdWithDeletedAsync<T>(int id)
             where T : BaseClass
         {
@@ -130,15 +143,22 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             DbSet<T>().RemoveRange(entities);
         }
 
-        public void SoftDelete<T>(T entity, string userId)
+        /// <summary>
+        /// Soft deletes the specified entity from the database.
+        /// </summary>
+        /// <param name="entity">The entity to soft delete.</param>
+        public void SoftDelete<T>(T entity)
             where T : BaseClass
         {
             entity.IsDeleted = true;
             entity.DeletedAt = DateTime.UtcNow;
-            entity.DeletedByUserId = userId;
         }
 
-        public async Task SoftDeleteById<T>(object id, string userId)
+        /// <summary>
+        /// Asynchronously soft deletes the entity with the specified id from the database.
+        /// </summary>
+        /// <param name="id">The id of the entity to soft delete.</param>
+        public async Task SoftDeleteById<T>(object id)
             where T : BaseClass
         {
             var entity = await GetByIdAsync<T>(id);
@@ -146,10 +166,13 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             {
                 entity.IsDeleted = true;
                 entity.DeletedAt = DateTime.UtcNow;
-                entity.DeletedByUserId = userId;
             }
         }
 
+        /// <summary>
+        /// Restores a soft deleted entity in the database.
+        /// </summary>
+        /// <param name="entity">The entity to restore.</param>
         public void UnDelete<T>(T entity)
             where T : BaseClass
         {
@@ -158,6 +181,9 @@ namespace WarehouseManagement.Infrastructure.Data.Common
             entity.DeletedByUserId = null;
         }
 
+        /// <summary>
+        /// Asynchronously saves all changes made in the database context, along with logging the changes.
+        /// </summary>
         public async Task<int> SaveChangesWithLogAsync(
             CancellationToken cancellationToken = default
         )
