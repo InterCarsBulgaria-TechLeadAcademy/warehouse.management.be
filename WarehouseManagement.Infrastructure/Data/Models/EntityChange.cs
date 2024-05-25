@@ -15,5 +15,4 @@ public class EntityChange
     public string? NewValue { get; set; }
     public DateTime ChangedAt { get; set; }
     public string ChangedByUserId { get; set; } = string.Empty;
-    public string Action { get; set; } = "Created";
 }

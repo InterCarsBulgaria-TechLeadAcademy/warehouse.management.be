@@ -61,8 +61,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     OldValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NewValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ChangedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ChangedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Action = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    ChangedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
