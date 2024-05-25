@@ -60,73 +60,31 @@ namespace WarehouseManagement.Infrastructure.Data
             var now = DateTime.UtcNow;
 
             foreach (
-                var entry in ChangeTracker
-                    .Entries()
-                    .Where(e =>
-                        e.State == EntityState.Added
-                        || e.State == EntityState.Modified
-                        || e.State == EntityState.Deleted
-                    )
+                var entry in ChangeTracker.Entries().Where(e => e.State == EntityState.Modified)
             )
             {
                 var entityName = entry.Entity.GetType().Name;
                 var entityId = GetEntityId(entry);
 
-                foreach (var property in entry.Properties)
+                if (string.IsNullOrEmpty(entityId))
                 {
-                    if (entry.State == EntityState.Added)
-                    {
-                        changes.Add(
-                            new EntityChange
-                            {
-                                EntityName = entityName,
-                                EntityId = entityId,
-                                PropertyName = property.Metadata.Name,
-                                OldValue = null,
-                                NewValue = property.CurrentValue?.ToString(),
-                                ChangedAt = now,
-                                ChangedByUserId = userId,
-                                Action = entry.State.ToString()
-                            }
-                        );
-                    }
-                    else if (entry.State == EntityState.Modified && property.IsModified)
-                    {
-                        var action =
-                            entry.Entity is BaseClass baseEntity && baseEntity.IsDeleted
-                                ? "SoftDelete"
-                                : "Modified";
+                    continue;
+                }
 
-                        changes.Add(
-                            new EntityChange
-                            {
-                                EntityName = entityName,
-                                EntityId = entityId,
-                                PropertyName = property.Metadata.Name,
-                                OldValue = property.OriginalValue?.ToString(),
-                                NewValue = property.CurrentValue?.ToString(),
-                                ChangedAt = now,
-                                ChangedByUserId = userId,
-                                Action = action
-                            }
-                        );
-                    }
-                    else if (entry.State == EntityState.Deleted)
-                    {
-                        changes.Add(
-                            new EntityChange
-                            {
-                                EntityName = entityName,
-                                EntityId = entityId,
-                                PropertyName = property.Metadata.Name,
-                                OldValue = property.OriginalValue?.ToString(),
-                                NewValue = null,
-                                ChangedAt = now,
-                                ChangedByUserId = userId,
-                                Action = entry.State.ToString()
-                            }
-                        );
-                    }
+                foreach (var property in entry.Properties.Where(p => p.IsModified))
+                {
+                    changes.Add(
+                        new EntityChange
+                        {
+                            EntityName = entityName,
+                            EntityId = entityId,
+                            PropertyName = property.Metadata.Name,
+                            OldValue = property.OriginalValue?.ToString(),
+                            NewValue = property.CurrentValue?.ToString(),
+                            ChangedAt = now,
+                            ChangedByUserId = userId
+                        }
+                    );
                 }
             }
 
