@@ -1,4 +1,6 @@
-﻿namespace WarehouseManagement.Infrastructure.Data.Common
+﻿using WarehouseManagement.Infrastructure.Data.Models;
+
+namespace WarehouseManagement.Infrastructure.Data.Common
 {
     public interface IRepository
     {
@@ -59,5 +61,18 @@
         /// <param name="entities">The list of entities to delete.</param>
         void DeleteRange<T>(IEnumerable<T> entities)
             where T : class;
+        Task<T?> GetByIdWithDeletedAsync<T>(int id)
+            where T : BaseClass;
+        IQueryable<T> AllWithDeletedReadOnly<T>()
+            where T : BaseClass;
+        IQueryable<T> AllWithDeleted<T>()
+            where T : BaseClass;
+        void SoftDelete<T>(T entity, string userId)
+            where T : BaseClass;
+        Task SoftDeleteById<T>(object id, string userId)
+            where T : BaseClass;
+        void UnDelete<T>(T entity)
+            where T : BaseClass;
+        Task<int> SaveChangesWithLogAsync(CancellationToken cancellationToken = default);
     }
 }
