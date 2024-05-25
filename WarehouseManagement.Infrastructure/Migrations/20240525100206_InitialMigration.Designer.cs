@@ -12,7 +12,7 @@ using WarehouseManagement.Infrastructure.Data;
 namespace WarehouseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(WarehouseManagementDbContext))]
-    [Migration("20240522145431_InitialMigration")]
+    [Migration("20240525100206_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -321,11 +321,6 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("ChangedAt")
                         .HasColumnType("datetime2");
