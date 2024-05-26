@@ -39,6 +39,29 @@ namespace WarehouseManagement.Api.Controllers
             return Ok(model);
         }
 
+        [HttpPut("add")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Add([FromBody] VendorFormDto model)
+        {
+            if (await vendorService.ExistByNameAsync(model.Name))
+            {
+                return BadRequest($"Vendor with name {model.Name} already exist");
+            }
+
+            if (await vendorService.ExistBySystemNumberAsync(model.SystemNumber))
+            {
+                return BadRequest($"Vendor with system number {model.SystemNumber} already exist");
+            }
+
+            await vendorService.AddAsync(model, User.Id());
+
+            return Ok(
+                $"Vendor with name {model.Name} and system number {model.SystemNumber} was added suscesfully"
+            );
+        }
+
         [HttpPut("edit/{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -50,19 +73,17 @@ namespace WarehouseManagement.Api.Controllers
                 return NotFound($"Vendor with ID {id} not found.");
             }
 
-            string userId = User.Id();
-
-            if (await vendorService.OtherVendorWithNameExistIdAsync(id, model.Name))
+            if (await vendorService.AnotherVendorWithNameExistIdAsync(id, model.Name))
             {
-                return BadRequest($"Vendor with name {model.Name} already exist");
+                return BadRequest($"Another vendor with name {model.Name} already exist");
             }
 
-            if (await vendorService.OtherVendorWithSystemNumberExistAsync(id, model.SystemNumber))
+            if (await vendorService.AnotherVendorWithSystemNumberExistAsync(id, model.SystemNumber))
             {
-                return BadRequest($"Vendor with system number {model.SystemNumber} already exist");
+                return BadRequest($"Another with system number {model.SystemNumber} already exist");
             }
 
-            await vendorService.EditAsync(id, model, userId);
+            await vendorService.EditAsync(id, model, User.Id());
 
             return Ok("Vendor edited successfully");
         }
