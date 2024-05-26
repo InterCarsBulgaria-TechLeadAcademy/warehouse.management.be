@@ -1,5 +1,8 @@
-﻿using WarehouseManagement.Core.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs.Vendor;
 using WarehouseManagement.Infrastructure.Data.Common;
+using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Core.Services
 {
@@ -10,6 +13,35 @@ namespace WarehouseManagement.Core.Services
         public VendorService(IRepository repository)
         {
             this.repository = repository;
+        }
+
+        public async Task<VendorDto?> GetByIdAsync(int id)
+        {
+            return await repository
+                .AllReadOnly<Vendor>()
+                .Where(v => v.Id == id)
+                .Select(v => new VendorDto()
+                {
+                    Id = v.Id,
+                    Name = v.Name,
+                    SystemNumber = v.SystemNumber,
+                    Markers = v
+                        .VendorsMarkers.Select(vm => new VendorMarkerDto()
+                        {
+                            MarkerId = vm.MarkerId,
+                            MarkerName = vm.Marker.Name,
+                        })
+                        .ToList(),
+                    Zones = v
+                        .VendorsZones.Select(vz => new VendorZoneDto()
+                        {
+                            ZoneId = vz.ZoneId,
+                            ZoneName = vz.Zone.Name,
+                            IsFinal = vz.Zone.IsFinal,
+                        })
+                        .ToList(),
+                })
+                .FirstOrDefaultAsync();
         }
     }
 }
