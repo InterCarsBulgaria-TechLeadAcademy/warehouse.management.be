@@ -43,5 +43,33 @@ namespace WarehouseManagement.Core.Services
                 })
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<IEnumerable<VendorDto>> GetAllAsync()
+        {
+            return await repository
+                .AllReadOnly<Vendor>()
+                .Select(v => new VendorDto()
+                {
+                    Id = v.Id,
+                    Name = v.Name,
+                    SystemNumber = v.SystemNumber,
+                    Markers = v
+                        .VendorsMarkers.Select(vm => new VendorMarkerDto()
+                        {
+                            MarkerId = vm.MarkerId,
+                            MarkerName = vm.Marker.Name,
+                        })
+                        .ToList(),
+                    Zones = v
+                        .VendorsZones.Select(vz => new VendorZoneDto()
+                        {
+                            ZoneId = vz.ZoneId,
+                            ZoneName = vz.Zone.Name,
+                            IsFinal = vz.Zone.IsFinal,
+                        })
+                        .ToList(),
+                })
+                .ToListAsync();
+        }
     }
 }

@@ -28,5 +28,14 @@ namespace WarehouseManagement.Api.Controllers
 
             return Ok(model);
         }
+
+        [HttpGet("all")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<VendorDto>))]
+        public async Task<IActionResult> All()
+        {
+            var model = await vendorService.GetAllAsync();
+
+            return Ok(model);
+        }
     }
 }
