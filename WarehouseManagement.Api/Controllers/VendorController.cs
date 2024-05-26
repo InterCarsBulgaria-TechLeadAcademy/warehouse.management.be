@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs.Vendor;
 
 namespace WarehouseManagement.Api.Controllers
 {
@@ -12,6 +13,20 @@ namespace WarehouseManagement.Api.Controllers
         public VendorController(IVendorService vendorService)
         {
             this.vendorService = vendorService;
+        }
+
+        [HttpGet("{id}")]
+        [ProducesResponseType(200, Type = typeof(VendorDto))]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetMarker(int id)
+        {
+            var model = await vendorService.GetByIdAsync(id);
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(model);
         }
     }
 }
