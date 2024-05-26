@@ -100,20 +100,19 @@ public class MarkerService : IMarkerService
 
     public async Task<MarkerDto?> GetByIdAsync(int id)
     {
-        return await repository
-            .AllReadOnly<Marker>()
-            .Where(m => m.Id == id)
-            .Select(m => new MarkerDto
-            {
-                Name = m.Name,
-                Deliveries = m
+        Marker marker = (await repository.GetByIdAsync<Marker>(id))!;
+
+        MarkerDto markerDto = new MarkerDto()
+        {
+            Name = marker.Name,
+            Deliveries = marker
                     .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
                     {
                         DeliveryId = dm.DeliveryId,
                         DeliverySystemNumber = dm.Delivery.SystemNumber
                     })
                     .ToList(),
-                Vendors = m
+            Vendors = marker
                     .VendorsMarkers.Select(vm => new MarkerVendorDto
                     {
                         VendorId = vm.VendorId,
@@ -121,15 +120,16 @@ public class MarkerService : IMarkerService
                         VendorSystemNumber = vm.Vendor.SystemNumber
                     })
                     .ToList(),
-                Zones = m
+            Zones = marker
                     .ZonesMarkers.Select(zm => new MarkerZoneDto
                     {
                         ZoneId = zm.ZoneId,
                         ZoneName = zm.Zone.Name
                     })
                     .ToList()
-            })
-            .FirstOrDefaultAsync();
+        };
+
+        return markerDto;
     }
 
     public async Task RestoreAsync(int id, string userId)
