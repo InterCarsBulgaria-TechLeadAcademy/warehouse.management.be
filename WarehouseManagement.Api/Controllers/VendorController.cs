@@ -19,7 +19,7 @@ namespace WarehouseManagement.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(VendorDto))]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetMarker(int id)
+        public async Task<IActionResult> GetVendor(int id)
         {
             var model = await vendorService.GetByIdAsync(id);
             if (model == null)
@@ -73,7 +73,7 @@ namespace WarehouseManagement.Api.Controllers
                 return NotFound($"Vendor with ID {id} not found.");
             }
 
-            if (await vendorService.AnotherVendorWithNameExistIdAsync(id, model.Name))
+            if (await vendorService.AnotherVendorWithNameExistAsync(id, model.Name))
             {
                 return BadRequest($"Another vendor with name {model.Name} already exist");
             }
@@ -86,6 +86,28 @@ namespace WarehouseManagement.Api.Controllers
             await vendorService.EditAsync(id, model, User.Id());
 
             return Ok("Vendor edited successfully");
+        }
+
+        [HttpDelete("delete/{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                await vendorService.DeleteAsync(id, User.Id());
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+            return Ok("Vendor was deleted successfully");
         }
     }
 }

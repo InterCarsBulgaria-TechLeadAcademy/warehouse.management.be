@@ -89,6 +89,7 @@ namespace WarehouseManagement.Core.Services
         public async Task EditAsync(int id, VendorFormDto model, string userId)
         {
             var vendor = await repository.GetByIdAsync<Vendor>(id);
+
             if (vendor == null)
             {
                 throw new KeyNotFoundException($"Vendor with ID {id} not found.");
@@ -100,6 +101,34 @@ namespace WarehouseManagement.Core.Services
             vendor.LastModifiedByUserId = userId;
 
             await repository.SaveChangesWithLogAsync();
+        }
+
+        public async Task DeleteAsync(int id, string userId)
+        {
+            var vendor = await repository
+                .All<Vendor>()
+                .Where(v => v.Id == id)
+                .Include(v => v.Deliveries)
+                .FirstOrDefaultAsync();
+
+            if (vendor == null)
+            {
+                throw new KeyNotFoundException($"Vendor with ID {id} not found.");
+            }
+
+            if (vendor.Deliveries.Any())
+            {
+                var deliveries = vendor.Deliveries.Select(d => d.SystemNumber).ToList();
+                throw new InvalidOperationException(
+                    $"Vendor can not be deleted because has existing deliveries with system numbers: {string.Join(", ", deliveries)}"
+                );
+            }
+
+            vendor.DeletedByUserId = userId;
+
+            repository.SoftDelete(vendor);
+
+            await repository.SaveChangesAsync();
         }
 
         public async Task<bool> ExistByNameAsync(string name)
@@ -116,7 +145,7 @@ namespace WarehouseManagement.Core.Services
                 .AnyAsync(v => v.SystemNumber.ToLower() == systemNumber.ToLower());
         }
 
-        public async Task<bool> AnotherVendorWithNameExistIdAsync(int id, string name)
+        public async Task<bool> AnotherVendorWithNameExistAsync(int id, string name)
         {
             return await repository
                 .AllReadOnly<Vendor>()

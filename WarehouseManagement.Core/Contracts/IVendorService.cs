@@ -8,7 +8,8 @@ namespace WarehouseManagement.Core.Contracts
         Task<IEnumerable<VendorDto>> GetAllAsync();
         Task AddAsync(VendorFormDto model, string userId);
         Task EditAsync(int id, VendorFormDto model, string userId);
-        Task<bool> AnotherVendorWithNameExistIdAsync(int id, string name);
+        Task DeleteAsync(int id, string userId);
+        Task<bool> AnotherVendorWithNameExistAsync(int id, string name);
         Task<bool> ExistByNameAsync(string name);
         Task<bool> ExistBySystemNumberAsync(string systemNumber);
         Task<bool> AnotherVendorWithSystemNumberExistAsync(int id, string systemNumber);
