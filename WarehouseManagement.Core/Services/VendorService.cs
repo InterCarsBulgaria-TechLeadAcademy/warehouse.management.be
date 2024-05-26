@@ -131,6 +131,40 @@ namespace WarehouseManagement.Core.Services
             await repository.SaveChangesAsync();
         }
 
+        public async Task<string> RestoreAsync(int id)
+        {
+            var vendor = await repository.All<Vendor>().FirstOrDefaultAsync(v => v.Id == id);
+
+            if (vendor == null)
+            {
+                throw new KeyNotFoundException($"Vendor with ID {id} not found.");
+            }
+
+            if (!vendor.IsDeleted)
+            {
+                throw new InvalidOperationException($"Vendor {vendor.Name} is not deleted");
+            }
+
+            if (await this.AnotherVendorWithNameExistAsync(vendor.Id, vendor.Name))
+            {
+                throw new InvalidOperationException(
+                    $"Another vendor with name {vendor.Name} already exist"
+                );
+            }
+
+            if (await this.AnotherVendorWithSystemNumberExistAsync(vendor.Id, vendor.SystemNumber))
+            {
+                throw new InvalidOperationException(
+                    $"Another vendor with system number {vendor.SystemNumber} already exist"
+                );
+            }
+
+            repository.UnDelete(vendor);
+            await repository.SaveChangesAsync();
+
+            return vendor.Name;
+        }
+
         public async Task<bool> ExistByNameAsync(string name)
         {
             return await repository

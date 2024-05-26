@@ -80,7 +80,9 @@ namespace WarehouseManagement.Api.Controllers
 
             if (await vendorService.AnotherVendorWithSystemNumberExistAsync(id, model.SystemNumber))
             {
-                return BadRequest($"Another with system number {model.SystemNumber} already exist");
+                return BadRequest(
+                    $"Another vendor with system number {model.SystemNumber} already exist"
+                );
             }
 
             await vendorService.EditAsync(id, model, User.Id());
@@ -108,6 +110,29 @@ namespace WarehouseManagement.Api.Controllers
             }
 
             return Ok("Vendor was deleted successfully");
+        }
+
+        [HttpPut("restore/{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Restore(int id)
+        {
+            string name;
+            try
+            {
+                name = await vendorService.RestoreAsync(id);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+            return Ok($"Vendor {name} was restored");
         }
     }
 }
