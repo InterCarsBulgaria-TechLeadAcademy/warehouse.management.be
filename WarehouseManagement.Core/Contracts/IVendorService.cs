@@ -6,6 +6,7 @@ namespace WarehouseManagement.Core.Contracts
     {
         Task<VendorDto?> GetByIdAsync(int id);
         Task<IEnumerable<VendorDto>> GetAllAsync();
+        Task<IEnumerable<VendorDto>> GetAllDeletedAsync();
         Task AddAsync(VendorFormDto model, string userId);
         Task EditAsync(int id, VendorFormDto model, string userId);
         Task DeleteAsync(int id, string userId);

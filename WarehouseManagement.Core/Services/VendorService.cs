@@ -72,6 +72,35 @@ namespace WarehouseManagement.Core.Services
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<VendorDto>> GetAllDeletedAsync()
+        {
+            return await repository
+                .AllWithDeletedReadOnly<Vendor>()
+                .Where(v => v.IsDeleted)
+                .Select(v => new VendorDto()
+                {
+                    Id = v.Id,
+                    Name = v.Name,
+                    SystemNumber = v.SystemNumber,
+                    Markers = v
+                        .VendorsMarkers.Select(vm => new VendorMarkerDto()
+                        {
+                            MarkerId = vm.MarkerId,
+                            MarkerName = vm.Marker.Name,
+                        })
+                        .ToList(),
+                    Zones = v
+                        .VendorsZones.Select(vz => new VendorZoneDto()
+                        {
+                            ZoneId = vz.ZoneId,
+                            ZoneName = vz.Zone.Name,
+                            IsFinal = vz.Zone.IsFinal,
+                        })
+                        .ToList(),
+                })
+                .ToListAsync();
+        }
+
         public async Task AddAsync(VendorFormDto model, string userId)
         {
             var vendor = new Vendor()

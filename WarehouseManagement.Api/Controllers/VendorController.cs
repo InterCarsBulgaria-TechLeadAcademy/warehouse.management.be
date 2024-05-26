@@ -134,5 +134,13 @@ namespace WarehouseManagement.Api.Controllers
 
             return Ok($"Vendor {name} was restored");
         }
+
+        [HttpGet("deleted")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<VendorDto>))]
+        public async Task<IActionResult> AllDeleted()
+        {
+            var model = await vendorService.GetAllDeletedAsync();
+            return Ok(model);
+        }
     }
 }
