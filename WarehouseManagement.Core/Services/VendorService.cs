@@ -71,5 +71,42 @@ namespace WarehouseManagement.Core.Services
                 })
                 .ToListAsync();
         }
+
+        public async Task EditAsync(int id, VendorFormDto model, string userId)
+        {
+            var vendor = await repository.GetByIdAsync<Vendor>(id);
+            if (vendor == null)
+            {
+                throw new KeyNotFoundException($"Vendor with ID {id} not found.");
+            }
+
+            vendor.Name = model.Name;
+            vendor.SystemNumber = model.SystemNumber;
+            vendor.LastModifiedAt = DateTime.UtcNow;
+            vendor.LastModifiedByUserId = userId;
+
+            await repository.SaveChangesWithLogAsync();
+        }
+
+        public async Task<bool> OtherVendorWithNameExistIdAsync(int id, string name)
+        {
+            return await repository
+                .AllReadOnly<Vendor>()
+                .Where(v => v.Id != id)
+                .AnyAsync(v => v.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<bool> OtherVendorWithSystemNumberExistAsync(int id, string systemNumber)
+        {
+            return await repository
+                .AllReadOnly<Vendor>()
+                .Where(v => v.Id != id)
+                .AnyAsync(v => v.SystemNumber.ToLower() == systemNumber.ToLower());
+        }
+
+        public async Task<bool> ExistByIdAsync(int id)
+        {
+            return await repository.AllReadOnly<Vendor>().AnyAsync(v => v.Id == id);
+        }
     }
 }
