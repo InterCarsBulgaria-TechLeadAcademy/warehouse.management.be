@@ -13,6 +13,7 @@ namespace WarehouseManagement.Api.Extensions
         {
             //Here we add services
             services.AddScoped<IMarkerService, MarkerService>();
+            services.AddScoped<IVendorService, VendorService>();
             return services;
         }
 
