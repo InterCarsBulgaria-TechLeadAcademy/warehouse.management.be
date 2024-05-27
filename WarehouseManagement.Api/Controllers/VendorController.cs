@@ -39,7 +39,7 @@ namespace WarehouseManagement.Api.Controllers
             return Ok(model);
         }
 
-        [HttpPut("add")]
+        [HttpPost("add")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(400)]
