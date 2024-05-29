@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using WarehouseManagement.Core.DTOs;
 
-namespace WarehouseManagement.Infrastructure.Data.Common
+namespace WarehouseManagement.Core.Extensions
 {
     public static class QueryableExtensions
     {
