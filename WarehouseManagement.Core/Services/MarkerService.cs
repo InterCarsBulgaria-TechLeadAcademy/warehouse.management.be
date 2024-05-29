@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Marker;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
@@ -65,10 +66,11 @@ public class MarkerService : IMarkerService
             .AnyAsync(m => m.Name.ToLower() == name.ToLower());
     }
 
-    public async Task<IEnumerable<MarkerDto>> GetAllAsync()
+    public async Task<IEnumerable<MarkerDto>> GetAllAsync(PaginationParameters paginationParams)
     {
         return await repository
             .AllReadOnly<Marker>()
+            .Paginate(paginationParams)
             .Select(m => new MarkerDto
             {
                 Name = m.Name,
