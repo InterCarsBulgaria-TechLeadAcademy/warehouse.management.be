@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Marker;
@@ -68,9 +69,13 @@ public class MarkerService : IMarkerService
 
     public async Task<IEnumerable<MarkerDto>> GetAllAsync(PaginationParameters paginationParams)
     {
-        return await repository
+        Expression<Func<Marker, bool>> filter = m =>
+            EF.Functions.Like(m.Name, $"%{paginationParams.SearchQuery}%");
+        //We can add more filters if we need more columns to search into
+
+        var markers = await repository
             .AllReadOnly<Marker>()
-            .Paginate(paginationParams)
+            .Paginate(paginationParams, filter)
             .Select(m => new MarkerDto
             {
                 Name = m.Name,
@@ -98,6 +103,8 @@ public class MarkerService : IMarkerService
                     .ToList()
             })
             .ToListAsync();
+
+        return markers;
     }
 
     public async Task<MarkerDto?> GetByIdAsync(int id)
