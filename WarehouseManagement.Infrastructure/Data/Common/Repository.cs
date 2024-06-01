@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Api.Services.Contracts;
 using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data.Common
@@ -6,14 +7,16 @@ namespace WarehouseManagement.Infrastructure.Data.Common
     public class Repository : IRepository
     {
         private readonly WarehouseManagementDbContext context;
+        private readonly IUserService userService;
 
         /// <summary>
         /// Initializes a new instance of the Repository class with the specified database context.
         /// </summary>
         /// <param name="context">The database context to be used.</param>
-        public Repository(WarehouseManagementDbContext context)
+        public Repository(WarehouseManagementDbContext context, IUserService userService)
         {
             this.context = context;
+            this.userService = userService;
         }
 
         /// <summary>
@@ -150,6 +153,7 @@ namespace WarehouseManagement.Infrastructure.Data.Common
         public void SoftDelete<T>(T entity)
             where T : BaseClass
         {
+            entity.DeletedByUserId = userService.UserId;
             entity.IsDeleted = true;
             entity.DeletedAt = DateTime.UtcNow;
         }

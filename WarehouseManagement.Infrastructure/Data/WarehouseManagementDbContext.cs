@@ -1,24 +1,23 @@
 ﻿using System.Reflection;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using WarehouseManagement.Api.Services.Contracts;
 using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data
 {
     public class WarehouseManagementDbContext : IdentityDbContext
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IUserService userService;
 
         public WarehouseManagementDbContext(
             DbContextOptions<WarehouseManagementDbContext> options,
-            IHttpContextAccessor httpContextAccessor
+            IUserService userService
         )
             : base(options)
         {
-            this.httpContextAccessor = httpContextAccessor;
+            this.userService = userService;
         }
 
         public DbSet<Delivery> Deliveries { get; set; } = null!;
@@ -43,9 +42,7 @@ namespace WarehouseManagement.Infrastructure.Data
             CancellationToken cancellationToken = default
         )
         {
-            var userId =
-                httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                ?? "guest";
+            var userId = userService.UserId;
             var changes = OnBeforeSaveChanges(userId);
             var result = await base.SaveChangesAsync(cancellationToken);
             await OnAfterSaveChangesAsync(changes);
