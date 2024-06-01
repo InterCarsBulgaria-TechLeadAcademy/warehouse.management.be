@@ -1,6 +1,6 @@
 ﻿namespace WarehouseManagement.Common.MessageConstants.Keys
 {
-    public class VendorMessageKeys
+    public static class VendorMessageKeys
     {
         public const string VendorEditedSuccessfully = "VendorEditedSuccessfully";
         public const string VendorDeletedSuccessfully = "VendorDeletedSuccessfully";
