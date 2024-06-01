@@ -68,7 +68,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)
         {
-            await vendorService.DeleteAsync(id, User.Id());
+            await vendorService.DeleteAsync(id);
 
             return Ok(VendorDeletedSuccessfully);
         }

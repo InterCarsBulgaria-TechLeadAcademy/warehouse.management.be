@@ -157,7 +157,7 @@ namespace WarehouseManagement.Core.Services
             await repository.SaveChangesWithLogAsync();
         }
 
-        public async Task DeleteAsync(int id, string userId)
+        public async Task DeleteAsync(int id)
         {
             var vendor = await repository
                 .All<Vendor>()
