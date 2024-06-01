@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Marker;
 
 namespace WarehouseManagement.Api.Controllers;
@@ -32,9 +33,9 @@ public class MarkerController : ControllerBase
 
     [HttpGet("all")]
     [ProducesResponseType(200, Type = typeof(IEnumerable<MarkerDto>))]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParams)
     {
-        var model = await markerService.GetAllAsync();
+        var model = await markerService.GetAllAsync(paginationParams);
 
         return Ok(model);
     }
