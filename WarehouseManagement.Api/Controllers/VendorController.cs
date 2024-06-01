@@ -55,11 +55,9 @@ namespace WarehouseManagement.Api.Controllers
                 return BadRequest($"Vendor with system number {model.SystemNumber} already exist");
             }
 
-            await vendorService.AddAsync(model, User.Id());
+            var newVendorId = await vendorService.AddAsync(model, User.Id());
 
-            return Ok(
-                $"Vendor with name {model.Name} and system number {model.SystemNumber} was added suscesfully"
-            );
+            return Ok(newVendorId);
         }
 
         [HttpPut("edit/{id}")]
@@ -68,23 +66,6 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Edit(int id, [FromBody] VendorFormDto model)
         {
-            if (!await vendorService.ExistByIdAsync(id))
-            {
-                return NotFound($"Vendor with ID {id} not found.");
-            }
-
-            if (await vendorService.AnotherVendorWithNameExistAsync(id, model.Name))
-            {
-                return BadRequest($"Another vendor with name {model.Name} already exist");
-            }
-
-            if (await vendorService.AnotherVendorWithSystemNumberExistAsync(id, model.SystemNumber))
-            {
-                return BadRequest(
-                    $"Another vendor with system number {model.SystemNumber} already exist"
-                );
-            }
-
             await vendorService.EditAsync(id, model, User.Id());
 
             return Ok("Vendor edited successfully");

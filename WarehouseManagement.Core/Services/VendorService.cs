@@ -101,7 +101,7 @@ namespace WarehouseManagement.Core.Services
                 .ToListAsync();
         }
 
-        public async Task AddAsync(VendorFormDto model, string userId)
+        public async Task<int> AddAsync(VendorFormDto model, string userId)
         {
             var vendor = new Vendor()
             {
@@ -113,6 +113,8 @@ namespace WarehouseManagement.Core.Services
 
             await repository.AddAsync(vendor);
             await repository.SaveChangesAsync();
+
+            return vendor.Id;
         }
 
         public async Task EditAsync(int id, VendorFormDto model, string userId)
@@ -122,6 +124,20 @@ namespace WarehouseManagement.Core.Services
             if (vendor == null)
             {
                 throw new KeyNotFoundException($"Vendor with ID {id} not found.");
+            }
+
+            if (await this.AnotherVendorWithNameExistAsync(id, model.Name))
+            {
+                throw new InvalidOperationException(
+                    $"Another vendor with name {model.Name} already exist"
+                );
+            }
+
+            if (await this.AnotherVendorWithSystemNumberExistAsync(id, model.SystemNumber))
+            {
+                throw new InvalidOperationException(
+                    $"Another vendor with system number {model.SystemNumber} already exist"
+                );
             }
 
             vendor.Name = model.Name;
@@ -162,7 +178,9 @@ namespace WarehouseManagement.Core.Services
 
         public async Task<string> RestoreAsync(int id)
         {
-            var vendor = await repository.All<Vendor>().FirstOrDefaultAsync(v => v.Id == id);
+            var vendor = await repository
+                .AllWithDeleted<Vendor>()
+                .FirstOrDefaultAsync(v => v.Id == id);
 
             if (vendor == null)
             {
@@ -208,7 +226,7 @@ namespace WarehouseManagement.Core.Services
                 .AnyAsync(v => v.SystemNumber.ToLower() == systemNumber.ToLower());
         }
 
-        public async Task<bool> AnotherVendorWithNameExistAsync(int id, string name)
+        private async Task<bool> AnotherVendorWithNameExistAsync(int id, string name)
         {
             return await repository
                 .AllReadOnly<Vendor>()
@@ -216,17 +234,15 @@ namespace WarehouseManagement.Core.Services
                 .AnyAsync(v => v.Name.ToLower() == name.ToLower());
         }
 
-        public async Task<bool> AnotherVendorWithSystemNumberExistAsync(int id, string systemNumber)
+        private async Task<bool> AnotherVendorWithSystemNumberExistAsync(
+            int id,
+            string systemNumber
+        )
         {
             return await repository
                 .AllReadOnly<Vendor>()
                 .Where(v => v.Id != id)
                 .AnyAsync(v => v.SystemNumber.ToLower() == systemNumber.ToLower());
-        }
-
-        public async Task<bool> ExistByIdAsync(int id)
-        {
-            return await repository.AllReadOnly<Vendor>().AnyAsync(v => v.Id == id);
         }
     }
 }
