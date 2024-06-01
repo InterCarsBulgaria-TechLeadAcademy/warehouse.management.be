@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Vendor;
+using static WarehouseManagement.Common.MessageConstants.Keys.VendorMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers
 {
@@ -58,7 +59,7 @@ namespace WarehouseManagement.Api.Controllers
         {
             await vendorService.EditAsync(id, model, User.Id());
 
-            return Ok("Vendor edited successfully");
+            return Ok(VendorEditedSuccessfully);
         }
 
         [HttpDelete("delete/{id}")]
@@ -69,7 +70,7 @@ namespace WarehouseManagement.Api.Controllers
         {
             await vendorService.DeleteAsync(id, User.Id());
 
-            return Ok("Vendor was deleted successfully");
+            return Ok(VendorDeletedSuccessfully);
         }
 
         [HttpPut("restore/{id}")]
@@ -80,7 +81,7 @@ namespace WarehouseManagement.Api.Controllers
         {
             await vendorService.RestoreAsync(id);
 
-            return Ok($"Vendor was restored");
+            return Ok(VendorRestored);
         }
 
         [HttpGet("all-deleted")]

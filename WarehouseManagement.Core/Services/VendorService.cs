@@ -3,6 +3,7 @@ using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Vendor;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using static WarehouseManagement.Common.MessageConstants.Keys.VendorMessageKeys;
 
 namespace WarehouseManagement.Core.Services
 {
@@ -105,14 +106,12 @@ namespace WarehouseManagement.Core.Services
         {
             if (await ExistByNameAsync(model.Name))
             {
-                throw new ArgumentException($"Vendor with name {model.Name} already exist");
+                throw new ArgumentException($"{VendorWithNameExist} {model.Name}");
             }
 
             if (await ExistBySystemNumberAsync(model.SystemNumber))
             {
-                throw new ArgumentException(
-                    $"Vendor with system number {model.SystemNumber} already exist"
-                );
+                throw new ArgumentException($"{VendorWithSystemNumberExist} {model.SystemNumber}");
             }
 
             var vendor = new Vendor()
@@ -135,20 +134,18 @@ namespace WarehouseManagement.Core.Services
 
             if (vendor == null)
             {
-                throw new KeyNotFoundException($"Vendor with ID {id} not found.");
+                throw new KeyNotFoundException($"{VendorWithIdNotFound} {id}");
             }
 
             if (await this.AnotherVendorWithNameExistAsync(id, model.Name))
             {
-                throw new InvalidOperationException(
-                    $"Another vendor with name {model.Name} already exist"
-                );
+                throw new InvalidOperationException($"{VendorWithNameExist} {model.Name}");
             }
 
             if (await this.AnotherVendorWithSystemNumberExistAsync(id, model.SystemNumber))
             {
                 throw new InvalidOperationException(
-                    $"Another vendor with system number {model.SystemNumber} already exist"
+                    $"{VendorWithSystemNumberExist} {model.SystemNumber}"
                 );
             }
 
@@ -170,18 +167,16 @@ namespace WarehouseManagement.Core.Services
 
             if (vendor == null)
             {
-                throw new KeyNotFoundException($"Vendor with ID {id} not found.");
+                throw new KeyNotFoundException($"{VendorWithIdNotFound} {id}");
             }
 
             if (vendor.Deliveries.Any())
             {
                 var deliveries = vendor.Deliveries.Select(d => d.SystemNumber).ToList();
                 throw new InvalidOperationException(
-                    $"Vendor can not be deleted because has existing deliveries with system numbers: {string.Join(", ", deliveries)}"
+                    $"{VendorHasDeliveries} {string.Join(",", deliveries)}"
                 );
             }
-
-            vendor.DeletedByUserId = userId;
 
             repository.SoftDelete(vendor);
 
@@ -196,25 +191,23 @@ namespace WarehouseManagement.Core.Services
 
             if (vendor == null)
             {
-                throw new KeyNotFoundException($"Vendor with ID {id} not found.");
+                throw new KeyNotFoundException($"{VendorWithIdNotFound} {id}");
             }
 
             if (!vendor.IsDeleted)
             {
-                throw new InvalidOperationException($"Vendor {vendor.Name} is not deleted");
+                throw new InvalidOperationException($"{VendorNotDeleted} {id}");
             }
 
-            if (await this.AnotherVendorWithNameExistAsync(vendor.Id, vendor.Name))
+            if (await AnotherVendorWithNameExistAsync(vendor.Id, vendor.Name))
             {
-                throw new InvalidOperationException(
-                    $"Another vendor with name {vendor.Name} already exist"
-                );
+                throw new InvalidOperationException($"{VendorWithNameExist} {vendor.Name}");
             }
 
-            if (await this.AnotherVendorWithSystemNumberExistAsync(vendor.Id, vendor.SystemNumber))
+            if (await AnotherVendorWithSystemNumberExistAsync(vendor.Id, vendor.SystemNumber))
             {
                 throw new InvalidOperationException(
-                    $"Another vendor with system number {vendor.SystemNumber} already exist"
+                    $"{VendorWithSystemNumberExist} {vendor.SystemNumber}"
                 );
             }
 
