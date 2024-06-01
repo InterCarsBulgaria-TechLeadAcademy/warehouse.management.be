@@ -1,4 +1,5 @@
-﻿using WarehouseManagement.Core.DTOs.Marker;
+﻿using WarehouseManagement.Core.DTOs;
+using WarehouseManagement.Core.DTOs.Marker;
 
 namespace WarehouseManagement.Core.Contracts;
 
@@ -6,7 +7,7 @@ public interface IMarkerService
 {
     Task<MarkerDto?> GetByIdAsync(int id);
     Task<bool> ExistByNameAsync(string name);
-    Task<IEnumerable<MarkerDto>> GetAllAsync();
+    Task<IEnumerable<MarkerDto>> GetAllAsync(PaginationParameters paginationParams);
     Task AddAsync(MarkerFormDto model, string userId);
     Task EditAsync(int id, MarkerFormDto model, string userId);
     Task DeleteAsync(int id, string userId);
