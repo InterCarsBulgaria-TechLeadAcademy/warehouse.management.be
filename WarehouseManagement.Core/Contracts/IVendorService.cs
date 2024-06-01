@@ -10,11 +10,6 @@ namespace WarehouseManagement.Core.Contracts
         Task<int> AddAsync(VendorFormDto model, string userId);
         Task EditAsync(int id, VendorFormDto model, string userId);
         Task DeleteAsync(int id, string userId);
-        Task<string> RestoreAsync(int id);
-
-        //Task<bool> AnotherVendorWithNameExistAsync(int id, string name);
-        Task<bool> ExistByNameAsync(string name);
-        Task<bool> ExistBySystemNumberAsync(string systemNumber);
-        // Task<bool> AnotherVendorWithSystemNumberExistAsync(int id, string systemNumber);
+        Task RestoreAsync(int id);
     }
 }

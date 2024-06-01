@@ -103,6 +103,18 @@ namespace WarehouseManagement.Core.Services
 
         public async Task<int> AddAsync(VendorFormDto model, string userId)
         {
+            if (await ExistByNameAsync(model.Name))
+            {
+                throw new ArgumentException($"Vendor with name {model.Name} already exist");
+            }
+
+            if (await ExistBySystemNumberAsync(model.SystemNumber))
+            {
+                throw new ArgumentException(
+                    $"Vendor with system number {model.SystemNumber} already exist"
+                );
+            }
+
             var vendor = new Vendor()
             {
                 Name = model.Name,
@@ -176,7 +188,7 @@ namespace WarehouseManagement.Core.Services
             await repository.SaveChangesAsync();
         }
 
-        public async Task<string> RestoreAsync(int id)
+        public async Task RestoreAsync(int id)
         {
             var vendor = await repository
                 .AllWithDeleted<Vendor>()
@@ -208,18 +220,16 @@ namespace WarehouseManagement.Core.Services
 
             repository.UnDelete(vendor);
             await repository.SaveChangesAsync();
-
-            return vendor.Name;
         }
 
-        public async Task<bool> ExistByNameAsync(string name)
+        private async Task<bool> ExistByNameAsync(string name)
         {
             return await repository
                 .AllReadOnly<Vendor>()
                 .AnyAsync(v => v.Name.ToLower() == name.ToLower());
         }
 
-        public async Task<bool> ExistBySystemNumberAsync(string systemNumber)
+        private async Task<bool> ExistBySystemNumberAsync(string systemNumber)
         {
             return await repository
                 .AllReadOnly<Vendor>()

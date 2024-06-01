@@ -45,16 +45,6 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Add([FromBody] VendorFormDto model)
         {
-            if (await vendorService.ExistByNameAsync(model.Name))
-            {
-                return BadRequest($"Vendor with name {model.Name} already exist");
-            }
-
-            if (await vendorService.ExistBySystemNumberAsync(model.SystemNumber))
-            {
-                return BadRequest($"Vendor with system number {model.SystemNumber} already exist");
-            }
-
             var newVendorId = await vendorService.AddAsync(model, User.Id());
 
             return Ok(newVendorId);
@@ -77,18 +67,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await vendorService.DeleteAsync(id, User.Id());
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await vendorService.DeleteAsync(id, User.Id());
 
             return Ok("Vendor was deleted successfully");
         }
@@ -99,28 +78,17 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Restore(int id)
         {
-            string name;
-            try
-            {
-                name = await vendorService.RestoreAsync(id);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            await vendorService.RestoreAsync(id);
 
-            return Ok($"Vendor {name} was restored");
+            return Ok($"Vendor was restored");
         }
 
-        [HttpGet("deleted")]
+        [HttpGet("all-deleted")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<VendorDto>))]
         public async Task<IActionResult> AllDeleted()
         {
             var model = await vendorService.GetAllDeletedAsync();
+
             return Ok(model);
         }
     }
