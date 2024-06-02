@@ -21,16 +21,9 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var model = await this.zoneService.GetByIdAsync(id);
+            var model = await this.zoneService.GetByIdAsync(id);
 
-                return Ok(model);
-            }
-            catch (KeyNotFoundException e)
-            {
-                return NotFound(e.Message);
-            }
+            return Ok(model);
         }
 
         [HttpGet("all")]
@@ -47,16 +40,9 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Add([FromBody] ZoneFormDto model)
         {
-            try
-            {
-                await this.zoneService.CreateAsync(model, User.Id());
+            await this.zoneService.CreateAsync(model, User.Id());
 
-                return Ok("Zone with name {model.Name} was successfully added");
-            }
-            catch (ArgumentException ae)
-            {
-                return BadRequest(ae.Message);
-            }
+            return Ok("Zone with name {model.Name} was successfully added");
         }
 
         [HttpPut("edit/{id}")]
@@ -65,20 +51,9 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Edit(int id, [FromBody] ZoneFormDto model)
         {
-            try
-            {
-                await zoneService.EditAsync(id, model, User.Id());
+            await zoneService.EditAsync(id, model, User.Id());
 
-                return Ok("Zone successfully edited");
-            }
-            catch (KeyNotFoundException ke)
-            {
-                return NotFound(ke.Message);
-            }
-            catch (ArgumentException ae)
-            {
-                return BadRequest(ae.Message);
-            }
+            return Ok("Zone successfully edited");
         }
 
         [HttpDelete("delete/{id}")]
@@ -87,18 +62,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await zoneService.DeleteAsync(id, User.Id());
-            }
-            catch (KeyNotFoundException ke)
-            {
-                return NotFound(ke.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await zoneService.DeleteAsync(id, User.Id());
 
             return Ok("Zone was deleted successfully");
         }
@@ -109,20 +73,9 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Restore(int id)
         {
-            try
-            {
-                var name = await zoneService.RestoreAsync(id);
+            var name = await zoneService.RestoreAsync(id);
 
-                return Ok($"Zone {name} was restored");
-            }
-            catch (KeyNotFoundException ke)
-            {
-                return NotFound(ke.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok($"Zone {name} was restored");
         }
 
         [HttpGet("deleted")]
@@ -130,6 +83,7 @@ namespace WarehouseManagement.Api.Controllers
         public async Task<IActionResult> AllDeleted()
         {
             var model = await zoneService.GetAllWithDeletedAsync();
+
             return Ok(model);
         }
     }
