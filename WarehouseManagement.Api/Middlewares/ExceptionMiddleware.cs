@@ -29,8 +29,28 @@ public class ExceptionMiddleware
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogError($"Something went wrong: {ex}");
+            _logger.LogError($"Resource not found: {ex}");
             await HandleExceptionAsync(httpContext, ex, HttpStatusCode.NotFound);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Invalid argument provided: {ex}");
+            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.BadRequest);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError($"Invalid operation: {ex}");
+            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.BadRequest);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError($"Unauthorized access: {ex}");
+            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.Unauthorized);
+        }
+        catch (TimeoutException ex)
+        {
+            _logger.LogError($"Request timed out: {ex}");
+            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.RequestTimeout);
         }
         catch (Exception ex)
         {
