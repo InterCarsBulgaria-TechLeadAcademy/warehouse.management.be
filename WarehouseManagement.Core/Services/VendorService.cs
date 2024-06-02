@@ -16,9 +16,9 @@ namespace WarehouseManagement.Core.Services
             this.repository = repository;
         }
 
-        public async Task<VendorDto?> GetByIdAsync(int id)
+        public async Task<VendorDto> GetByIdAsync(int id)
         {
-            return await repository
+            var vendor = await repository
                 .AllReadOnly<Vendor>()
                 .Where(v => v.Id == id)
                 .Select(v => new VendorDto()
@@ -43,6 +43,13 @@ namespace WarehouseManagement.Core.Services
                         .ToList(),
                 })
                 .FirstOrDefaultAsync();
+
+            if (vendor == null)
+            {
+                throw new KeyNotFoundException($"{VendorWithIdNotFound} {id}");
+            }
+
+            return vendor;
         }
 
         public async Task<IEnumerable<VendorDto>> GetAllAsync()

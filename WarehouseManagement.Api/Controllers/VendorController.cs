@@ -23,10 +23,6 @@ namespace WarehouseManagement.Api.Controllers
         public async Task<IActionResult> GetVendor(int id)
         {
             var model = await vendorService.GetByIdAsync(id);
-            if (model == null)
-            {
-                return NotFound();
-            }
 
             return Ok(model);
         }
