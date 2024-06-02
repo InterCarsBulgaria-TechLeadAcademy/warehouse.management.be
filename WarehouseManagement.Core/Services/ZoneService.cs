@@ -3,6 +3,7 @@ using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Zone;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -19,7 +20,7 @@ public class ZoneService : IZoneService
     {
         if (await this.ExistsByNameAsync(model.Name))
         {
-            throw new ArgumentException($"Zone with name '{model.Name}' already exists.");
+            throw new ArgumentException(ZoneWithIdNotFound);
         }
 
         var zone = new Zone()
@@ -37,7 +38,7 @@ public class ZoneService : IZoneService
     {
         if (!await this.ExistsByIdAsync(id))
         {
-            throw new KeyNotFoundException($"Zone with ID '{id}' not found.");
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
         var zone = (await this.repository.GetByIdAsync<Zone>(id))!;
@@ -46,29 +47,20 @@ public class ZoneService : IZoneService
         {
             var markers = zone.ZonesMarkers.Select(zm => zm.Marker.Name);
 
-            throw new InvalidOperationException(
-                $"Zone cannot be deleted because it has existing markers: {string.Join(",", markers)}"
-            );
+            throw new InvalidOperationException(ZoneHasMarkers);
         }
 
         if (zone.VendorsZones.Any())
         {
             var vendors = zone.VendorsZones.Select(vz => vz.Vendor.Name);
 
-            throw new InvalidOperationException(
-                $"Zone cannot be deleted because it has existing vendors: {string.Join(",", vendors)}."
-            );
+            throw new InvalidOperationException(ZoneHasVendors);
         }
 
         if (zone.Entries.Any())
         {
-            throw new InvalidOperationException(
-                "Zone cannot be deleted because it has existing entries."
-            );
+            throw new InvalidOperationException(ZoneHasEntries);
         }
-
-        zone.DeletedByUserId = userId;
-        zone.DeletedAt = DateTime.UtcNow;
 
         this.repository.SoftDelete(zone);
         await this.repository.SaveChangesAsync();
@@ -78,12 +70,12 @@ public class ZoneService : IZoneService
     {
         if (!await this.ExistsByIdAsync(id))
         {
-            throw new KeyNotFoundException($"Zone with ID '{id}' not found.");
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
         if (!await this.ExistsByNameAsync(model.Name))
         {
-            throw new ArgumentException($"Zone with the name '{model.Name}' already exists.");
+            throw new ArgumentException(ZoneWithNameExist);
         }
 
         var zone = (await this.repository.GetByIdAsync<Zone>(id))!;
@@ -173,7 +165,7 @@ public class ZoneService : IZoneService
     {
         if (!await this.ExistsByIdAsync(id))
         {
-            throw new KeyNotFoundException($"Zone with ID '{id}' not found.");
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
         var zone = (
@@ -213,17 +205,17 @@ public class ZoneService : IZoneService
 
         if (zone == null)
         {
-            throw new KeyNotFoundException($"Vendor with ID '{id}' not found.");
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
         if (!zone.IsDeleted)
         {
-            throw new InvalidOperationException($"Zone '{zone.Name}' is not deleted");
+            throw new InvalidOperationException(ZoneNotDeleted);
         }
 
         if (await this.ExistsByNameAsync(zone.Name))
         {
-            throw new InvalidOperationException($"Zone with name '{zone.Name}' already exists.");
+            throw new InvalidOperationException(ZoneWithNameExist);
         }
 
         this.repository.UnDelete(zone);
