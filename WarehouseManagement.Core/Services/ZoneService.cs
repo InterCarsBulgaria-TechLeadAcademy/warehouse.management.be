@@ -18,7 +18,7 @@ public class ZoneService : IZoneService
 
     public async Task CreateAsync(ZoneFormDto model, string userId)
     {
-        if (await this.ExistsByNameAsync(model.Name))
+        if (await ExistsByNameAsync(model.Name))
         {
             throw new ArgumentException(ZoneWithIdNotFound);
         }
@@ -30,18 +30,18 @@ public class ZoneService : IZoneService
             CreatedByUserId = userId
         };
 
-        await this.repository.AddAsync(zone);
-        await this.repository.SaveChangesAsync();
+        await repository.AddAsync(zone);
+        await repository.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id, string userId)
     {
-        if (!await this.ExistsByIdAsync(id))
+        if (!await ExistsByIdAsync(id))
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        var zone = (await this.repository.GetByIdAsync<Zone>(id))!;
+        var zone = (await repository.GetByIdAsync<Zone>(id))!;
 
         if (zone.ZonesMarkers.Any())
         {
@@ -62,45 +62,45 @@ public class ZoneService : IZoneService
             throw new InvalidOperationException(ZoneHasEntries);
         }
 
-        this.repository.SoftDelete(zone);
-        await this.repository.SaveChangesAsync();
+        repository.SoftDelete(zone);
+        await repository.SaveChangesAsync();
     }
 
     public async Task EditAsync(int id, ZoneFormDto model, string userId)
     {
-        if (!await this.ExistsByIdAsync(id))
+        if (!await ExistsByIdAsync(id))
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        if (!await this.ExistsByNameAsync(model.Name))
+        if (!await ExistsByNameAsync(model.Name))
         {
             throw new ArgumentException(ZoneWithNameExist);
         }
 
-        var zone = (await this.repository.GetByIdAsync<Zone>(id))!;
+        var zone = (await repository.GetByIdAsync<Zone>(id))!;
 
         zone.Name = model.Name;
         zone.LastModifiedAt = DateTime.UtcNow;
         zone.LastModifiedByUserId = userId;
 
-        await this.repository.SaveChangesWithLogAsync();
+        await repository.SaveChangesWithLogAsync();
     }
 
     public async Task<bool> ExistsByIdAsync(int id)
     {
-        return await this.repository.GetByIdAsync<Zone>(id) != null;
+        return await repository.GetByIdAsync<Zone>(id) != null;
     }
 
     public async Task<bool> ExistsByNameAsync(string name)
     {
-        return await this.repository.AllReadOnly<Zone>().AnyAsync(z => z.Name == name);
+        return await repository.AllReadOnly<Zone>().AnyAsync(z => z.Name == name);
     }
 
     public async Task<IEnumerable<ZoneDto>> GetAllAsync()
     {
-        return await this
-            .repository.AllReadOnly<Zone>()
+        return await repository
+            .AllReadOnly<Zone>()
             .Select(z => new ZoneDto()
             {
                 Id = z.Id,
@@ -131,8 +131,8 @@ public class ZoneService : IZoneService
 
     public async Task<IEnumerable<ZoneDto>> GetAllWithDeletedAsync()
     {
-        return await this
-            .repository.AllWithDeletedReadOnly<Zone>()
+        return await repository
+            .AllWithDeletedReadOnly<Zone>()
             .Select(z => new ZoneDto()
             {
                 Id = z.Id,
@@ -163,14 +163,12 @@ public class ZoneService : IZoneService
 
     public async Task<ZoneDto> GetByIdAsync(int id)
     {
-        if (!await this.ExistsByIdAsync(id))
+        if (!await ExistsByIdAsync(id))
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        var zone = (
-            await this.repository.AllReadOnly<Zone>().FirstOrDefaultAsync(z => z.Id == id)
-        )!;
+        var zone = (await repository.AllReadOnly<Zone>().FirstOrDefaultAsync(z => z.Id == id))!;
 
         return new ZoneDto()
         {
@@ -201,7 +199,7 @@ public class ZoneService : IZoneService
 
     public async Task<string> RestoreAsync(int id)
     {
-        var zone = await this.repository.All<Zone>().FirstOrDefaultAsync(v => v.Id == id);
+        var zone = await repository.All<Zone>().FirstOrDefaultAsync(v => v.Id == id);
 
         if (zone == null)
         {
@@ -213,12 +211,12 @@ public class ZoneService : IZoneService
             throw new InvalidOperationException(ZoneNotDeleted);
         }
 
-        if (await this.ExistsByNameAsync(zone.Name))
+        if (await ExistsByNameAsync(zone.Name))
         {
             throw new InvalidOperationException(ZoneWithNameExist);
         }
 
-        this.repository.UnDelete(zone);
+        repository.UnDelete(zone);
         await repository.SaveChangesAsync();
 
         return zone.Name;

@@ -21,7 +21,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
         {
-            var model = await this.zoneService.GetByIdAsync(id);
+            var model = await zoneService.GetByIdAsync(id);
 
             return Ok(model);
         }
@@ -30,7 +30,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
         public async Task<IActionResult> GetAll()
         {
-            var zones = await this.zoneService.GetAllAsync();
+            var zones = await zoneService.GetAllAsync();
 
             return Ok(zones);
         }
@@ -40,7 +40,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Add([FromBody] ZoneFormDto model)
         {
-            await this.zoneService.CreateAsync(model, User.Id());
+            await zoneService.CreateAsync(model, User.Id());
 
             return Ok("Zone with name {model.Name} was successfully added");
         }
