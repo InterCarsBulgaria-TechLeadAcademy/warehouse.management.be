@@ -131,7 +131,7 @@ public class MarkerService : IMarkerService
         return markers;
     }
 
-    public async Task<MarkerDto?> GetByIdAsync(int id)
+    public async Task<MarkerDto> GetByIdAsync(int id)
     {
         var marker = await repository
             .AllReadOnly<Marker>()
