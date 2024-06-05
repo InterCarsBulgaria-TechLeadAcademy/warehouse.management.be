@@ -1,4 +1,5 @@
 ﻿using WarehouseManagement.Core.DTOs.Zone;
+using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Core.Contracts
 {
@@ -13,5 +14,6 @@ namespace WarehouseManagement.Core.Contracts
         Task<string> RestoreAsync(int id);
         Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
+        Task<IEnumerable<ZoneEntryDto>> GetEntriesAsync(int id, Predicate<Entry> predicate);
     }
 }

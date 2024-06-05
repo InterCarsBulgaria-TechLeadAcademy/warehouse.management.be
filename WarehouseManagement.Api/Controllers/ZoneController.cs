@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Zone;
+using WarehouseManagement.Infrastructure.Data.Models;
+using static WarehouseManagement.Common.Statuses.ZoneEntryStatuses;
 
 namespace WarehouseManagement.Api.Controllers
 {
@@ -85,6 +87,40 @@ namespace WarehouseManagement.Api.Controllers
             var model = await zoneService.GetAllWithDeletedAsync();
 
             return Ok(model);
+        }
+
+        [HttpGet("entries")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Entries(int zoneId, [FromQuery] string[] statuses)
+        {
+            var predicates = new List<Predicate<Entry>>();
+
+            if (statuses.Contains(Waiting))
+            {
+                predicates.Add(entry =>
+                    entry.StartedProccessing == null && entry.FinishedProccessing == null
+                );
+            }
+
+            if (statuses.Contains(Finished))
+            {
+                predicates.Add(entry => entry.FinishedProccessing != null);
+            }
+
+            if (statuses.Contains(Processing))
+            {
+                predicates.Add(entry =>
+                    entry.StartedProccessing != null && entry.FinishedProccessing == null
+                );
+            }
+
+            Predicate<Entry> combinedPredicate = entry =>
+                predicates.Any(predicate => predicate(entry));
+
+            var entries = await this.zoneService.GetEntriesAsync(zoneId, combinedPredicate);
+
+            return Ok(entries);
         }
     }
 }

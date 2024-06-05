@@ -197,6 +197,29 @@ public class ZoneService : IZoneService
         };
     }
 
+    public async Task<IEnumerable<ZoneEntryDto>> GetEntriesAsync(int id, Predicate<Entry> predicate)
+    {
+        // Check if this will include the entries
+        var currentZone = await this.repository.GetByIdAsync<Zone>(id);
+
+        if (currentZone == null)
+        {
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
+        }
+
+        var entries = currentZone.Entries.Where(e => predicate(e));
+
+        return entries.Select(e => new ZoneEntryDto()
+        {
+            Pallets = e.Pallets,
+            Packages = e.Packages,
+            Pieces = e.Pieces,
+            StartedProccessing = e.StartedProccessing,
+            FinishedProccessing = e.FinishedProccessing,
+            DeliveryId = e.DeliveryId
+        });
+    }
+
     public async Task<string> RestoreAsync(int id)
     {
         var zone = await repository.All<Zone>().FirstOrDefaultAsync(v => v.Id == id);
