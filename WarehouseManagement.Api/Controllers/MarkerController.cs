@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Marker;
+using static WarehouseManagement.Common.MessageConstants.Keys.MarkerMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers;
 
@@ -23,10 +24,6 @@ public class MarkerController : ControllerBase
     public async Task<IActionResult> GetMarker(int id)
     {
         var model = await markerService.GetByIdAsync(id);
-        if (model == null)
-        {
-            return NotFound();
-        }
 
         return Ok(model);
     }
@@ -45,16 +42,9 @@ public class MarkerController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> Add([FromBody] MarkerFormDto marker)
     {
-        if (await markerService.ExistByNameAsync(marker.Name) == true)
-        {
-            return BadRequest("A marker with the same name already exists.");
-        }
+        var markerId = await markerService.AddAsync(marker, User.Id());
 
-        var userId = User.Id();
-
-        await markerService.AddAsync(marker, userId);
-
-        return Ok("Marker added successfully");
+        return Ok(markerId);
     }
 
     [HttpPut("edit/{id}")]
@@ -63,21 +53,9 @@ public class MarkerController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> Edit(int id, [FromBody] MarkerFormDto marker)
     {
-        if (await markerService.GetByIdAsync(id) == null)
-        {
-            return NotFound();
-        }
+        await markerService.EditAsync(id, marker, User.Id());
 
-        if (await markerService.ExistByNameAsync(marker.Name))
-        {
-            return BadRequest("A marker with the same name already exists.");
-        }
-
-        var userId = User.Id();
-
-        await markerService.EditAsync(id, marker, userId);
-
-        return Ok("Marker updated successfully");
+        return Ok(MarkerEditedSuccessfully);
     }
 
     [HttpDelete("delete/{id}")]
@@ -86,24 +64,9 @@ public class MarkerController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(int id)
     {
-        if (await markerService.GetByIdAsync(id) == null)
-        {
-            return NotFound();
-        }
+        await markerService.DeleteAsync(id, User.Id());
 
-        var usages = await markerService.GetMarkerUsagesAsync(id);
-        if (usages.Any())
-        {
-            return BadRequest(
-                $"Cannot delete this marker because it is used in: {string.Join(", ", usages)}"
-            );
-        }
-
-        var userId = User.Id();
-
-        await markerService.DeleteAsync(id, userId);
-
-        return Ok(id);
+        return Ok(MarkerDeletedSuccessfully);
     }
 
     [HttpPut("restore/{id}")]
@@ -111,27 +74,9 @@ public class MarkerController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> Restore(int id)
     {
-        if (await markerService.IsDeletedByIdAsync(id) == false)
-        {
-            return BadRequest("The marker is not deleted.");
-        }
+        await markerService.RestoreAsync(id, User.Id());
 
-        var deletedMarkerName = await markerService.GetDeletedMarkerNameByIdAsync(id);
-        if (string.IsNullOrEmpty(deletedMarkerName))
-        {
-            return BadRequest("Marker not found.");
-        }
-
-        if (await markerService.ExistByNameAsync(deletedMarkerName))
-        {
-            return BadRequest($"A marker with the name '{deletedMarkerName}' already exists.");
-        }
-
-        var userId = User.Id();
-
-        await markerService.RestoreAsync(id, userId);
-
-        return Ok("Marker restored successfully");
+        return Ok(MarkerRestored);
     }
 
     [HttpGet("deleted")]
