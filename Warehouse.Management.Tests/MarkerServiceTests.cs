@@ -42,7 +42,7 @@ public class MarkerServiceTests
 
         dbContext = new WarehouseManagementDbContext(options, mockUserService.Object);
 
-        // Маркери
+        // Markers
         marker1 = new Marker
         {
             Id = 1,
@@ -68,7 +68,7 @@ public class MarkerServiceTests
             IsDeleted = true
         };
 
-        // Зони
+        // Zones
         zone1 = new Zone
         {
             Id = 1,
@@ -82,7 +82,7 @@ public class MarkerServiceTests
             IsFinal = true
         };
 
-        // Търговци
+        // Vendors
         vendor1 = new Vendor
         {
             Id = 1,
@@ -96,14 +96,14 @@ public class MarkerServiceTests
             SystemNumber = "V002"
         };
 
-        // Добавяне на тестови данни в контекста
+        // Adding test data
         await dbContext.Markers.AddRangeAsync(
             new List<Marker> { marker1, marker2, marker3, marker5 }
         );
         await dbContext.Zones.AddRangeAsync(new List<Zone> { zone1, zone2 });
         await dbContext.Vendors.AddRangeAsync(new List<Vendor> { vendor1, vendor2 });
 
-        // Добавяне на мапинг записи
+        // Adding mapping entities
         await dbContext.ZonesMarkers.AddAsync(
             new ZoneMarker { ZoneId = zone1.Id, MarkerId = marker1.Id }
         );
@@ -127,7 +127,7 @@ public class MarkerServiceTests
     [Test]
     public async Task DeleteAsync_ThrowsKeyNotFoundException_WhenMarkerNotFound()
     {
-        // Несъществуващ маркер
+        // Non-existent marker.
         int nonExistentMarkerId = 999;
         Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await markerService.DeleteAsync(nonExistentMarkerId)
@@ -137,7 +137,7 @@ public class MarkerServiceTests
     [Test]
     public async Task DeleteAsync_ThrowsInvalidOperationException_WhenMarkerHasUsages()
     {
-        int usedMarkerId = 1; // ID на маркер, който вече има usages
+        int usedMarkerId = 1; // Marker ID that already has usages.
 
         Assert.ThrowsAsync<InvalidOperationException>(
             async () => await markerService.DeleteAsync(usedMarkerId)
@@ -147,7 +147,7 @@ public class MarkerServiceTests
     [Test]
     public async Task DeleteAsync_Successful_WhenNoUsages()
     {
-        int freeMarkerId = 2; // Маркер без usages
+        int freeMarkerId = 2; //Marker ID without usages.
         await markerService.DeleteAsync(freeMarkerId);
 
         var deletedMarker = await dbContext.Markers.FindAsync(freeMarkerId);
@@ -157,11 +157,10 @@ public class MarkerServiceTests
     [Test]
     public async Task AddAsync_ThrowsArgumentException_WhenNameExists()
     {
-        //име, което вече съществува
+        //Name that already exists.
         var existingName = "Marker1";
         var newMarker = new MarkerFormDto { Name = existingName };
 
-        // Очакване на ArgumentException
         var ex = Assert.ThrowsAsync<ArgumentException>(
             async () => await markerService.AddAsync(newMarker, "TestUser")
         );
@@ -171,14 +170,12 @@ public class MarkerServiceTests
     [Test]
     public async Task AddAsync_SuccessfullyAddsMarker_WhenNameDoesNotExist()
     {
-        // Ново име, което не съществува в базата данни
+        // New name that does not exist in the database.
         var uniqueName = "NewUniqueMarkerName";
         var newMarker = new MarkerFormDto { Name = uniqueName };
 
-        // Добавяне на нов маркер
         int newMarkerId = await markerService.AddAsync(newMarker, "TestUser");
 
-        // Проверка дали новият маркер е добавен успешно
         var addedMarker = await dbContext.Markers.FindAsync(newMarkerId);
         Assert.IsNotNull(addedMarker);
         Assert.AreEqual(uniqueName, addedMarker.Name);
@@ -187,7 +184,7 @@ public class MarkerServiceTests
     [Test]
     public async Task EditAsync_ThrowsKeyNotFoundException_WhenMarkerNotFound()
     {
-        int nonExistentMarkerId = 999; // ИД на несъществуващ маркер
+        int nonExistentMarkerId = 999; //Non - existent marker ID.
         var model = new MarkerFormDto { Name = "NewName" };
 
         var ex = Assert.ThrowsAsync<KeyNotFoundException>(
@@ -202,8 +199,8 @@ public class MarkerServiceTests
     [Test]
     public async Task EditAsync_ThrowsArgumentException_WhenNameExists()
     {
-        int existingMarkerId = 1; // Маркер, който вече съществува
-        var model = new MarkerFormDto { Name = "Marker2" }; // Име, което вече съществува
+        int existingMarkerId = 1; //Marker ID that already exists.
+        var model = new MarkerFormDto { Name = "Marker2" }; //Name that already exists.
 
         var ex = Assert.ThrowsAsync<ArgumentException>(
             async () => await markerService.EditAsync(existingMarkerId, model, "User123")
@@ -232,7 +229,7 @@ public class MarkerServiceTests
     [Test]
     public async Task ExistByNameAsync_ReturnsTrue_WhenMarkerExistsAndIsNotDeleted()
     {
-        var markerName = "Marker1"; // Съществуващ маркер, който не е изтрит
+        var markerName = "Marker1"; // Existing marker that is not deleted.
         bool exists = await markerService.ExistByNameAsync(markerName);
         Assert.IsTrue(exists);
     }
@@ -240,7 +237,7 @@ public class MarkerServiceTests
     [Test]
     public async Task ExistByNameAsync_ReturnsFalse_WhenMarkerExistsButIsDeleted()
     {
-        // Добавяне на маркер, който е изтрит
+        // Marker that is deleted.
         var deletedMarker = new Marker { Name = "DeletedMarker", IsDeleted = true };
         await dbContext.Markers.AddAsync(deletedMarker);
         await dbContext.SaveChangesAsync();
@@ -252,7 +249,7 @@ public class MarkerServiceTests
     [Test]
     public async Task ExistByNameAsync_ReturnsFalse_WhenMarkerDoesNotExist()
     {
-        //Несъществуващ маркер
+        //Non-existing marker.
         var nonExistingName = "NonExistingMarker";
         bool exists = await markerService.ExistByNameAsync(nonExistingName);
         Assert.IsFalse(exists);
@@ -265,7 +262,7 @@ public class MarkerServiceTests
 
         var results = await markerService.GetAllAsync(paginationParams);
 
-        // Проверка дали всички върнати маркери съдържат "Marker1" в името
+        // Search query to check the filtered results contains on "Marker1".
         Assert.IsTrue(results.All(m => m.Name.Contains("Marker1")));
     }
 
@@ -281,26 +278,26 @@ public class MarkerServiceTests
 
         var results = await markerService.GetAllAsync(paginationParams);
 
-        // Проверка дали броят на върнатите резултати не надвишава зададения PageSize
+        // Check if the number of returned results does not exceed the set PageSize.
         Assert.IsTrue(results.Count() <= 2);
     }
 
     [Test]
     public async Task GetByIdAsync_ReturnsMarkerDto_WhenMarkerExists()
     {
-        int existingMarkerId = 1; //Съществуващ маркер
+        int existingMarkerId = 1; //Existing Marker
         var result = await markerService.GetByIdAsync(existingMarkerId);
 
         Assert.IsNotNull(result);
         Assert.AreEqual("Marker1", result.Name);
-        Assert.IsNotEmpty(result.Vendors); // Проверка, че има търговци свързани с маркера
-        Assert.IsNotEmpty(result.Zones); // Проверка, че има зони свързани с маркера
+        Assert.IsNotEmpty(result.Vendors); //Check if there are vendors assosiated with the Marker
+        Assert.IsNotEmpty(result.Zones); // Check if there are zones assosiated with the Marker
     }
 
     [Test]
     public async Task GetByIdAsync_ThrowsKeyNotFoundException_WhenMarkerDoesNotExist()
     {
-        int nonExistentMarkerId = 999; // ИД, което със сигурност не съществува
+        int nonExistentMarkerId = 999; // Non-existing Id
         var ex = Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await markerService.GetByIdAsync(nonExistentMarkerId)
         );
@@ -313,7 +310,7 @@ public class MarkerServiceTests
     [Test]
     public async Task RestoreAsync_ThrowsKeyNotFoundException_WhenMarkerDoesNotExist()
     {
-        int nonExistentMarkerId = 999; //несъществуващ маркер
+        int nonExistentMarkerId = 999; //Non-existing id
         Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await markerService.RestoreAsync(nonExistentMarkerId, "TestUser")
         );
@@ -322,7 +319,7 @@ public class MarkerServiceTests
     [Test]
     public async Task RestoreAsync_ThrowsInvalidOperationException_WhenMarkerIsNotDeleted()
     {
-        int existingMarkerId = 1; //този маркер не е изтрит.
+        int existingMarkerId = 1; //Non-deleted marker
         Assert.ThrowsAsync<InvalidOperationException>(
             async () => await markerService.RestoreAsync(existingMarkerId, "TestUser")
         );
@@ -331,7 +328,7 @@ public class MarkerServiceTests
     [Test]
     public async Task RestoreAsync_ThrowsArgumentException_WhenActiveMarkerWithSameNameExists()
     {
-        var deletedMarker = new Marker //този маркер е изтрит, но има активен маркер със същото име.
+        var deletedMarker = new Marker //Deleted marker , but there is an active marker with the same name
         {
             Id = 4,
             Name = "Marker1",
@@ -349,7 +346,7 @@ public class MarkerServiceTests
     [Test]
     public async Task RestoreAsync_SuccessfullyRestoresDeletedMarker()
     {
-        var deletedMarkerId = 5; //този маркер е изтрит и няма друг активен маркер със същото име.
+        var deletedMarkerId = 5; //Deleted marker and there isnt an active marker with the same name
 
         await markerService.RestoreAsync(deletedMarkerId, "TestUser");
 
@@ -363,10 +360,9 @@ public class MarkerServiceTests
     {
         var deletedMarkers = await markerService.GetDeletedMarkersAsync();
 
-        // Проверка за включване само на имената на изтритите маркери
         var expectedNames = new List<string> { "Marker5" };
         Assert.That(deletedMarkers, Is.EquivalentTo(expectedNames));
-        Assert.That(deletedMarkers.Count(), Is.EqualTo(1)); // Проверка, че има точно два изтрити маркера
+        Assert.That(deletedMarkers.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -374,7 +370,7 @@ public class MarkerServiceTests
     {
         var deletedMarkers = await markerService.GetDeletedMarkersAsync();
 
-        // Проверка, че активните маркери не са включени
+        // Check if the existing marker are excluded
         Assert.IsFalse(deletedMarkers.Contains("Marker1"));
         Assert.IsFalse(deletedMarkers.Contains("Marker2"));
         Assert.IsFalse(deletedMarkers.Contains("Marker3"));
@@ -383,7 +379,7 @@ public class MarkerServiceTests
     [Test]
     public async Task GetMarkerUsagesAsync_ReturnsAllUsages_WhenMarkerIsUsedEverywhere()
     {
-        int markerId = 1; // този маркер се използва в зони и търговци, но не и в доставки
+        int markerId = 1; // This marker is used in zones and vendors, but not in deliveries.
         var usages = await markerService.GetMarkerUsagesAsync(markerId);
 
         Assert.IsFalse(usages.ContainsKey("Deliveries"));
@@ -396,7 +392,7 @@ public class MarkerServiceTests
     [Test]
     public async Task GetMarkerUsagesAsync_ReturnsEmptyDictionary_WhenNoUsagesExist()
     {
-        int markerId = 2; //този маркер не се използва никъде.
+        int markerId = 2; //This marker is not used anywhere.
         var usages = await markerService.GetMarkerUsagesAsync(markerId);
 
         Assert.IsEmpty(usages);
@@ -405,25 +401,25 @@ public class MarkerServiceTests
     [Test]
     public async Task GetDeletedMarkerNameByIdAsync_ReturnsName_WhenMarkerIsDeleted()
     {
-        int deletedMarkerId = 5; // ID на изтрит маркер, който е "Marker5"
+        int deletedMarkerId = 5; // ID of a deleted marker to check if the correct name is returned.
         var name = await markerService.GetDeletedMarkerNameByIdAsync(deletedMarkerId);
 
-        Assert.AreEqual("Marker5", name); // Проверка дали името съвпада с това на изтрития маркер
+        Assert.AreEqual("Marker5", name);
     }
 
     [Test]
     public async Task GetDeletedMarkerNameByIdAsync_ReturnsNull_WhenMarkerIsNotDeleted()
     {
-        int activeMarkerId = 1; // ID на активен маркер, който не е изтрит
+        int activeMarkerId = 1; // Non-deleted marker
         var name = await markerService.GetDeletedMarkerNameByIdAsync(activeMarkerId);
 
-        Assert.IsNull(name); // Тъй като маркерът не е изтрит, методът трябва да върне null
+        Assert.IsNull(name); // ID of an active marker to check if null is returned since the marker is not deleted.
     }
 
     [Test]
     public async Task GetDeletedMarkerNameByIdAsync_ThrowsKeyNotFoundException_WhenMarkerDoesNotExist()
     {
-        int nonExistentMarkerId = 999; // ID, което не съществува
+        int nonExistentMarkerId = 999; // Non-existing id
         Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await markerService.GetDeletedMarkerNameByIdAsync(nonExistentMarkerId)
         );
