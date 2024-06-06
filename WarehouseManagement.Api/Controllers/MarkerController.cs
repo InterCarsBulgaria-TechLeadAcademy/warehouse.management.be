@@ -64,7 +64,7 @@ public class MarkerController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(int id)
     {
-        await markerService.DeleteAsync(id, User.Id());
+        await markerService.DeleteAsync(id);
 
         return Ok(MarkerDeletedSuccessfully);
     }
