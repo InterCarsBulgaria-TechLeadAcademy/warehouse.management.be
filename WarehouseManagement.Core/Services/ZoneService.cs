@@ -197,17 +197,64 @@ public class ZoneService : IZoneService
         };
     }
 
-    public async Task<IEnumerable<ZoneEntryDto>> GetEntriesAsync(int id, Predicate<Entry> predicate)
+    public async Task<IEnumerable<ZoneEntryDto>> GetFinishedEntries(int zoneId)
     {
-        // Check if this will include the entries
-        var currentZone = await this.repository.GetByIdAsync<Zone>(id);
+        var currentZone = await this.repository.GetByIdAsync<Zone>(zoneId);
 
         if (currentZone == null)
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        var entries = currentZone.Entries.Where(e => predicate(e));
+        var entries = currentZone.Entries.Where(e => e.FinishedProccessing != null);
+
+        return entries.Select(e => new ZoneEntryDto()
+        {
+            Pallets = e.Pallets,
+            Packages = e.Packages,
+            Pieces = e.Pieces,
+            StartedProccessing = e.StartedProccessing,
+            FinishedProccessing = e.FinishedProccessing,
+            DeliveryId = e.DeliveryId
+        });
+    }
+
+    public async Task<IEnumerable<ZoneEntryDto>> GetProccessingEntries(int zoneId)
+    {
+        var currentZone = await this.repository.GetByIdAsync<Zone>(zoneId);
+
+        if (currentZone == null)
+        {
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
+        }
+
+        var entries = currentZone.Entries.Where(e =>
+            e.StartedProccessing != null && e.FinishedProccessing == null
+        );
+
+        return entries.Select(e => new ZoneEntryDto()
+        {
+            Pallets = e.Pallets,
+            Packages = e.Packages,
+            Pieces = e.Pieces,
+            StartedProccessing = e.StartedProccessing,
+            FinishedProccessing = e.FinishedProccessing,
+            DeliveryId = e.DeliveryId
+        });
+    }
+
+    public async Task<IEnumerable<ZoneEntryDto>> GetWaitingEntries(int zoneId)
+    {
+        var currentZone = await this.repository.GetByIdAsync<Zone>(zoneId);
+
+        if (currentZone == null)
+        {
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
+        }
+
+        var entries = currentZone.Entries.Where(e =>
+            e.StartedProccessing == null && e.FinishedProccessing == null
+        );
 
         return entries.Select(e => new ZoneEntryDto()
         {

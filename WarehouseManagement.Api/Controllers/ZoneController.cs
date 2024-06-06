@@ -1,9 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Zone;
-using WarehouseManagement.Infrastructure.Data.Models;
-using static WarehouseManagement.Common.Statuses.ZoneEntryStatuses;
 
 namespace WarehouseManagement.Api.Controllers
 {
@@ -90,35 +89,29 @@ namespace WarehouseManagement.Api.Controllers
         }
 
         [HttpGet("entries")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneEntryDto>))]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Entries(int zoneId, [FromQuery] string[] statuses)
+        public async Task<IActionResult> Entries(
+            int zoneId,
+            [FromQuery] ZoneEntryStatuses[] statuses
+        )
         {
-            var predicates = new List<Predicate<Entry>>();
+            IEnumerable<ZoneEntryDto> entries = new List<ZoneEntryDto>();
 
-            if (statuses.Contains(Waiting))
+            if (statuses.Contains(ZoneEntryStatuses.Waiting))
             {
-                predicates.Add(entry =>
-                    entry.StartedProccessing == null && entry.FinishedProccessing == null
-                );
+                entries = await zoneService.GetWaitingEntries(zoneId);
             }
 
-            if (statuses.Contains(Finished))
+            if (statuses.Contains(ZoneEntryStatuses.Processing))
             {
-                predicates.Add(entry => entry.FinishedProccessing != null);
+                entries = await zoneService.GetProccessingEntries(zoneId);
             }
 
-            if (statuses.Contains(Processing))
+            if (statuses.Contains(ZoneEntryStatuses.Finished))
             {
-                predicates.Add(entry =>
-                    entry.StartedProccessing != null && entry.FinishedProccessing == null
-                );
+                entries = await zoneService.GetFinishedEntries(zoneId);
             }
-
-            Predicate<Entry> combinedPredicate = entry =>
-                predicates.Any(predicate => predicate(entry));
-
-            var entries = await this.zoneService.GetEntriesAsync(zoneId, combinedPredicate);
 
             return Ok(entries);
         }
