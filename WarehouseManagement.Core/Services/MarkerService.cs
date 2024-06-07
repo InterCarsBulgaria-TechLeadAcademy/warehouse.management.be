@@ -41,7 +41,7 @@ public class MarkerService : IMarkerService
         return marker.Id;
     }
 
-    public async Task DeleteAsync(int id, string userId)
+    public async Task DeleteAsync(int id)
     {
         var marker = await repository.GetByIdAsync<Marker>(id);
 
@@ -197,11 +197,6 @@ public class MarkerService : IMarkerService
         await repository.SaveChangesAsync();
     }
 
-    public async Task<bool> IsDeletedByIdAsync(int id)
-    {
-        return await repository.AllWithDeleted<Marker>().AnyAsync(m => m.Id == id && m.IsDeleted);
-    }
-
     public async Task<IEnumerable<string>> GetDeletedMarkersAsync()
     {
         return await repository
@@ -254,7 +249,7 @@ public class MarkerService : IMarkerService
 
     public async Task<string?> GetDeletedMarkerNameByIdAsync(int id)
     {
-        var marker = await repository.GetByIdWithDeletedAsync<Marker>(id);
+        var marker = await repository.AllWithDeleted<Marker>().FirstOrDefaultAsync(m => m.Id == id);
 
         if (marker == null)
         {
