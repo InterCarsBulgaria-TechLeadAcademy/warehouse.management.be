@@ -118,6 +118,7 @@ public class ZoneService : IZoneService
                 }),
                 Entries = z.Entries.Select(e => new ZoneEntryDto()
                 {
+                    EntryId = e.Id,
                     Pallets = e.Pallets,
                     Packages = e.Packages,
                     Pieces = e.Pieces,
@@ -150,6 +151,7 @@ public class ZoneService : IZoneService
                 }),
                 Entries = z.Entries.Select(e => new ZoneEntryDto()
                 {
+                    EntryId = e.Id,
                     Pallets = e.Pallets,
                     Packages = e.Packages,
                     Pieces = e.Pieces,
@@ -168,7 +170,7 @@ public class ZoneService : IZoneService
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        var zone = (await repository.AllReadOnly<Zone>().FirstOrDefaultAsync(z => z.Id == id))!;
+        var zone = (await repository.AllReadOnly<Zone>().FirstAsync(z => z.Id == id))!;
 
         return new ZoneDto()
         {
@@ -187,6 +189,7 @@ public class ZoneService : IZoneService
             }),
             Entries = zone.Entries.Select(e => new ZoneEntryDto()
             {
+                EntryId = e.Id,
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
@@ -210,6 +213,7 @@ public class ZoneService : IZoneService
 
         return entries.Select(e => new ZoneEntryDto()
         {
+            EntryId = e.Id,
             Pallets = e.Pallets,
             Packages = e.Packages,
             Pieces = e.Pieces,
@@ -234,6 +238,7 @@ public class ZoneService : IZoneService
 
         return entries.Select(e => new ZoneEntryDto()
         {
+            EntryId = e.Id,
             Pallets = e.Pallets,
             Packages = e.Packages,
             Pieces = e.Pieces,
@@ -258,6 +263,7 @@ public class ZoneService : IZoneService
 
         return entries.Select(e => new ZoneEntryDto()
         {
+            EntryId = e.Id,
             Pallets = e.Pallets,
             Packages = e.Packages,
             Pieces = e.Pieces,
