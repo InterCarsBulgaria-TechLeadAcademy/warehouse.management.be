@@ -58,7 +58,8 @@ namespace WarehouseManagement.Core.Services
         public async Task<IEnumerable<VendorDto>> GetAllAsync(PaginationParameters paginationParams)
         {
             Expression<Func<Vendor, bool>> filter = v =>
-                EF.Functions.Like(v.Name, $"%{paginationParams.SearchQuery}%");
+                EF.Functions.Like(v.Name, $"%{paginationParams.SearchQuery}%")
+                || EF.Functions.Like(v.SystemNumber, $"%{paginationParams.SearchQuery}%");
 
             return await repository
                 .AllReadOnly<Vendor>()
