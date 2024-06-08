@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Vendor;
 using static WarehouseManagement.Common.MessageConstants.Keys.VendorMessageKeys;
 
@@ -29,9 +30,9 @@ namespace WarehouseManagement.Api.Controllers
 
         [HttpGet("all")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<VendorDto>))]
-        public async Task<IActionResult> All()
+        public async Task<IActionResult> All([FromQuery] PaginationParameters paginationParams)
         {
-            var model = await vendorService.GetAllAsync();
+            var model = await vendorService.GetAllAsync(paginationParams);
 
             return Ok(model);
         }

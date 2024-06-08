@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Vendor;
+using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.VendorMessageKeys;
@@ -52,10 +55,14 @@ namespace WarehouseManagement.Core.Services
             return vendor;
         }
 
-        public async Task<IEnumerable<VendorDto>> GetAllAsync()
+        public async Task<IEnumerable<VendorDto>> GetAllAsync(PaginationParameters paginationParams)
         {
+            Expression<Func<Vendor, bool>> filter = v =>
+                EF.Functions.Like(v.Name, $"%{paginationParams.SearchQuery}%");
+
             return await repository
                 .AllReadOnly<Vendor>()
+                .Paginate(paginationParams, filter)
                 .Select(v => new VendorDto()
                 {
                     Id = v.Id,
