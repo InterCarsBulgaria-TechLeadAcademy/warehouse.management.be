@@ -63,7 +63,7 @@ public class EntryService : IEntryService
 
     public async Task<bool> ExistsByIdAsync(int id)
     {
-        return await this.repository.GetByIdAsync<Entry>(id) != null;
+        return await repository.GetByIdAsync<Entry>(id) != null;
     }
 
     public async Task<IEnumerable<EntryDto>> GetAllAsync()
@@ -78,6 +78,7 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProccessing,
                 FinishedProccessing = e.FinishedProccessing,
+                ZoneId = e.ZoneId,
                 DeliveryId = e.DeliveryId
             })
             .ToListAsync();
@@ -95,6 +96,7 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProccessing,
                 FinishedProccessing = e.FinishedProccessing,
+                ZoneId = e.ZoneId,
                 DeliveryId = e.DeliveryId
             })
             .ToListAsync();
@@ -111,10 +113,14 @@ public class EntryService : IEntryService
 
         return new EntryDto()
         {
-            Id = id,
+            Id = entry.Id,
             Pallets = entry.Pallets,
             Packages = entry.Packages,
-            Pieces = entry.Pieces
+            Pieces = entry.Pieces,
+            StartedProccessing = entry.StartedProccessing,
+            FinishedProccessing = entry.FinishedProccessing,
+            ZoneId = entry.ZoneId,
+            DeliveryId = entry.DeliveryId
         };
     }
 

@@ -8,5 +8,6 @@ public class EntryDto
     public int Pieces { get; set; }
     public DateTime? StartedProccessing { get; set; }
     public DateTime? FinishedProccessing { get; set; }
+    public int ZoneId { get; set; }
     public int DeliveryId { get; set; }
 }
