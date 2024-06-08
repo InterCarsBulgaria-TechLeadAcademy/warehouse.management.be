@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Infrastructure.Data.Common;
@@ -66,10 +67,38 @@ public class EntryService : IEntryService
         return await repository.GetByIdAsync<Entry>(id) != null;
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllAsync()
+    public async Task<IEnumerable<EntryDto>> GetAllAsync(int? zoneId, ZoneEntryStatuses[]? statuses)
     {
-        return await repository
-            .AllReadOnly<Entry>()
+        var query = repository.AllReadOnly<Entry>();
+
+        if (zoneId != null)
+        {
+            query = query.Where(e => e.ZoneId == zoneId);
+        }
+
+        if (statuses != null)
+        {
+            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            {
+                query = query.Where(e =>
+                    e.StartedProccessing == null && e.FinishedProccessing == null
+                );
+            }
+
+            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            {
+                query = query.Where(e =>
+                    e.StartedProccessing != null && e.FinishedProccessing == null
+                );
+            }
+
+            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            {
+                query = query.Where(e => e.FinishedProccessing != null);
+            }
+        }
+
+        return await query
             .Select(e => new EntryDto()
             {
                 Id = e.Id,
@@ -84,10 +113,41 @@ public class EntryService : IEntryService
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync()
+    public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(
+        int? zoneId,
+        ZoneEntryStatuses[]? statuses
+    )
     {
-        return await repository
-            .AllWithDeletedReadOnly<Entry>()
+        var query = repository.AllReadOnly<Entry>();
+
+        if (zoneId != null)
+        {
+            query = query.Where(e => e.ZoneId == zoneId);
+        }
+
+        if (statuses != null)
+        {
+            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            {
+                query = query.Where(e =>
+                    e.StartedProccessing == null && e.FinishedProccessing == null
+                );
+            }
+
+            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            {
+                query = query.Where(e =>
+                    e.StartedProccessing != null && e.FinishedProccessing == null
+                );
+            }
+
+            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            {
+                query = query.Where(e => e.FinishedProccessing != null);
+            }
+        }
+
+        return await query
             .Select(e => new EntryDto()
             {
                 Id = e.Id,

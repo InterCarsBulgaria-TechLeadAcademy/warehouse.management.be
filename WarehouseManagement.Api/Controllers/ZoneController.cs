@@ -79,9 +79,9 @@ namespace WarehouseManagement.Api.Controllers
             return Ok($"Zone {name} was restored");
         }
 
-        [HttpGet("deleted")]
+        [HttpGet("all-with-deleted")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
-        public async Task<IActionResult> AllDeleted()
+        public async Task<IActionResult> AllWithDeleted()
         {
             var model = await zoneService.GetAllWithDeletedAsync();
 

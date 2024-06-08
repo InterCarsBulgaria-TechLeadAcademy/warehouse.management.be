@@ -1,12 +1,13 @@
-﻿using WarehouseManagement.Core.DTOs.Entry;
+﻿using WarehouseManagement.Common.Statuses;
+using WarehouseManagement.Core.DTOs.Entry;
 
 namespace WarehouseManagement.Core.Contracts;
 
 public interface IEntryService
 {
     Task<EntryDto> GetByIdAsync(int id);
-    Task<IEnumerable<EntryDto>> GetAllAsync();
-    Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync();
+    Task<IEnumerable<EntryDto>> GetAllAsync(int? zoneId, ZoneEntryStatuses[]? statuses);
+    Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(int? zoneId, ZoneEntryStatuses[]? statuses);
     Task CreateAsync(EntryFormDto model, string userId);
     Task EditAsync(int id, EntryFormDto model, string userId);
     Task DeleteAsync(int id, string userId);
