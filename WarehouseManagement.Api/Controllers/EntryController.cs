@@ -53,6 +53,11 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> Add([FromBody] EntryFormDto model)
         {
+            if (ModelState.IsValid)
+            {
+                return BadRequest(EntryInvalidData);
+            }
+
             await entryService.CreateAsync(model, User.Id());
 
             return Ok(EntryCreatedSuccessfuly);
@@ -63,6 +68,11 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Edit(int id, [FromBody] EntryFormDto model)
         {
+            if (ModelState.IsValid)
+            {
+                return BadRequest(EntryInvalidData);
+            }
+
             await entryService.EditAsync(id, model, User.Id());
 
             return Ok(EntryEditedSuccessfully);
