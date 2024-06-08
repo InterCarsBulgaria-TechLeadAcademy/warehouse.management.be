@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.DTOs.Zone;
 
 namespace WarehouseManagement.Api.Controllers
@@ -11,10 +12,12 @@ namespace WarehouseManagement.Api.Controllers
     public class ZoneController : ControllerBase
     {
         private readonly IZoneService zoneService;
+        private readonly IEntryService entryService;
 
-        public ZoneController(IZoneService zoneService)
+        public ZoneController(IZoneService zoneService, IEntryService entryService)
         {
             this.zoneService = zoneService;
+            this.entryService = entryService;
         }
 
         [HttpGet("{id}")]
@@ -89,29 +92,14 @@ namespace WarehouseManagement.Api.Controllers
         }
 
         [HttpGet("entries")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneEntryDto>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Entries(
             int zoneId,
             [FromQuery] ZoneEntryStatuses[] statuses
         )
         {
-            IEnumerable<ZoneEntryDto> entries = new List<ZoneEntryDto>();
-
-            if (statuses.Contains(ZoneEntryStatuses.Waiting))
-            {
-                entries = await zoneService.GetWaitingEntries(zoneId);
-            }
-
-            if (statuses.Contains(ZoneEntryStatuses.Processing))
-            {
-                entries = await zoneService.GetProccessingEntries(zoneId);
-            }
-
-            if (statuses.Contains(ZoneEntryStatuses.Finished))
-            {
-                entries = await zoneService.GetFinishedEntries(zoneId);
-            }
+            IEnumerable<EntryDto> entries = await entryService.GetAllAsync(zoneId, statuses);
 
             return Ok(entries);
         }

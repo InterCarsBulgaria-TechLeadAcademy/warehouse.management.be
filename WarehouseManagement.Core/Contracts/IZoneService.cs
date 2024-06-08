@@ -14,8 +14,5 @@ namespace WarehouseManagement.Core.Contracts
         Task<string> RestoreAsync(int id);
         Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
-        Task<IEnumerable<ZoneEntryDto>> GetWaitingEntries(int zoneId);
-        Task<IEnumerable<ZoneEntryDto>> GetProccessingEntries(int zoneId);
-        Task<IEnumerable<ZoneEntryDto>> GetFinishedEntries(int zoneId);
     }
 }
