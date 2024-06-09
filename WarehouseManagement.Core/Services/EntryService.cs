@@ -67,7 +67,7 @@ public class EntryService : IEntryService
         return await repository.GetByIdAsync<Entry>(id) != null;
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllAsync(int? zoneId, ZoneEntryStatuses[]? statuses)
+    public async Task<IEnumerable<EntryDto>> GetAllAsync(int? zoneId, EntryStatuses[]? statuses)
     {
         var query = BuildQuery(zoneId, statuses);
 
@@ -88,7 +88,7 @@ public class EntryService : IEntryService
 
     public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(
         int? zoneId,
-        ZoneEntryStatuses[]? statuses
+        EntryStatuses[]? statuses
     )
     {
         var query = BuildQuery(zoneId, statuses);
@@ -167,7 +167,7 @@ public class EntryService : IEntryService
         await repository.SaveChangesAsync();
     }
 
-    private IQueryable<Entry> BuildQuery(int? zoneId, ZoneEntryStatuses[]? statuses)
+    private IQueryable<Entry> BuildQuery(int? zoneId, EntryStatuses[]? statuses)
     {
         var query = repository.AllReadOnly<Entry>();
 
@@ -178,21 +178,21 @@ public class EntryService : IEntryService
 
         if (statuses != null)
         {
-            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            if (statuses.Contains(EntryStatuses.Waiting))
             {
                 query = query.Where(e =>
                     e.StartedProccessing == null && e.FinishedProccessing == null
                 );
             }
 
-            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            if (statuses.Contains(EntryStatuses.Waiting))
             {
                 query = query.Where(e =>
                     e.StartedProccessing != null && e.FinishedProccessing == null
                 );
             }
 
-            if (statuses.Contains(ZoneEntryStatuses.Waiting))
+            if (statuses.Contains(EntryStatuses.Waiting))
             {
                 query = query.Where(e => e.FinishedProccessing != null);
             }

@@ -200,7 +200,7 @@ public class ZoneService : IZoneService
         };
     }
 
-    public async Task<string> RestoreAsync(int id)
+    public async Task RestoreAsync(int id)
     {
         var zone = await repository.All<Zone>().FirstOrDefaultAsync(v => v.Id == id);
 
@@ -221,7 +221,5 @@ public class ZoneService : IZoneService
 
         repository.UnDelete(zone);
         await repository.SaveChangesAsync();
-
-        return zone.Name;
     }
 }

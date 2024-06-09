@@ -53,7 +53,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> Add([FromBody] EntryFormDto model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(EntryInvalidData);
             }
