@@ -100,9 +100,9 @@ namespace WarehouseManagement.Api.Controllers
         [HttpGet("entries")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Entries(int zoneId, [FromQuery] EntryStatuses[] statuses)
+        public async Task<IActionResult> Entries(int zoneId, [FromQuery] EntryStatuses[]? statuses)
         {
-            IEnumerable<EntryDto> entries = await entryService.GetAllAsync(zoneId, statuses);
+            IEnumerable<EntryDto> entries = await entryService.GetAllByZoneAsync(zoneId, statuses);
 
             return Ok(entries);
         }

@@ -67,9 +67,9 @@ public class EntryService : IEntryService
         return await repository.GetByIdAsync<Entry>(id) != null;
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllAsync(int? zoneId, EntryStatuses[]? statuses)
+    public async Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses)
     {
-        var query = BuildQuery(zoneId, statuses);
+        var query = BuildQuery(statuses);
 
         return await query
             .Select(e => new EntryDto()
@@ -86,12 +86,42 @@ public class EntryService : IEntryService
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<EntryDto>> GetAllByZoneAsync(
+        int zoneId,
+        EntryStatuses[]? statuses
+    )
+    {
+        var query = BuildQuery(statuses);
+
+        var entries = await query
+            .Where(e => e.ZoneId == zoneId)
+            .Select(e => new EntryDto()
+            {
+                Id = e.Id,
+                Pallets = e.Pallets,
+                Packages = e.Packages,
+                Pieces = e.Pieces,
+                StartedProccessing = e.StartedProccessing,
+                FinishedProccessing = e.FinishedProccessing,
+                ZoneId = e.ZoneId,
+                DeliveryId = e.DeliveryId
+            })
+            .ToListAsync();
+
+        return entries;
+    }
+
     public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(
         int? zoneId,
         EntryStatuses[]? statuses
     )
     {
-        var query = BuildQuery(zoneId, statuses);
+        var query = BuildQuery(statuses);
+
+        if (zoneId != null)
+        {
+            query = query.Where(e => e.ZoneId == zoneId);
+        }
 
         return await query
             .Select(e => new EntryDto()
@@ -167,14 +197,9 @@ public class EntryService : IEntryService
         await repository.SaveChangesAsync();
     }
 
-    private IQueryable<Entry> BuildQuery(int? zoneId, EntryStatuses[]? statuses)
+    private IQueryable<Entry> BuildQuery(EntryStatuses[]? statuses)
     {
         var query = repository.AllReadOnly<Entry>();
-
-        if (zoneId != null)
-        {
-            query = query.Where(e => e.ZoneId == zoneId);
-        }
 
         if (statuses != null)
         {

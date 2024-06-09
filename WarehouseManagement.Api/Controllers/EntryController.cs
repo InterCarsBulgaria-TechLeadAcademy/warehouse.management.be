@@ -22,9 +22,14 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
         public async Task<IActionResult> All([FromBody] EntryRequest request)
         {
-            var entries = await entryService.GetAllAsync(request.ZoneId, request.Statuses);
+            if (request.ZoneId != null)
+            {
+                return Ok(
+                    await entryService.GetAllByZoneAsync((int)request.ZoneId, request.Statuses)
+                );
+            }
 
-            return Ok(entries);
+            return Ok(await entryService.GetAllAsync(request.Statuses));
         }
 
         [HttpGet("{id}")]
