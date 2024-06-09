@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Numerics;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using WarehouseManagement.Api.Services.Contracts;
 using WarehouseManagement.Common.MessageConstants.Keys;
@@ -33,6 +34,7 @@ public class VendorServiceTests
     private Zone zone1;
     private Zone zone2;
     private Zone zone3;
+    private Delivery delivery;
 
     [SetUp]
     public async Task Setup()
@@ -180,6 +182,24 @@ public class VendorServiceTests
             VendorId = vendorWithZonesAndMarkes.Id
         };
 
+        delivery = new Delivery()
+        {
+            Id = 1,
+            Cmr = "cmr",
+            Packages = 1,
+            Pallets = 1,
+            Pieces = 3,
+            CreatedAt = DateTime.UtcNow.AddDays(-1),
+            CreatedByUserId = "userId",
+            ReceptionNumber = "rn",
+            SystemNumber = "sm",
+            IsApproved = true,
+            VendorId = 1,
+            TruckNumber = "c0000cc",
+            DeliveryTime = DateTime.UtcNow.AddDays(-1),
+            IsDeleted = false
+        };
+
         mockUserService = new Mock<IUserService>();
         mockUserService.Setup(x => x.UserId).Returns("TestUser");
         var options = new DbContextOptionsBuilder<WarehouseManagementDbContext>()
@@ -204,6 +224,7 @@ public class VendorServiceTests
         dbContext.AddRange(zone1, zone2, zone3);
         dbContext.AddRange(vendorMarker1, vendorMarker2, vendorMarker3);
         dbContext.AddRange(vendorZone1, vendorMarker2, vendorMarker3);
+        dbContext.AddRange(delivery);
 
         await dbContext.SaveChangesAsync();
 
@@ -213,6 +234,7 @@ public class VendorServiceTests
         var vendors = await dbContext.Vendors.ToListAsync();
         var markers = await dbContext.Markers.ToListAsync();
         var zones = await dbContext.Zones.ToListAsync();
+        var deliveries = await dbContext.Deliveries.ToListAsync();
     }
 
     [Test]
@@ -394,6 +416,177 @@ public class VendorServiceTests
             ex.Message,
             Is.EqualTo($"{VendorMessageKeys.VendorWithSystemNumberExist} {newVendor.SystemNumber}")
         );
+    }
+
+    [Test]
+    public void EditAsync_ShouldThrowKeyNotFoundException_WhenTryingToEditItemThatNotExist()
+    {
+        var nonExistingId = -1;
+        var formModel = new VendorFormDto()
+        {
+            Name = "testName",
+            SystemNumber = "testSystemNumber"
+        };
+
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(
+            async () => await vendorService.EditAsync(nonExistingId, formModel, "userId")
+        );
+
+        Assert.That(
+            ex.Message,
+            Is.EqualTo($"{VendorMessageKeys.VendorWithIdNotFound} {nonExistingId}")
+        );
+    }
+
+    [Test]
+    public void EditAsync_ShouldThrowInvalidOperationException_WhenTryingToEditVendorNameButAnotherVendorWithThatNameExist()
+    {
+        var existingVendorId = vendor1.Id;
+        var formModel = new VendorFormDto()
+        {
+            Name = vendor2.Name,
+            SystemNumber = "testSystemNumber"
+        };
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await vendorService.EditAsync(existingVendorId, formModel, "userId")
+        );
+
+        Assert.That(
+            ex.Message,
+            Is.EqualTo($"{VendorMessageKeys.VendorWithNameExist} {formModel.Name}")
+        );
+    }
+
+    [Test]
+    public void EditAsync_ShouldThrowInvalidOperationException_WhenTryingToEditVendorSystemNumberButAnotherVendorWithThatSystemNumberExist()
+    {
+        var existingVendorId = vendor1.Id;
+        var formModel = new VendorFormDto()
+        {
+            Name = "EditedName",
+            SystemNumber = vendor2.SystemNumber,
+        };
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await vendorService.EditAsync(existingVendorId, formModel, "userId")
+        );
+
+        Assert.That(
+            ex.Message,
+            Is.EqualTo($"{VendorMessageKeys.VendorWithSystemNumberExist} {formModel.SystemNumber}")
+        );
+    }
+
+    [Test]
+    public async Task EditAsync_ShouldUpdateNameAndSystemNumber()
+    {
+        var existingVendorId = vendor1.Id;
+        var newName = "vendorNewName";
+        var newSystemNumber = "EditedSystemNumber";
+        var formModel = new VendorFormDto() { Name = newName, SystemNumber = newSystemNumber, };
+
+        await vendorService.EditAsync(existingVendorId, formModel, "userId");
+
+        Assert.That(vendor1.Name, Is.EqualTo(newName));
+        Assert.That(vendor1.SystemNumber, Is.EqualTo(newSystemNumber));
+        Assert.That(vendor1.LastModifiedByUserId, Is.EqualTo("userId"));
+    }
+
+    [Test]
+    public void DeleteAsync_ShouldThrowKeyNotFoundException_IfVendorDoesNotExist()
+    {
+        var nonExistingId = -1;
+
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(
+            async () => await vendorService.DeleteAsync(nonExistingId)
+        );
+
+        Assert.That(
+            ex.Message,
+            Is.EqualTo($"{VendorMessageKeys.VendorWithIdNotFound} {nonExistingId}")
+        );
+    }
+
+    [Test]
+    public void DeleteAsync_ShouldThrowInvalidOperationException_WhenVendorHasExistingDeliveries()
+    {
+        var existingVendorId = vendor1.Id;
+        var deliveries = vendor1.Deliveries.Select(v => v.SystemNumber).ToList();
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await vendorService.DeleteAsync(existingVendorId)
+        );
+
+        Assert.That(
+            ex.Message,
+            Is.EqualTo(
+                $"{VendorMessageKeys.VendorHasDeliveries} {string.Join(",", vendor1.Deliveries.Select(v => v.SystemNumber))}"
+            )
+        );
+    }
+
+    [Test]
+    public async Task DeleteAsync_ShouldSetVendorToIsDelitedTrue()
+    {
+        var existingVendorIdWithNoDeliveries = vendor2.Id;
+        var vendorIsDeletedPropBeforeDeleteAsync = vendor2.IsDeleted;
+
+        await vendorService.DeleteAsync(existingVendorIdWithNoDeliveries);
+
+        Assert.That(vendorIsDeletedPropBeforeDeleteAsync, Is.False);
+        Assert.That(vendor2.IsDeleted, Is.True);
+    }
+
+    [Test]
+    public async Task GetAllDeletedAsync_ShoudReturnAllDeletedVendors()
+    {
+        var deletedVendorsCount = 2;
+
+        var result = await vendorService.GetAllDeletedAsync();
+
+        Assert.That(result.Count, Is.EqualTo(deletedVendorsCount));
+    }
+
+    [Test]
+    public void RestoreAsync_ShoudReturnKeyNotFoundException_IfVendorDoesNotExist()
+    {
+        var nonExistingId = -1;
+
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(
+            async () => await vendorService.RestoreAsync(nonExistingId)
+        );
+
+        Assert.That(
+            ex.Message,
+            Is.EqualTo($"{VendorMessageKeys.VendorWithIdNotFound} {nonExistingId}")
+        );
+    }
+
+    [Test]
+    public void RestoreAsync_ShoudReturnInvalidOperationException_IfVendorIsNotDeleted()
+    {
+        var nonDeletedVendorId = 1;
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await vendorService.RestoreAsync(nonDeletedVendorId)
+        );
+
+        Assert.That(
+            ex.Message,
+            Is.EqualTo($"{VendorMessageKeys.VendorNotDeleted} {nonDeletedVendorId}")
+        );
+    }
+
+    [Test]
+    public async Task RestoreAsync_ShoudRestoreDeletedVendor()
+    {
+        var deletedVendorId = deletedVendor1.Id;
+        var isDeletedPropBeforeRestore = deletedVendor1.IsDeleted;
+
+        await vendorService.RestoreAsync(deletedVendorId);
+
+        Assert.That(isDeletedPropBeforeRestore, Is.True);
+        Assert.That(deletedVendor1.IsDeleted, Is.False);
     }
 
     [TearDown]
