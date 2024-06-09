@@ -6,5 +6,5 @@ public class EntryRequest
 {
     public int? ZoneId { get; set; }
 
-    public ZoneEntryStatuses[]? Statuses { get; set; }
+    public EntryStatuses[]? Statuses { get; set; }
 }

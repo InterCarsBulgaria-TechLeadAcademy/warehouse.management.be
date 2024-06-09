@@ -1,6 +1,6 @@
 ﻿namespace WarehouseManagement.Common.Statuses
 {
-    public enum ZoneEntryStatuses
+    public enum EntryStatuses
     {
         Waiting,
         Processing,
