@@ -42,7 +42,7 @@ namespace WarehouseManagement.Api.Controllers
         {
             await zoneService.CreateAsync(model, User.Id());
 
-            return Ok("Zone with name {model.Name} was successfully added");
+            return Ok($"Zone with name {model.Name} was successfully added");
         }
 
         [HttpPut("edit/{id}")]
