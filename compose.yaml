@@ -18,10 +18,10 @@ services:
     environment:
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
       - ASPNETCORE_ENVIRONMENT=Development
-
     depends_on:
       - db
   db:
+    container_name: mssql_db
     image: mcr.microsoft.com/mssql/server:2022-latest
     volumes:
       - db-data:/var/opt/mssql
