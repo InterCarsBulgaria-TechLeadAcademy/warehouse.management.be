@@ -54,7 +54,7 @@ namespace WarehouseManagement.Api.Controllers
             return Ok(entries);
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> Add([FromBody] EntryFormDto model)
         {
@@ -68,12 +68,12 @@ namespace WarehouseManagement.Api.Controllers
             return Ok(EntryCreatedSuccessfuly);
         }
 
-        [HttpPost]
+        [HttpPut("edit/{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Edit(int id, [FromBody] EntryFormDto model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(EntryInvalidData);
             }
