@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Api.Extensions;
 using WarehouseManagement.Api.Middlewares;
+using WarehouseManagement.Infrastructure.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,8 @@ builder.Services.AddApplicationIdentity(builder.Configuration);
 builder.Services.AddApplicationService();
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<WarehouseManagementDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -24,6 +29,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    using (var scope = app.Services.CreateScope())
+    {
+        var salesContext = scope.ServiceProvider.GetRequiredService<WarehouseManagementDbContext>();
+        salesContext.Database.EnsureCreated();
+    }
+
     app.UseSwagger();
     app.UseSwaggerUI();
 }

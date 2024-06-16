@@ -1,0 +1,43 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+services:
+  server:
+    build:
+      context: .
+      target: development
+    ports:
+      - 8080:8080
+      - 8081:8081
+    environment:
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    container_name: mssql_db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    volumes:
+      - db-data:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Vexisth3pro!
+    ports:
+      - 1433:1433
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "Vexisth3pro!" -Q "SELECT 1" -b -o /dev/null
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+
+volumes:
+  db-data:
