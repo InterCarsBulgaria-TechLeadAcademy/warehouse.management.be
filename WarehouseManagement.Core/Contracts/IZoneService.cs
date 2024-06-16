@@ -10,7 +10,7 @@ namespace WarehouseManagement.Core.Contracts
         Task CreateAsync(ZoneFormDto model, string userId);
         Task EditAsync(int id, ZoneFormDto model, string userId);
         Task DeleteAsync(int id, string userId);
-        Task<string> RestoreAsync(int id);
+        Task RestoreAsync(int id);
         Task<bool> ExistsByIdAsync(int id);
         Task<bool> ExistsByNameAsync(string name);
     }

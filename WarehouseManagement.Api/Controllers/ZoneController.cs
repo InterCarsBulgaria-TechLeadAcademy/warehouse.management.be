@@ -1,7 +1,10 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.DTOs.Zone;
+using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers
 {
@@ -10,10 +13,12 @@ namespace WarehouseManagement.Api.Controllers
     public class ZoneController : ControllerBase
     {
         private readonly IZoneService zoneService;
+        private readonly IEntryService entryService;
 
-        public ZoneController(IZoneService zoneService)
+        public ZoneController(IZoneService zoneService, IEntryService entryService)
         {
             this.zoneService = zoneService;
+            this.entryService = entryService;
         }
 
         [HttpGet("{id}")]
@@ -40,9 +45,14 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Add([FromBody] ZoneFormDto model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ZoneInvalidData);
+            }
+
             await zoneService.CreateAsync(model, User.Id());
 
-            return Ok($"Zone with name {model.Name} was successfully added");
+            return Ok(ZoneCreatedSuccessfully);
         }
 
         [HttpPut("edit/{id}")]
@@ -53,7 +63,7 @@ namespace WarehouseManagement.Api.Controllers
         {
             await zoneService.EditAsync(id, model, User.Id());
 
-            return Ok("Zone successfully edited");
+            return Ok(ZoneEditedSuccessfully);
         }
 
         [HttpDelete("delete/{id}")]
@@ -64,7 +74,7 @@ namespace WarehouseManagement.Api.Controllers
         {
             await zoneService.DeleteAsync(id, User.Id());
 
-            return Ok("Zone was deleted successfully");
+            return Ok(ZoneDeletedSuccessfully);
         }
 
         [HttpPut("restore/{id}")]
@@ -73,18 +83,28 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Restore(int id)
         {
-            var name = await zoneService.RestoreAsync(id);
+            await zoneService.RestoreAsync(id);
 
-            return Ok($"Zone {name} was restored");
+            return Ok(ZoneRestored);
         }
 
-        [HttpGet("deleted")]
+        [HttpGet("all-with-deleted")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
-        public async Task<IActionResult> AllDeleted()
+        public async Task<IActionResult> AllWithDeleted()
         {
             var model = await zoneService.GetAllWithDeletedAsync();
 
             return Ok(model);
+        }
+
+        [HttpGet("entries")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Entries(int zoneId, [FromQuery] EntryStatuses[]? statuses)
+        {
+            IEnumerable<EntryDto> entries = await entryService.GetAllByZoneAsync(zoneId, statuses);
+
+            return Ok(entries);
         }
     }
 }
