@@ -33,4 +33,21 @@ public class DeliveryController : ControllerBase
 
         return Ok(model);
     }
+
+    [HttpGet("add")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> Add()
+    {
+        return Ok();
+    }
+
+    [HttpGet("edit /{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Edit(int id, [FromBody] DeliveryFormDto model)
+    {
+        return Ok();
+    }
 }

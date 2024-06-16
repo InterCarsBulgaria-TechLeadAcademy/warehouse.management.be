@@ -41,8 +41,8 @@ public class DeliveryService : IDeliveryService
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
                         : d.Entries.Any(e => e.StartedProccessing.HasValue)
-                            ? DeliveryStatus.InProgress.ToString()
-                            : DeliveryStatus.NotStarted.ToString()
+                            ? DeliveryStatus.Processing.ToString()
+                            : DeliveryStatus.Waiting.ToString()
                     : DeliveryStatus.None.ToString(),
                 Entries = d
                     .Entries.Select(e => new DeliveryEntryDto()
@@ -88,9 +88,9 @@ public class DeliveryService : IDeliveryService
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
                         : d.Entries.Any(e => e.StartedProccessing.HasValue)
-                            ? DeliveryStatus.InProgress.ToString()
-                            : DeliveryStatus.NotStarted.ToString()
-                    : DeliveryStatus.None.ToString(),
+                            ? DeliveryStatus.Processing.ToString()
+                            : DeliveryStatus.Waiting.ToString()
+                    : DeliveryStatus.Waiting.ToString(),
                 Entries = d
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
@@ -106,17 +106,26 @@ public class DeliveryService : IDeliveryService
         return deliverise;
     }
 
-    //   context.Deliveries.Select(x => new DeliveryDto()
-    //   {
-    //       Id = x.Id,
-    //Name = x.Name,
-    //Status = x.Entries.All(e => e.FinishedDate.HasValue)
-    //           ? x.IsApproved
-    //               ? Status.Approved
-    //               : Status.Finished
-    //           : x.Entries.Any(e => e.StartedDate.HasValue)
-    //               ? Status.InProgress
-    //               : Status.NotStarted,
-    //StartedDate = x.Entries.Min(e => e.StartedDate),
-    //FinishedDate = x.Entries.Max(e => e.FinishedDate),
+    public async Task EditAsync(int id, DeliveryFormDto model, string userId)
+    {
+        var deliveryToEdit = await repository.GetByIdAsync<Delivery>(id);
+
+        if (deliveryToEdit == null)
+        {
+            throw new KeyNotFoundException();
+        }
+
+        deliveryToEdit.TruckNumber = model.TruckNumber;
+        deliveryToEdit.SystemNumber = model.SystemNumber;
+        deliveryToEdit.ReceptionNumber = model.ReceptionNumber;
+        deliveryToEdit.VendorId = model.VendorId;
+        deliveryToEdit.Cmr = model.Cmr;
+        deliveryToEdit.IsApproved = model.IsApproved;
+        deliveryToEdit.Packages = model.Packages;
+        deliveryToEdit.Pieces = model.Pieces;
+        deliveryToEdit.Pallets = model.Pallets;
+        deliveryToEdit.DeliveryTime = model.DeliveryTime;
+        deliveryToEdit.LastModifiedAt = DateTime.UtcNow;
+        deliveryToEdit.LastModifiedByUserId = userId;
+    }
 }
