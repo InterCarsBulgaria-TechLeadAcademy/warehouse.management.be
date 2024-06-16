@@ -43,7 +43,7 @@ public class DeliveryService : IDeliveryService
                         : d.Entries.Any(e => e.StartedProccessing.HasValue)
                             ? DeliveryStatus.Processing.ToString()
                             : DeliveryStatus.Waiting.ToString()
-                    : DeliveryStatus.None.ToString(),
+                    : DeliveryStatus.Waiting.ToString(),
                 Entries = d
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
