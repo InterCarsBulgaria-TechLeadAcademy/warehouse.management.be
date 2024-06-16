@@ -1,3 +1,9 @@
-﻿namespace WarehouseManagement.Core.Contracts;
+﻿using WarehouseManagement.Core.DTOs.Delivery;
 
-public interface IDeliveryService { }
+namespace WarehouseManagement.Core.Contracts;
+
+public interface IDeliveryService
+{
+    Task<DeliveryDto> GetByIdAsync(int id);
+    Task<ICollection<DeliveryDto>> GetAllAsync();
+}
