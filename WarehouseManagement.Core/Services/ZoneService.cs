@@ -20,7 +20,7 @@ public class ZoneService : IZoneService
     {
         if (await ExistsByNameAsync(model.Name))
         {
-            throw new ArgumentException(ZoneWithIdNotFound);
+            throw new ArgumentException(ZoneWithNameExists);
         }
 
         var zone = new Zone()
@@ -73,9 +73,9 @@ public class ZoneService : IZoneService
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        if (!await ExistsByNameAsync(model.Name))
+        if (await ExistsByNameAsync(model.Name))
         {
-            throw new ArgumentException(ZoneWithNameExist);
+            throw new ArgumentException(ZoneWithNameExists);
         }
 
         var zone = (await repository.GetByIdAsync<Zone>(id))!;
@@ -202,7 +202,7 @@ public class ZoneService : IZoneService
 
     public async Task RestoreAsync(int id)
     {
-        var zone = await repository.All<Zone>().FirstOrDefaultAsync(v => v.Id == id);
+        var zone = await repository.AllWithDeleted<Zone>().FirstOrDefaultAsync(v => v.Id == id);
 
         if (zone == null)
         {
@@ -216,7 +216,7 @@ public class ZoneService : IZoneService
 
         if (await ExistsByNameAsync(zone.Name))
         {
-            throw new InvalidOperationException(ZoneWithNameExist);
+            throw new InvalidOperationException(ZoneWithNameExists);
         }
 
         repository.UnDelete(zone);
