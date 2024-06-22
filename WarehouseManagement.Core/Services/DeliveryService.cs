@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Delivery;
-using WarehouseManagement.Core.Enums;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 
@@ -52,6 +52,14 @@ public class DeliveryService : IDeliveryService
                         StartedProccessing = e.StartedProccessing,
                         ZoneId = e.ZoneId
                     })
+                    .ToList(),
+                Markers = d
+                    .DeliveriesMarkers.Where(dm => dm.DeliveryId == id)
+                    .Select(dm => new DeliveryMarkerDto()
+                    {
+                        MarkerId = dm.MarkerId,
+                        MarkerName = dm.Marker.Name
+                    })
                     .ToList()
             })
             .FirstOrDefaultAsync();
@@ -99,6 +107,13 @@ public class DeliveryService : IDeliveryService
                         StartedProccessing = e.StartedProccessing,
                         ZoneId = e.ZoneId
                     })
+                    .ToList(),
+                Markers = d
+                    .DeliveriesMarkers.Select(dm => new DeliveryMarkerDto()
+                    {
+                        MarkerId = dm.MarkerId,
+                        MarkerName = dm.Marker.Name
+                    })
                     .ToList()
             })
             .ToListAsync();
@@ -127,5 +142,7 @@ public class DeliveryService : IDeliveryService
         deliveryToEdit.DeliveryTime = model.DeliveryTime;
         deliveryToEdit.LastModifiedAt = DateTime.UtcNow;
         deliveryToEdit.LastModifiedByUserId = userId;
+
+        await repository.SaveChangesWithLogAsync();
     }
 }

@@ -1,6 +1,4 @@
-﻿using WarehouseManagement.Core.Enums;
-
-namespace WarehouseManagement.Core.DTOs.Delivery;
+﻿namespace WarehouseManagement.Core.DTOs.Delivery;
 
 public class DeliveryDto
 {
@@ -18,4 +16,5 @@ public class DeliveryDto
     public string VendorName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public ICollection<DeliveryEntryDto> Entries { get; set; } = new List<DeliveryEntryDto>();
+    public ICollection<DeliveryMarkerDto> Markers { get; set; } = new List<DeliveryMarkerDto>();
 }

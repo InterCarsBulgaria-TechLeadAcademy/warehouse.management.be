@@ -1,4 +1,4 @@
-﻿namespace WarehouseManagement.Core.Enums;
+﻿namespace WarehouseManagement.Common.Statuses;
 
 public enum DeliveryStatus
 {
