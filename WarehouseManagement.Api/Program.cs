@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Api.Extensions;
 using WarehouseManagement.Api.Middlewares;
@@ -20,8 +21,8 @@ builder.Services.AddApplicationIdentity(builder.Configuration);
 builder.Services.AddApplicationService();
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<WarehouseManagementDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<WarehouseManagementDbContext>(options => 
+        options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
