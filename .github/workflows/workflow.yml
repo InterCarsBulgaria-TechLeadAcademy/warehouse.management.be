@@ -12,11 +12,14 @@ jobs:
     steps:
       - name: Checkout master
         uses: actions/checkout@main
-        
+        with:
+          rref: addKubernates # for testing
+
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
       - name: Build container image
         run: docker build -t ${{ secrets.REGISTRY_NAME }}/intercars-be:$(echo $GITHUB_SHA | head -c7) --target final .
 
