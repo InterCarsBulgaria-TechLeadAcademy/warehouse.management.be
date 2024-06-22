@@ -3,37 +3,26 @@ name: ci
 on:
   push:
     branches:
+      - addKubernates # for testing
       - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Checkout master
+        uses: actions/checkout@main
+        
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      # -
-      #   name: Build and test
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: .
-      #     target: build-env
-      #     load: true
-      -
-        name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          # platforms: linux/amd64,linux/arm64
-          push: true
-          target: final
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Build container image
+        run: docker build -t ${{ secrets.REGISTRY_NAME }}/intercars-be:$(echo $GITHUB_SHA | head -c7) --target final .
+
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 1200
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push ${{ secrets.REGISTRY_NAME }}/intercars-be:$(echo $GITHUB_SHA | head -c7)
+
