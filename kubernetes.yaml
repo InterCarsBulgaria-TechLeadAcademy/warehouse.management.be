@@ -27,12 +27,8 @@ spec:
       labels:
         service: server
     spec:
-      # initContainers:
-      #   - name: wait-for-db
-      #     image: busybox:1.28
-      #     command: ['sh', '-c', 'until nc -zv db 5432; do echo "waiting for db"; sleep 2; done;']
       containers:
-        - image: registry.digitalocean.com/intercars/intercars-be:53140fd
+        - image: <IMAGE>
           name: server
           imagePullPolicy: Always
           ports:
