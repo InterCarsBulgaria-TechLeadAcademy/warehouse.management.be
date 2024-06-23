@@ -96,6 +96,7 @@ public class DeliveryController : ControllerBase
         return Ok(DeliveryEditedSuccessfully);
     }
 
+    //TODO ONLY FOR ADMIN USERS
     [HttpDelete("delete/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
@@ -105,5 +106,25 @@ public class DeliveryController : ControllerBase
         await deliveryService.DeleteASync(id);
 
         return Ok(DeliveryDeletedSuccessfully);
+    }
+
+    [HttpPut("restore/{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Restore(int id)
+    {
+        await deliveryService.RestoreAsync(id);
+
+        return Ok(DeliveryRestored);
+    }
+
+    [HttpGet("all-deleted")]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<DeliveryDto>))]
+    public async Task<IActionResult> AllDeleted()
+    {
+        var model = await deliveryService.GetAllDeletedAsync();
+
+        return Ok(model);
     }
 }

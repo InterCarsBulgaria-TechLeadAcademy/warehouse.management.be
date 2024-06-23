@@ -10,4 +10,6 @@ public interface IDeliveryService
     Task EditAsync(int id, DeliveryFormDto model, string userId);
     Task<int> AddASync(DeliveryFormDto model, string userId);
     Task DeleteASync(int id);
+    Task RestoreAsync(int id);
+    Task<ICollection<DeliveryDto>> GetAllDeletedAsync();
 }
