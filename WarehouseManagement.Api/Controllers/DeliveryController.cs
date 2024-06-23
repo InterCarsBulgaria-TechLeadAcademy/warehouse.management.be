@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
@@ -13,11 +14,17 @@ public class DeliveryController : ControllerBase
 {
     private readonly IDeliveryService deliveryService;
     private readonly IVendorService vendorService;
+    private readonly IMarkerService markerService;
 
-    public DeliveryController(IDeliveryService deliveryService, IVendorService vendorService)
+    public DeliveryController(
+        IDeliveryService deliveryService,
+        IVendorService vendorService,
+        IMarkerService markerService
+    )
     {
         this.deliveryService = deliveryService;
         this.vendorService = vendorService;
+        this.markerService = markerService;
     }
 
     [HttpGet("{id}")]
@@ -32,9 +39,11 @@ public class DeliveryController : ControllerBase
 
     [HttpGet("all")]
     [ProducesResponseType(200, Type = typeof(ICollection<DeliveryDto>))]
-    public async Task<IActionResult> GetDeliveries()
+    public async Task<IActionResult> GetDeliveries(
+        [FromQuery] PaginationParameters paginationParams
+    )
     {
-        var model = await deliveryService.GetAllAsync();
+        var model = await deliveryService.GetAllAsync(paginationParams);
 
         return Ok(model);
     }
@@ -42,11 +51,27 @@ public class DeliveryController : ControllerBase
     [HttpPost("add")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> Add()
+    public async Task<IActionResult> Add(DeliveryFormDto model)
     {
-        return Ok();
+        if (!await vendorService.ExistByIdAsync(model.VendorId))
+        {
+            return BadRequest($"{VendorMessageKeys.VendorWithIdNotFound} {model.VendorId}");
+        }
+
+        foreach (var markerId in model.Markers)
+        {
+            if (!await markerService.ExistById(markerId))
+            {
+                return BadRequest($"{MarkerMessageKeys.MarkerWithIdNotFound} {markerId}");
+            }
+        }
+
+        var deliveryId = await deliveryService.AddASync(model, User.Id());
+
+        return Ok(deliveryId);
     }
 
+    //TODO ONLY FOR ADMIN USERS
     [HttpPut("edit/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
@@ -58,8 +83,27 @@ public class DeliveryController : ControllerBase
             return BadRequest($"{VendorMessageKeys.VendorWithIdNotFound} {model.VendorId}");
         }
 
+        foreach (var markerId in model.Markers)
+        {
+            if (!await markerService.ExistById(markerId))
+            {
+                return BadRequest($"{MarkerMessageKeys.MarkerWithIdNotFound} {markerId}");
+            }
+        }
+
         await deliveryService.EditAsync(id, model, User.Id());
 
         return Ok(DeliveryEditedSuccessfully);
+    }
+
+    [HttpDelete("delete/{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await deliveryService.DeleteASync(id);
+
+        return Ok(DeliveryDeletedSuccessfully);
     }
 }

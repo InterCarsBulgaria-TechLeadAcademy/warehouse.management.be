@@ -26,4 +26,5 @@ public class DeliveryFormDto
     public int Pieces { get; set; }
     public bool IsApproved { get; set; }
     public int VendorId { get; set; }
+    public ICollection<int> Markers { get; set; } = new HashSet<int>();
 }

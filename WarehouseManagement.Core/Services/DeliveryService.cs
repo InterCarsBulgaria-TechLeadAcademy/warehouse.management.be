@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
+using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -72,10 +76,16 @@ public class DeliveryService : IDeliveryService
         return delivery;
     }
 
-    public async Task<ICollection<DeliveryDto>> GetAllAsync()
+    public async Task<ICollection<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams)
     {
+        Expression<Func<Delivery, bool>> filter = v =>
+            EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
+            || EF.Functions.Like(v.SystemNumber, $"%{paginationParams.SearchQuery}%")
+            || EF.Functions.Like(v.TruckNumber, $"%{paginationParams.SearchQuery}%");
+
         var deliverise = await repository
             .AllReadOnly<Delivery>()
+            .Paginate(paginationParams, filter)
             .Select(d => new DeliveryDto()
             {
                 Id = d.Id,
@@ -123,7 +133,11 @@ public class DeliveryService : IDeliveryService
 
     public async Task EditAsync(int id, DeliveryFormDto model, string userId)
     {
-        var deliveryToEdit = await repository.GetByIdAsync<Delivery>(id);
+        var deliveryToEdit = repository
+            .All<Delivery>()
+            .Where(d => d.Id == id)
+            .Include(d => d.DeliveriesMarkers)
+            .FirstOrDefault();
 
         if (deliveryToEdit == null)
         {
@@ -143,6 +157,72 @@ public class DeliveryService : IDeliveryService
         deliveryToEdit.LastModifiedAt = DateTime.UtcNow;
         deliveryToEdit.LastModifiedByUserId = userId;
 
+        repository.DeleteRange(deliveryToEdit.DeliveriesMarkers);
+
+        foreach (var markerId in model.Markers)
+        {
+            var newDeliveryMarker = new DeliveryMarker()
+            {
+                DeliveryId = deliveryToEdit.Id,
+                MarkerId = markerId
+            };
+
+            deliveryToEdit.DeliveriesMarkers.Add(newDeliveryMarker);
+        }
+
         await repository.SaveChangesWithLogAsync();
+    }
+
+    public async Task<int> AddASync(DeliveryFormDto model, string userId)
+    {
+        var delivery = new Delivery()
+        {
+            Cmr = model.Cmr,
+            TruckNumber = model.TruckNumber,
+            ReceptionNumber = model.ReceptionNumber,
+            SystemNumber = model.SystemNumber,
+            VendorId = model.VendorId,
+            CreatedAt = DateTime.UtcNow,
+            CreatedByUserId = userId,
+            DeliveryTime = model.DeliveryTime,
+            IsApproved = false,
+            IsDeleted = false,
+            Packages = model.Packages,
+            Pallets = model.Pallets,
+            Pieces = model.Pieces,
+        };
+
+        await repository.AddAsync(delivery);
+
+        await repository.SaveChangesAsync();
+
+        foreach (var markerId in model.Markers)
+        {
+            var newDeliveryMarker = new DeliveryMarker()
+            {
+                DeliveryId = delivery.Id,
+                MarkerId = markerId
+            };
+
+            delivery.DeliveriesMarkers.Add(newDeliveryMarker);
+        }
+
+        await repository.SaveChangesAsync();
+
+        return delivery.Id;
+    }
+
+    public async Task DeleteASync(int id)
+    {
+        var deliveryToDelete = await repository.GetByIdAsync<Delivery>(id);
+
+        if (deliveryToDelete == null)
+        {
+            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+        }
+
+        repository.SoftDelete(deliveryToDelete);
+
+        await repository.SaveChangesAsync();
     }
 }

@@ -263,4 +263,9 @@ public class MarkerService : IMarkerService
 
         return null;
     }
+
+    public async Task<bool> ExistById(int id)
+    {
+        return await repository.AllReadOnly<Marker>().AnyAsync(m => m.Id == id);
+    }
 }
