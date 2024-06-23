@@ -1,3 +1,14 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: <registry_name>
+  namespace: kube-system
+  annotations:
+    digitalocean.com/dosecret-identifier: <registry_name>
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: <docker_credentials>
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,7 +32,7 @@ spec:
       #     image: busybox:1.28
       #     command: ['sh', '-c', 'until nc -zv db 5432; do echo "waiting for db"; sleep 2; done;']
       containers:
-        - image: kristianmalamov/warehouse.management.be
+        - image: registry.digitalocean.com/intercars/intercars-be:53140fd
           name: server
           imagePullPolicy: Always
           ports:
@@ -52,17 +63,17 @@ spec:
         service: db
     spec:
       containers:
-        - env:
-            - name: ACCEPT_EULA
-              value: "Y"
-            - name: SA_PASSWORD
-              value: "Vexisth3pro!"
-          image: mcr.microsoft.com/mssql/server:2022-latest
-          name: "db"
-          ports:
-            - containerPort: 1433
-              protocol: TCP
-          resources: {}
+          - image: mcr.microsoft.com/mssql/server:2022-latest
+            env:
+              - name: ACCEPT_EULA
+                value: "Y"
+              - name: SA_PASSWORD
+                value: "Vexisth3pro!"
+            name: "db"
+            ports:
+              - containerPort: 1433
+                protocol: TCP
+            resources: {}
       restartPolicy: Always
 status: {}
 ---

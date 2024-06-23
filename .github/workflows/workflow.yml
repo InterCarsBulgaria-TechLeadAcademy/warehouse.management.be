@@ -19,7 +19,7 @@ jobs:
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
+          
       - name: Build container image
         run: docker build -t ${{ secrets.REGISTRY_NAME }}/intercars-be:$(echo $GITHUB_SHA | head -c7) --target final .
 
@@ -29,3 +29,14 @@ jobs:
       - name: Push image to DigitalOcean Container Registry
         run: docker push ${{ secrets.REGISTRY_NAME }}/intercars-be:$(echo $GITHUB_SHA | head -c7)
 
+      - name: Update deployment file
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|${{ secrets.REGISTRY_NAME }}/intercars-be:'${TAG}'|' $GITHUB_WORKSPACE/kubernetes.yaml
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
+
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f $GITHUB_WORKSPACE/kubernetes.yaml
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/intercars-be
