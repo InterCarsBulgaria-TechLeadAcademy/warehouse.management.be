@@ -9,7 +9,7 @@ public interface IEntryService
     Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses);
     Task<IEnumerable<EntryDto>> GetAllByZoneAsync(int zoneId, EntryStatuses[]? statuses);
     Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(int? zoneId, EntryStatuses[]? statuses);
-    Task CreateAsync(EntryFormDto model, string userId);
+    Task CreateAsync(ICollection<EntryFormDto> model, string userId);
     Task EditAsync(int id, EntryFormDto model, string userId);
     Task DeleteAsync(int id, string userId);
     Task RestoreAsync(int id);

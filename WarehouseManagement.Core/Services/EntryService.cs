@@ -18,18 +18,24 @@ public class EntryService : IEntryService
         this.repository = repository;
     }
 
-    public async Task CreateAsync(EntryFormDto model, string userId)
+    public async Task CreateAsync(ICollection<EntryFormDto> model, string userId)
     {
-        var entry = new Entry()
+        foreach (var entry in model)
         {
-            Pallets = model.Pallets,
-            Packages = model.Packages,
-            Pieces = model.Pieces,
-            CreatedAt = DateTime.UtcNow,
-            CreatedByUserId = userId
-        };
+            var newEntry = new Entry()
+            {
+                Pallets = entry.Pallets,
+                Packages = entry.Packages,
+                Pieces = entry.Pieces,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+                DeliveryId = entry.DeliveryId,
+                ZoneId = entry.ZoneId,
+            };
 
-        await repository.AddAsync(entry);
+            await repository.AddAsync(newEntry);
+        }
+
         await repository.SaveChangesAsync();
     }
 
@@ -140,11 +146,6 @@ public class EntryService : IEntryService
 
     public async Task<EntryDto> GetByIdAsync(int id)
     {
-        //if (await ExistsByIdAsync(id))
-        //{
-        //    throw new KeyNotFoundException(EntryWithIdNotFound);
-        //}
-
         var entry = await repository.AllReadOnly<Entry>().FirstOrDefaultAsync(e => e.Id == id);
 
         if (entry == null)

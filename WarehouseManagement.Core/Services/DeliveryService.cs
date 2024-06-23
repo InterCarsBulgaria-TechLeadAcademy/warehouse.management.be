@@ -83,7 +83,7 @@ public class DeliveryService : IDeliveryService
             || EF.Functions.Like(v.SystemNumber, $"%{paginationParams.SearchQuery}%")
             || EF.Functions.Like(v.TruckNumber, $"%{paginationParams.SearchQuery}%");
 
-        var deliverise = await repository
+        var deliveries = await repository
             .AllReadOnly<Delivery>()
             .Paginate(paginationParams, filter)
             .Select(d => new DeliveryDto()
@@ -128,7 +128,7 @@ public class DeliveryService : IDeliveryService
             })
             .ToListAsync();
 
-        return deliverise;
+        return deliveries;
     }
 
     public async Task EditAsync(int id, DeliveryFormDto model, string userId)
@@ -224,5 +224,76 @@ public class DeliveryService : IDeliveryService
         repository.SoftDelete(deliveryToDelete);
 
         await repository.SaveChangesAsync();
+    }
+
+    public async Task RestoreAsync(int id)
+    {
+        var delivery = await repository
+            .AllWithDeleted<Delivery>()
+            .FirstOrDefaultAsync(d => d.Id == id);
+
+        if (delivery == null)
+        {
+            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+        }
+
+        if (!delivery.IsDeleted)
+        {
+            throw new InvalidOperationException($"{DeliveryNotDeleted} {id}");
+        }
+
+        repository.UnDelete(delivery);
+
+        await repository.SaveChangesAsync();
+    }
+
+    public async Task<ICollection<DeliveryDto>> GetAllDeletedAsync()
+    {
+        var deliveries = await repository
+            .AllWithDeletedReadOnly<Delivery>()
+            .Where(d => d.IsDeleted)
+            .Select(d => new DeliveryDto()
+            {
+                Id = d.Id,
+                Cmr = d.Cmr,
+                DeliveryTime = d.DeliveryTime,
+                IsApproved = d.IsApproved,
+                Packages = d.Packages,
+                Pallets = d.Pallets,
+                Pieces = d.Pieces,
+                ReceptionNumber = d.ReceptionNumber,
+                SystemNumber = d.SystemNumber,
+                TruckNumber = d.TruckNumber,
+                VendorId = d.VendorId,
+                VendorName = d.Vendor.Name,
+                Status = d.Entries.Any()
+                    ? d.Entries.All(e => e.FinishedProccessing.HasValue)
+                        ? d.IsApproved
+                            ? DeliveryStatus.Approved.ToString()
+                            : DeliveryStatus.Finished.ToString()
+                        : d.Entries.Any(e => e.StartedProccessing.HasValue)
+                            ? DeliveryStatus.Processing.ToString()
+                            : DeliveryStatus.Waiting.ToString()
+                    : DeliveryStatus.Waiting.ToString(),
+                Entries = d
+                    .Entries.Select(e => new DeliveryEntryDto()
+                    {
+                        Id = e.Id,
+                        FinishedProccessing = e.FinishedProccessing,
+                        StartedProccessing = e.StartedProccessing,
+                        ZoneId = e.ZoneId
+                    })
+                    .ToList(),
+                Markers = d
+                    .DeliveriesMarkers.Select(dm => new DeliveryMarkerDto()
+                    {
+                        MarkerId = dm.MarkerId,
+                        MarkerName = dm.Marker.Name
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
+
+        return deliveries;
     }
 }
