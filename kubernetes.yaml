@@ -71,16 +71,12 @@ metadata:
   name: server
   namespace: default
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
-    - name: "8080"
-      port: 8080
+    - port: 8080
       targetPort: 8080
-      nodePort: 30001
   selector:
     service: server
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Service
