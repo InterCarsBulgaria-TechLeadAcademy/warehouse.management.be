@@ -67,7 +67,7 @@ public class EntryService : IEntryService
         return await repository.GetByIdAsync<Entry>(id) != null;
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses)
+    public async Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses = null)
     {
         var query = BuildQuery(statuses);
 
@@ -88,7 +88,7 @@ public class EntryService : IEntryService
 
     public async Task<IEnumerable<EntryDto>> GetAllByZoneAsync(
         int zoneId,
-        EntryStatuses[]? statuses
+        EntryStatuses[]? statuses = null
     )
     {
         var query = BuildQuery(statuses);
@@ -112,11 +112,11 @@ public class EntryService : IEntryService
     }
 
     public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(
-        int? zoneId,
-        EntryStatuses[]? statuses
+        int? zoneId = null,
+        EntryStatuses[]? statuses = null
     )
     {
-        var query = BuildQuery(statuses);
+        var query = BuildQuery(statuses, true);
 
         if (zoneId != null)
         {
@@ -140,7 +140,7 @@ public class EntryService : IEntryService
 
     public async Task<EntryDto> GetByIdAsync(int id)
     {
-        if (await ExistsByIdAsync(id))
+        if (!await ExistsByIdAsync(id))
         {
             throw new KeyNotFoundException(EntryWithIdNotFound);
         }
@@ -162,7 +162,7 @@ public class EntryService : IEntryService
 
     public async Task MoveEntryToZoneWithId(int entryId, int zoneId)
     {
-        if (await ExistsByIdAsync(entryId))
+        if (!await ExistsByIdAsync(entryId))
         {
             throw new KeyNotFoundException(EntryWithIdNotFound);
         }
@@ -197,9 +197,18 @@ public class EntryService : IEntryService
         await repository.SaveChangesAsync();
     }
 
-    private IQueryable<Entry> BuildQuery(EntryStatuses[]? statuses)
+    private IQueryable<Entry> BuildQuery(EntryStatuses[]? statuses, bool withDeleted = false)
     {
-        var query = repository.AllReadOnly<Entry>();
+        IQueryable<Entry> query;
+
+        if (withDeleted)
+        {
+            query = repository.AllWithDeletedReadOnly<Entry>();
+        }
+        else
+        {
+            query = repository.AllReadOnly<Entry>();
+        }
 
         if (statuses != null)
         {
@@ -210,14 +219,14 @@ public class EntryService : IEntryService
                 );
             }
 
-            if (statuses.Contains(EntryStatuses.Waiting))
+            if (statuses.Contains(EntryStatuses.Processing))
             {
                 query = query.Where(e =>
                     e.StartedProccessing != null && e.FinishedProccessing == null
                 );
             }
 
-            if (statuses.Contains(EntryStatuses.Waiting))
+            if (statuses.Contains(EntryStatuses.Finished))
             {
                 query = query.Where(e => e.FinishedProccessing != null);
             }
