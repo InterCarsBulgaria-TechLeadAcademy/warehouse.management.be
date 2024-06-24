@@ -71,9 +71,10 @@ metadata:
   name: server
   namespace: default
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
-    - name: "8080"
+    - name: http
+      protocol: TCP
       port: 8080
       targetPort: 8080
   selector:
