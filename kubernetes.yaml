@@ -10,7 +10,8 @@ spec:
   selector:
     matchLabels:
       service: server
-  strategy: {}
+  strategy: 
+    type: Recreate
   template:
     metadata:
       labels:
