@@ -34,12 +34,9 @@ using (var scope = app.Services.CreateScope())
     salesContext.Database.EnsureCreated();
 }
 
-if (app.Environment.IsDevelopment())
-{
+app.UseSwagger();
+app.UseSwaggerUI();
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
