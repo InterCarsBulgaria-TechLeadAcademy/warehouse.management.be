@@ -168,16 +168,17 @@ public class EntryService : IEntryService
         }
 
         var entry = await repository.AllReadOnly<Entry>().FirstAsync(e => e.Id == entryId);
-        var zoneExists = await repository.AllReadOnly<Zone>().AnyAsync(z => z.Id == zoneId);
+        var zone = await repository.AllReadOnly<Zone>().FirstOrDefaultAsync(z => z.Id == zoneId);
 
-        if (!zoneExists)
+        if (zone == null)
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        entry.ZoneId = zoneId;
+        entry.Zone = zone;
         await repository.SaveChangesWithLogAsync();
     }
+
 
     public async Task RestoreAsync(int id)
     {

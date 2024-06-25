@@ -25,7 +25,6 @@ public class EntryServiceTests
     private Entry processingEntry;
     private Entry finishedEntry;
     private Entry deletedEntry;
-    private Entry oldWaitingEntry;
 
     private Zone zone1;
     private Zone zone2;
@@ -107,20 +106,7 @@ public class EntryServiceTests
             IsDeleted = true
         };
 
-        oldWaitingEntry = new Entry
-        {
-            Id = 1,
-            Pallets = 6,
-            Packages = 0,
-            Pieces = 0,
-            Zone = zone1,
-            StartedProccessing = null,
-            FinishedProccessing = null,
-            CreatedByUserId = "User1",
-            IsDeleted = true
-        };
-
-        var entries = new List<Entry> { waitingEntry, processingEntry, finishedEntry };
+        var entries = new List<Entry> { waitingEntry, processingEntry, finishedEntry, deletedEntry };
         var zones = new List<Zone> { zone1, zone2 };
 
         await dbContext.Entries.AddRangeAsync(entries);
@@ -242,7 +228,7 @@ public class EntryServiceTests
     {
         var entries = await entryService.GetAllWithDeletedAsync();
 
-        Assert.That(entries.Count(), Is.EqualTo(5));
+        Assert.That(entries.Count(), Is.EqualTo(4));
     }
 
     [Test]
