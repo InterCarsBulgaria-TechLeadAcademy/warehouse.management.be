@@ -236,7 +236,7 @@ public class EntryServiceTests
     {
         var entries = await entryService.GetAllWithDeletedAsync(1);
 
-        Assert.That(entries.Count(), Is.EqualTo(4));
+        Assert.That(entries.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -261,9 +261,9 @@ public class EntryServiceTests
     [Test]
     public async Task MoveEntryToZoneWithId_ShouldSuccessfullyMoveEntry()
     {
-        await entryService.MoveEntryToZoneWithId(processingEntry.Id, zone2.Id);
+        await entryService.MoveEntryToZoneWithId(waitingEntry.Id, zone2.Id);
 
-        Assert.That(processingEntry.ZoneId, Is.EqualTo(zone2.Id));
+        Assert.That(waitingEntry.ZoneId, Is.EqualTo(zone2.Id));
     }
 
     [Test]
@@ -310,7 +310,7 @@ public class EntryServiceTests
     [Test]
     public void RestoreAsync_ThrowsInvalidOperationException_WhenEntryIsNotDeleted()
     {
-        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             await entryService.RestoreAsync(waitingEntry.Id);
         });

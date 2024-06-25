@@ -167,8 +167,8 @@ public class EntryService : IEntryService
             throw new KeyNotFoundException(EntryWithIdNotFound);
         }
 
-        var entry = await repository.AllReadOnly<Entry>().FirstAsync(e => e.Id == entryId);
-        var zone = await repository.AllReadOnly<Zone>().FirstOrDefaultAsync(z => z.Id == zoneId);
+        var entry = await repository.All<Entry>().FirstAsync(e => e.Id == entryId);
+        var zone = await repository.All<Zone>().FirstOrDefaultAsync(z => z.Id == zoneId);
 
         if (zone == null)
         {
@@ -179,10 +179,9 @@ public class EntryService : IEntryService
         await repository.SaveChangesWithLogAsync();
     }
 
-
     public async Task RestoreAsync(int id)
     {
-        var entry = await repository.All<Entry>().FirstOrDefaultAsync(z => z.Id == id);
+        var entry = await repository.AllWithDeleted<Entry>().FirstOrDefaultAsync(z => z.Id == id);
 
         if (entry == null)
         {
