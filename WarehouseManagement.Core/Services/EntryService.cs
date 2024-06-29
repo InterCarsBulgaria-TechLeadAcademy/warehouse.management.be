@@ -30,49 +30,7 @@ public class EntryService : IEntryService
 
         foreach (var entry in model)
         {
-            Entry newEntry;
-
-            if (entry.Pallets > 0)
-            {
-                newEntry = new Entry()
-                {
-                    Pallets = entry.Pallets,
-                    Packages = 0,
-                    Pieces = 0,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedByUserId = userId,
-                    DeliveryId = entry.DeliveryId,
-                    ZoneId = entry.ZoneId,
-                };
-            }
-            else if (entry.Packages > 0)
-            {
-                newEntry = new Entry()
-                {
-                    Pallets = 0,
-                    Packages = entry.Packages,
-                    Pieces = 0,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedByUserId = userId,
-                    DeliveryId = entry.DeliveryId,
-                    ZoneId = entry.ZoneId,
-                };
-            }
-            else
-            {
-                newEntry = new Entry()
-                {
-                    Pallets = 0,
-                    Packages = 0,
-                    Pieces = entry.Pieces,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedByUserId = userId,
-                    DeliveryId = entry.DeliveryId,
-                    ZoneId = entry.ZoneId,
-                };
-            }
-
-            await repository.AddAsync(newEntry);
+            await MapnNewEntriesAndAddToEntriesAsync(entry, userId);
         }
 
         await repository.SaveChangesAsync();
@@ -283,5 +241,52 @@ public class EntryService : IEntryService
             count++;
 
         return count == 1;
+    }
+
+    private async Task MapnNewEntriesAndAddToEntriesAsync(EntryFormDto entry, string userId)
+    {
+        Entry newEntry;
+
+        if (entry.Pallets > 0)
+        {
+            newEntry = new Entry()
+            {
+                Pallets = entry.Pallets,
+                Packages = 0,
+                Pieces = 0,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+                DeliveryId = entry.DeliveryId,
+                ZoneId = entry.ZoneId,
+            };
+        }
+        else if (entry.Packages > 0)
+        {
+            newEntry = new Entry()
+            {
+                Pallets = 0,
+                Packages = entry.Packages,
+                Pieces = 0,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+                DeliveryId = entry.DeliveryId,
+                ZoneId = entry.ZoneId,
+            };
+        }
+        else
+        {
+            newEntry = new Entry()
+            {
+                Pallets = 0,
+                Packages = 0,
+                Pieces = entry.Pieces,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+                DeliveryId = entry.DeliveryId,
+                ZoneId = entry.ZoneId,
+            };
+        }
+
+        await repository.AddAsync(newEntry);
     }
 }
