@@ -30,8 +30,8 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var salesContext = scope.ServiceProvider.GetRequiredService<WarehouseManagementDbContext>();
-    salesContext.Database.Migrate();
+    var warehouseManagementDbContext = scope.ServiceProvider.GetRequiredService<WarehouseManagementDbContext>();
+    warehouseManagementDbContext.Database.Migrate();
 }
 
 app.UseSwagger();
