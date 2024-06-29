@@ -22,16 +22,55 @@ public class EntryService : IEntryService
     {
         foreach (var entry in model)
         {
-            var newEntry = new Entry()
+            if (HasExactlyOneTypeSet(entry) == false)
             {
-                Pallets = entry.Pallets,
-                Packages = entry.Packages,
-                Pieces = entry.Pieces,
-                CreatedAt = DateTime.UtcNow,
-                CreatedByUserId = userId,
-                DeliveryId = entry.DeliveryId,
-                ZoneId = entry.ZoneId,
-            };
+                throw new ArgumentException(EntryCanHaveOnlyOneTypeSet);
+            }
+        }
+
+        foreach (var entry in model)
+        {
+            Entry newEntry;
+
+            if (entry.Pallets > 0)
+            {
+                newEntry = new Entry()
+                {
+                    Pallets = entry.Pallets,
+                    Packages = 0,
+                    Pieces = 0,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedByUserId = userId,
+                    DeliveryId = entry.DeliveryId,
+                    ZoneId = entry.ZoneId,
+                };
+            }
+            else if (entry.Packages > 0)
+            {
+                newEntry = new Entry()
+                {
+                    Pallets = 0,
+                    Packages = entry.Packages,
+                    Pieces = 0,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedByUserId = userId,
+                    DeliveryId = entry.DeliveryId,
+                    ZoneId = entry.ZoneId,
+                };
+            }
+            else
+            {
+                newEntry = new Entry()
+                {
+                    Pallets = 0,
+                    Packages = 0,
+                    Pieces = entry.Pieces,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedByUserId = userId,
+                    DeliveryId = entry.DeliveryId,
+                    ZoneId = entry.ZoneId,
+                };
+            }
 
             await repository.AddAsync(newEntry);
         }
@@ -230,5 +269,19 @@ public class EntryService : IEntryService
         }
 
         return query;
+    }
+
+    private bool HasExactlyOneTypeSet(EntryFormDto dto)
+    {
+        int count = 0;
+
+        if (dto.Pallets > 0)
+            count++;
+        if (dto.Packages > 0)
+            count++;
+        if (dto.Pieces > 0)
+            count++;
+
+        return count == 1;
     }
 }

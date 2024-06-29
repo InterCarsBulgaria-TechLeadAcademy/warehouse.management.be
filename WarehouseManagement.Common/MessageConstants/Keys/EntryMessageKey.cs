@@ -9,4 +9,5 @@ public static class EntryMessageKey
     public const string EntryRestored = "EntryRestored";
     public const string EntryNotDeleted = "EntryNotDeleted";
     public const string EntryInvalidData = "EntryInvalidData";
+    public const string EntryCanHaveOnlyOneTypeSet = "EntryCanHaveOnlyOneTypeSet";
 }
