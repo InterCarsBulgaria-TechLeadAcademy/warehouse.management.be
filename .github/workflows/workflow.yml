@@ -3,7 +3,6 @@ name: ci
 on:
   push:
     branches:
-      - addKubernates # for testing
       - main
 
 jobs:
@@ -12,8 +11,6 @@ jobs:
     steps:
       - name: Checkout master
         uses: actions/checkout@main
-        with:
-          rref: addKubernates # for testing
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
