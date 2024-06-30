@@ -4,6 +4,7 @@ using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
+using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers;
@@ -58,12 +59,13 @@ public class DeliveryController : ControllerBase
             return BadRequest($"{VendorMessageKeys.VendorWithIdNotFound} {model.VendorId}");
         }
 
-        foreach (var markerId in model.Markers)
+        var nonExistingMarkes = await markerService.MarkersExistAsync(model.Markers);
+
+        if (nonExistingMarkes.Any())
         {
-            if (!await markerService.ExistById(markerId))
-            {
-                return BadRequest($"{MarkerMessageKeys.MarkerWithIdNotFound} {markerId}");
-            }
+            return BadRequest(
+                $"{MarkerMessageKeys.MarkerWithIdNotFound} {string.Join(",", nonExistingMarkes)}"
+            );
         }
 
         var deliveryId = await deliveryService.AddASync(model, User.Id());
@@ -83,12 +85,13 @@ public class DeliveryController : ControllerBase
             return BadRequest($"{VendorMessageKeys.VendorWithIdNotFound} {model.VendorId}");
         }
 
-        foreach (var markerId in model.Markers)
+        var nonExistingMarkes = await markerService.MarkersExistAsync(model.Markers);
+
+        if (nonExistingMarkes.Any())
         {
-            if (!await markerService.ExistById(markerId))
-            {
-                return BadRequest($"{MarkerMessageKeys.MarkerWithIdNotFound} {markerId}");
-            }
+            return BadRequest(
+                $"{MarkerMessageKeys.MarkerWithIdNotFound} {string.Join(",", nonExistingMarkes)}"
+            );
         }
 
         await deliveryService.EditAsync(id, model, User.Id());
