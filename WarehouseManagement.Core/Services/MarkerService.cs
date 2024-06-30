@@ -269,7 +269,7 @@ public class MarkerService : IMarkerService
         return await repository.AllReadOnly<Marker>().AnyAsync(m => m.Id == id);
     }
 
-    public async Task<ICollection<int>> MarkersExistAsync(ICollection<int> makrkerIds)
+    public async Task<ICollection<int>> GetNonExistingMarkerIdsAsync(ICollection<int> makrkerIds)
     {
         List<int> notExistingMarkerIds = new List<int>();
         foreach (var id in makrkerIds)

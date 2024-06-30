@@ -59,7 +59,7 @@ public class DeliveryController : ControllerBase
             return BadRequest($"{VendorMessageKeys.VendorWithIdNotFound} {model.VendorId}");
         }
 
-        var nonExistingMarkes = await markerService.MarkersExistAsync(model.Markers);
+        var nonExistingMarkes = await markerService.GetNonExistingMarkerIdsAsync(model.Markers);
 
         if (nonExistingMarkes.Any())
         {
@@ -85,7 +85,7 @@ public class DeliveryController : ControllerBase
             return BadRequest($"{VendorMessageKeys.VendorWithIdNotFound} {model.VendorId}");
         }
 
-        var nonExistingMarkes = await markerService.MarkersExistAsync(model.Markers);
+        var nonExistingMarkes = await markerService.GetNonExistingMarkerIdsAsync(model.Markers);
 
         if (nonExistingMarkes.Any())
         {
