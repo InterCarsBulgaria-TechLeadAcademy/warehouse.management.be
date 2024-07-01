@@ -3,7 +3,7 @@
 public static class ZoneMessageKeys
 {
     public const string ZoneWithIdNotFound = "ZoneWithIdNotFound";
-    public const string ZoneWithNameExist = "ZoneWithNameExist";
+    public const string ZoneWithNameExists = "ZoneWithNameExist";
     public const string ZoneCreatedSuccessfully = "ZoneCreatedSuccessfully";
     public const string ZoneEditedSuccessfully = "ZoneEditedSuccessfully";
     public const string ZoneDeletedSuccessfully = "ZoneDeletedSuccessfully";

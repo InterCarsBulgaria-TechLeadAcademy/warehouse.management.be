@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WarehouseManagement.Infrast
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WarehouseManagement.Common", "WarehouseManagement.Common\WarehouseManagement.Common.csproj", "{4E315029-755B-477D-BB08-CB1851427BD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Management.Tests", "Warehouse.Management.Tests\Warehouse.Management.Tests.csproj", "{ABBE65E2-3F1B-4518-A0F9-DF65E517D48F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Management.Tests", "Warehouse.Management.Tests\Warehouse.Management.Tests.csproj", "{ABBE65E2-3F1B-4518-A0F9-DF65E517D48F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
