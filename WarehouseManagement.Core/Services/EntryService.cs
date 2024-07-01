@@ -18,18 +18,21 @@ public class EntryService : IEntryService
         this.repository = repository;
     }
 
-    public async Task CreateAsync(EntryFormDto model, string userId)
+    public async Task CreateAsync(ICollection<EntryFormDto> model, string userId)
     {
-        var entry = new Entry()
+        foreach (var entry in model)
         {
-            Pallets = model.Pallets,
-            Packages = model.Packages,
-            Pieces = model.Pieces,
-            CreatedAt = DateTime.UtcNow,
-            CreatedByUserId = userId
-        };
+            if (HasExactlyOneTypeSet(entry) == false)
+            {
+                throw new ArgumentException(EntryCanHaveOnlyOneTypeSet);
+            }
+        }
 
-        await repository.AddAsync(entry);
+        foreach (var entry in model)
+        {
+            await MapnNewEntriesAndAddToEntriesAsync(entry, userId);
+        }
+
         await repository.SaveChangesAsync();
     }
 
@@ -140,12 +143,12 @@ public class EntryService : IEntryService
 
     public async Task<EntryDto> GetByIdAsync(int id)
     {
-        if (await ExistsByIdAsync(id))
-        {
-            throw new KeyNotFoundException(EntryWithIdNotFound);
-        }
+        var entry = await repository.AllReadOnly<Entry>().FirstOrDefaultAsync(e => e.Id == id);
 
-        var entry = await repository.AllReadOnly<Entry>().FirstAsync(e => e.Id == id);
+        if (entry == null)
+        {
+            throw new KeyNotFoundException($"{EntryWithIdNotFound} {id}");
+        }
 
         return new EntryDto()
         {
@@ -224,5 +227,66 @@ public class EntryService : IEntryService
         }
 
         return query;
+    }
+
+    private bool HasExactlyOneTypeSet(EntryFormDto dto)
+    {
+        int count = 0;
+
+        if (dto.Pallets > 0)
+            count++;
+        if (dto.Packages > 0)
+            count++;
+        if (dto.Pieces > 0)
+            count++;
+
+        return count == 1;
+    }
+
+    private async Task MapnNewEntriesAndAddToEntriesAsync(EntryFormDto entry, string userId)
+    {
+        Entry newEntry;
+
+        if (entry.Pallets > 0)
+        {
+            newEntry = new Entry()
+            {
+                Pallets = entry.Pallets,
+                Packages = 0,
+                Pieces = 0,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+                DeliveryId = entry.DeliveryId,
+                ZoneId = entry.ZoneId,
+            };
+        }
+        else if (entry.Packages > 0)
+        {
+            newEntry = new Entry()
+            {
+                Pallets = 0,
+                Packages = entry.Packages,
+                Pieces = 0,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+                DeliveryId = entry.DeliveryId,
+                ZoneId = entry.ZoneId,
+            };
+        }
+        else
+        {
+            newEntry = new Entry()
+            {
+                Pallets = 0,
+                Packages = 0,
+                Pieces = entry.Pieces,
+                CreatedAt = DateTime.UtcNow,
+                CreatedByUserId = userId,
+                DeliveryId = entry.DeliveryId,
+                ZoneId = entry.ZoneId,
+            };
+        }
+
+        await repository.AddAsync(newEntry);
     }
 }

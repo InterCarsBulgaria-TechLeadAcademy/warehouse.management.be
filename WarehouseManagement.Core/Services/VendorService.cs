@@ -262,5 +262,10 @@ namespace WarehouseManagement.Core.Services
                 .Where(v => v.Id != id)
                 .AnyAsync(v => v.SystemNumber.ToLower() == systemNumber.ToLower());
         }
+
+        public async Task<bool> ExistByIdAsync(int id)
+        {
+            return await repository.AllReadOnly<Vendor>().AnyAsync(v => v.Id == id);
+        }
     }
 }

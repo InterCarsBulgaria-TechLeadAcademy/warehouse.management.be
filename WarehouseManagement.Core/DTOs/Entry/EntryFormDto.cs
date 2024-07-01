@@ -13,4 +13,10 @@ public class EntryFormDto
 
     [Range(PiecesMinValue, PiecesMaxValue)]
     public int Pieces { get; set; }
+
+    [Required]
+    public int DeliveryId { get; set; }
+
+    [Required]
+    public int ZoneId { get; set; }
 }
