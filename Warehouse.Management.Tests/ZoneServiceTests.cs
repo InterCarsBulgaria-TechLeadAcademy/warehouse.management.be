@@ -36,6 +36,7 @@ public class ZoneServiceTests
     {
         mockUserService = new Mock<IUserService>();
         mockUserService.Setup(x => x.UserId).Returns("TestUser");
+
         var options = new DbContextOptionsBuilder<WarehouseManagementDbContext>()
             .UseInMemoryDatabase(
                 databaseName: "WarehouseManagementTestDb" + Guid.NewGuid().ToString()
@@ -167,7 +168,6 @@ public class ZoneServiceTests
         var addedZone = await dbContext.Zones.FirstAsync(z => z.Name == uniqueName);
 
         Assert.IsNotNull(addedZone);
-        Assert.That(addedZone.Name, Is.EqualTo(uniqueName));
     }
 
     [Test]
