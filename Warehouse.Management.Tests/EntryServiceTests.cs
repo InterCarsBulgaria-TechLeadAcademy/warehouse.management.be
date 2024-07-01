@@ -7,6 +7,7 @@ using WarehouseManagement.Core.Services;
 using WarehouseManagement.Infrastructure.Data;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using WarehouseManagement.Common.Statuses;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 
@@ -140,6 +141,24 @@ public class EntryServiceTests
     }
 
     [Test]
+    public void CreateAsync_ThrowsArgumentException_WhenEntryHasMoreThanOneTypeSet()
+    {
+        var entryDto = new EntryFormDto
+        {
+            Pallets = 0,
+            Packages = 6,
+            Pieces = 11
+        };
+
+        var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+        {
+            await entryService.CreateAsync(entryDto, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryCanHaveOnlyOneTypeSet));
+    }
+
+    [Test]
     public async Task DeleteAsync_SuccessfulyDeletesEntry()
     {
         await entryService.DeleteAsync(2, mockUserService.Object.UserId);
@@ -216,11 +235,27 @@ public class EntryServiceTests
     }
 
     [Test]
+    public async Task GetAllAsync_ShouldReturnAllEntries_WithTheProvidedStatus()
+    {
+        var entries = await entryService.GetAllAsync([EntryStatuses.Waiting]);
+
+        Assert.That(entries.Count(), Is.EqualTo(1));
+    }
+
+    [Test]
     public async Task GetAllByZoneAsync_ShouldReturnAllEntries_ForTheGivenZone()
     {
         var entries = await entryService.GetAllByZoneAsync(1);
 
         Assert.That(entries.Count(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task GetAllByZoneAsync_ShouldReturnAllEntries_WithTheProvidedStatus_ForTheGivenZone()
+    {
+        var entries = await entryService.GetAllByZoneAsync(1, [EntryStatuses.Waiting]);
+
+        Assert.That(entries.Count(), Is.EqualTo(1));
     }
 
     [Test]
@@ -237,6 +272,14 @@ public class EntryServiceTests
         var entries = await entryService.GetAllWithDeletedAsync(1);
 
         Assert.That(entries.Count(), Is.EqualTo(3));
+    }
+
+    [Test]
+    public async Task GetAllWithDeletedAsync_ShouldReturnAllEntries_IncludingTheDeleted_ForTheGivenZone_WithTheProvidedStatus()
+    {
+        var entries = await entryService.GetAllWithDeletedAsync(1, [EntryStatuses.Waiting]);
+
+        Assert.That(entries.Count(), Is.EqualTo(2));
     }
 
     [Test]
