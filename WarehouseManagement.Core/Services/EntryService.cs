@@ -231,11 +231,11 @@ public class EntryService : IEntryService
     {
         if (entry.StartedProccessing != null)
         {
-            throw new InvalidOperationException($"{EntryHasAlreadyStartedProccessing} {entry.Id}");
+            throw new InvalidOperationException($"{EntryHasAlreadyStartedProcessing} {entry.Id}");
         }
         else if (entry.FinishedProccessing != null)
         {
-            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProccessing} {entry.Id}");
+            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
         }
     }
 
@@ -243,11 +243,11 @@ public class EntryService : IEntryService
     {
         if (entry.FinishedProccessing != null)
         {
-            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProccessing} {entry.Id}");
+            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
         }
         else if (entry.StartedProccessing == null)
         {
-            throw new InvalidOperationException($"{EntryHasNotStartedProccessing} {entry.Id}");
+            throw new InvalidOperationException($"{EntryHasNotStartedProcessing} {entry.Id}");
         }
     }
 

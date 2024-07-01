@@ -107,22 +107,22 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> StartProccessing(int id)
+        public async Task<IActionResult> StartProcessing(int id)
         {
             await entryService.StartProccessingAsync(id);
 
-            return Ok(EntryStartedProccessing);
+            return Ok(EntryStartedProcessing);
         }
 
         [HttpGet("finish/{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> FinishProccessing(int id)
+        public async Task<IActionResult> FinishProcessing(int id)
         {
             await entryService.FinishProccessingAsync(id);
 
-            return Ok(EntryFinishedProccessing);
+            return Ok(EntryFinishedProcessing);
         }
     }
 }
