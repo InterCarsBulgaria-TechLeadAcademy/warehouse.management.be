@@ -140,6 +140,7 @@ public class EntryServiceTests
         Assert.IsNotNull(addedEntry);
     }
 
+    // Test should be refactored after merge of PR #30
     [Test]
     public void CreateAsync_ThrowsArgumentException_WhenEntryHasMoreThanOneTypeSet()
     {
