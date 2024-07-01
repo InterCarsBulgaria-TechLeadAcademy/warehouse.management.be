@@ -112,7 +112,7 @@ public class EntryService : IEntryService
     }
 
     public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(
-        int? zoneId,
+        int? zoneId = null,
         EntryStatuses[]? statuses = null
     )
     {
@@ -168,20 +168,20 @@ public class EntryService : IEntryService
         }
 
         var entry = await repository.AllReadOnly<Entry>().FirstAsync(e => e.Id == entryId);
-        var zoneExists = await repository.AllReadOnly<Zone>().AnyAsync(z => z.Id == zoneId);
+        var zone = await repository.All<Zone>().FirstOrDefaultAsync(z => z.Id == zoneId);
 
-        if (!zoneExists)
+        if (zone == null)
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        entry.ZoneId = zoneId;
+        entry.Zone = zone;
         await repository.SaveChangesWithLogAsync();
     }
 
     public async Task RestoreAsync(int id)
     {
-        var entry = await repository.All<Entry>().FirstOrDefaultAsync(z => z.Id == id);
+        var entry = await repository.AllWithDeleted<Entry>().FirstOrDefaultAsync(z => z.Id == id);
 
         if (entry == null)
         {
