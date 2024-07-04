@@ -128,32 +128,66 @@ public class EntryServiceTests
     [Test]
     public async Task CreateAsync_SuccessfullyCreatesEntry()
     {
-        await entryService.CreateAsync(new EntryFormDto
+        var entries = new List<EntryFormDto>()
         {
-            Pallets = 0,
-            Packages = 0,
-            Pieces = 15
-        }, mockUserService.Object.UserId);
+            new EntryFormDto()
+            {
+                Pallets = 5,
+                Packages = 0,
+                Pieces = 0,
+                DeliveryId = 1,
+                ZoneId = 1
+            },
+            new EntryFormDto()
+            {
+                Pallets = 0,
+                Packages = 0,
+                Pieces = 15,
+                DeliveryId = 1,
+                ZoneId = 1
+            },
+            new EntryFormDto()
+            {
+                Pallets = 0,
+                Packages = 4,
+                Pieces = 0,
+                DeliveryId = 1,
+                ZoneId = 1
+            }
+        };
 
-        var addedEntry = await dbContext.Entries.FirstOrDefaultAsync(e => e.Pieces == 15);
+        await entryService.CreateAsync(entries, mockUserService.Object.UserId);
 
-        Assert.IsNotNull(addedEntry);
+        Assert.That(dbContext.Entries.Count(), Is.EqualTo(6));
     }
 
     // Test should be refactored after merge of PR #30
     [Test]
     public void CreateAsync_ThrowsArgumentException_WhenEntryHasMoreThanOneTypeSet()
     {
-        var entryDto = new EntryFormDto
+        var entries = new List<EntryFormDto>()
         {
-            Pallets = 0,
-            Packages = 6,
-            Pieces = 11
+            new EntryFormDto()
+            {
+                Pallets = 5,
+                Packages = 5,
+                Pieces = 0,
+                DeliveryId = 1,
+                ZoneId = 1
+            },
+            new EntryFormDto()
+            {
+                Pallets = 0,
+                Packages = 0,
+                Pieces = 15,
+                DeliveryId = 1,
+                ZoneId = 1
+            }
         };
 
         var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
         {
-            await entryService.CreateAsync(entryDto, mockUserService.Object.UserId);
+            await entryService.CreateAsync(entries, mockUserService.Object.UserId);
         });
 
         Assert.That(ex.Message, Is.EqualTo(EntryCanHaveOnlyOneTypeSet));

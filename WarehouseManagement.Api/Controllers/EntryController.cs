@@ -56,7 +56,7 @@ namespace WarehouseManagement.Api.Controllers
 
         [HttpPost("add")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> Add([FromBody] EntryFormDto model)
+        public async Task<IActionResult> Add([FromBody] ICollection<EntryFormDto> model)
         {
             if (!ModelState.IsValid)
             {
