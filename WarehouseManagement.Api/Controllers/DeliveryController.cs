@@ -130,4 +130,14 @@ public class DeliveryController : ControllerBase
 
         return Ok(model);
     }
+
+    [HttpGet("history/{id}")]
+    [ProducesResponseType(200, Type = typeof(DeliveryHistoryDto))]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetHistory([FromQuery] int id)
+    {
+        var history = await deliveryService.GetHistoryAsync(id);
+
+        return Ok(history);
+    }
 }

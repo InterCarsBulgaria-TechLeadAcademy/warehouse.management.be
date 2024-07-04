@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Enums;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
@@ -295,5 +296,49 @@ public class DeliveryService : IDeliveryService
             .ToListAsync();
 
         return deliveries;
+    }
+
+    public async Task<DeliveryHistoryDto> GetHistoryAsync(int id)
+    {
+        var delivery = await repository.GetByIdAsync<Delivery>(id);
+
+        if (delivery == null)
+        {
+            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+        }
+
+        var relatedEntriesIds = repository
+            .AllReadOnly<Entry>()
+            .Where(e => e.DeliveryId == delivery.Id)
+            .Select(e => e.Id);
+
+        var changes = repository
+            .AllReadOnly<EntityChange>()
+            .Where(change => int.Parse(change.EntityId) == delivery.Id || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId)));
+
+        var deliveryHistory = new DeliveryHistoryDto
+        {
+            Id = delivery.Id,
+            Changes = await changes.Select(change => new DeliveryHistoryDto.Change
+            {
+                EntityId = int.Parse(change.EntityId),
+                PropertyName = change.PropertyName,
+                From = change.OldValue!,
+                To = change.NewValue!,
+                Type = change.EntityName == "Delivery" ? DeliveryHistoryChangeType.Delivery : DeliveryHistoryChangeType.Entry,
+                LogType = change.PropertyName == "Status" && change.EntityName == "Entry" ? LogType.EntryStatusChange :
+                    change.PropertyName == "Status" && change.EntityName == "Delivery" ? LogType.DeliveryStatusChange :
+                    change.PropertyName == "ZoneId" ? LogType.ZoneChange : LogType.Split // May be refactored based on the Move functionality
+            }).ToListAsync()
+        };
+
+        return deliveryHistory;
+    }
+
+    public Task ChangeDeliveryStatusIfNeeded(int id)
+    {
+        // Check if there is a missmatch between entries start and finish processing props and delivery status
+        // Example: If there is an entry from that delivery which has StartedProcessing != null and the status of delivery is still `Waiting`, status of delivery should be changed to `Processing`
+        throw new NotImplementedException();
     }
 }
