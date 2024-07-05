@@ -14,6 +14,8 @@ public class Delivery : BaseClass
     public int Pieces { get; set; }
     public bool IsApproved { get; set; }
     public DeliveryStatus Status { get; set; }
+    public DateTime? StartedProcessing { get; set; }
+    public DateTime? FinishedProcessing { get; set; }
     public int VendorId { get; set; }
     public Vendor Vendor { get; set; } = null!;
     public ICollection<DeliveryMarker> DeliveriesMarkers { get; set; } =

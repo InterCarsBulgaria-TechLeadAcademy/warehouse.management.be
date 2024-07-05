@@ -335,10 +335,83 @@ public class DeliveryService : IDeliveryService
         return deliveryHistory;
     }
 
-    public Task ChangeDeliveryStatusIfNeeded(int id)
+    public async Task ChangeDeliveryStatusIfNeeded(int id)
     {
-        // Check if there is a missmatch between entries start and finish processing props and delivery status
-        // Example: If there is an entry from that delivery which has StartedProcessing != null and the status of delivery is still `Waiting`, status of delivery should be changed to `Processing`
-        throw new NotImplementedException();
+        var delivery = await repository.GetByIdAsync<Delivery>(id);
+
+        if (delivery == null)
+        {
+            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+        }
+
+        DeliveryStatus expectedStatus;
+
+        if (delivery.Entries.All(e => e.StartedProccessing == null))
+        {
+            expectedStatus = DeliveryStatus.Waiting;
+        }
+        else if (delivery.Entries.Any(e => e.StartedProccessing != null) &&
+            delivery.Entries.Any(e => e.FinishedProccessing == null))
+        {
+            expectedStatus = DeliveryStatus.Processing;
+        }
+        else if (delivery.Entries.All(e => e.FinishedProccessing != null))
+        {
+            expectedStatus = DeliveryStatus.Finished;
+        }
+        else
+        {
+            throw new InvalidOperationException("The delivery entries are in an invalid state.");
+        }
+
+        if (delivery.Status != expectedStatus)
+        {
+            delivery.Status = expectedStatus;
+
+            await SetDatesForDeliveryAsync(delivery, expectedStatus);
+        }
+    }
+
+    private async Task SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
+    {
+        if (status == DeliveryStatus.Waiting)
+        {
+            delivery.StartedProcessing = null;
+            delivery.FinishedProcessing = null; // Assure that delivery is not in finished state
+        }
+        else if (status == DeliveryStatus.Processing)
+        {
+            delivery.FinishedProcessing = null; // Assure that delivery is not in finished state
+
+            var startedProcessing = delivery.Entries
+                .OrderBy(e => e.StartedProccessing)
+                .First()
+                .StartedProccessing;
+
+            delivery.StartedProcessing = startedProcessing;
+        }
+        else if (status == DeliveryStatus.Finished)
+        {
+            var startedProcessing = delivery.Entries
+                .OrderBy(e => e.StartedProccessing)
+                .First()
+                .StartedProccessing;
+
+            delivery.StartedProcessing = startedProcessing; // TODO: Ask if necessary
+
+            var finishedProcessing = delivery.Entries
+                .OrderByDescending(e => e.FinishedProccessing)
+                .First()
+                .FinishedProccessing;
+
+            delivery.FinishedProcessing = finishedProcessing;
+        }
+        else
+        {
+            // TODO: Handle Approve if needed (probably approve will be handled by another method ApproveDelivery() and will not be part of this functionality)
+            throw new InvalidOperationException("Operation for delivery with status 'Approved' currently not supported.");
+        }
+
+        await repository.SaveChangesWithLogAsync();
     }
 }
