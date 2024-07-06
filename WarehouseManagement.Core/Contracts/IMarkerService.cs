@@ -1,4 +1,5 @@
-﻿using WarehouseManagement.Core.DTOs;
+﻿using System.Threading.Tasks;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Marker;
 
 namespace WarehouseManagement.Core.Contracts;
@@ -15,4 +16,6 @@ public interface IMarkerService
     Task<IEnumerable<string>> GetDeletedMarkersAsync();
     Task<Dictionary<string, List<string>>> GetMarkerUsagesAsync(int id);
     Task<string?> GetDeletedMarkerNameByIdAsync(int id);
+    Task<bool> ExistById(int id);
+    Task<ICollection<int>> GetNonExistingMarkerIdsAsync(ICollection<int> makrkerIds);
 }

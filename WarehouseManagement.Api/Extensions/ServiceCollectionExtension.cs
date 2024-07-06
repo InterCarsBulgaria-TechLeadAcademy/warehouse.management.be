@@ -19,6 +19,7 @@ namespace WarehouseManagement.Api.Extensions
             services.AddScoped<IZoneService, ZoneService>();
             services.AddScoped<IVendorService, VendorService>();
             services.AddScoped<IEntryService, EntryService>();
+            services.AddScoped<IDeliveryService, DeliveryService>();
             return services;
         }
 

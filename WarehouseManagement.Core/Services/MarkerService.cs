@@ -263,4 +263,23 @@ public class MarkerService : IMarkerService
 
         return null;
     }
+
+    public async Task<bool> ExistById(int id)
+    {
+        return await repository.AllReadOnly<Marker>().AnyAsync(m => m.Id == id);
+    }
+
+    public async Task<ICollection<int>> GetNonExistingMarkerIdsAsync(ICollection<int> makrkerIds)
+    {
+        List<int> notExistingMarkerIds = new List<int>();
+        foreach (var id in makrkerIds)
+        {
+            if (await ExistById(id) == false)
+            {
+                notExistingMarkerIds.Add(id);
+            }
+        }
+
+        return notExistingMarkerIds;
+    }
 }

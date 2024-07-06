@@ -143,12 +143,12 @@ public class EntryService : IEntryService
 
     public async Task<EntryDto> GetByIdAsync(int id)
     {
-        if (!await ExistsByIdAsync(id))
-        {
-            throw new KeyNotFoundException(EntryWithIdNotFound);
-        }
+        var entry = await repository.AllReadOnly<Entry>().FirstOrDefaultAsync(e => e.Id == id);
 
-        var entry = await repository.AllReadOnly<Entry>().FirstAsync(e => e.Id == id);
+        if (entry == null)
+        {
+            throw new KeyNotFoundException($"{EntryWithIdNotFound} {id}");
+        }
 
         return new EntryDto()
         {

@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: server
+  name: server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: server
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: server
+    spec:
+      containers:
+        - image: <IMAGE>
+          name: server
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: db
+  name: db
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: db
+    spec:
+      containers:
+          - image: mcr.microsoft.com/mssql/server:2022-latest
+            env:
+              - name: ACCEPT_EULA
+                value: "Y"
+              - name: SA_PASSWORD
+                value: "Vexisth3pro!"
+            name: "db"
+            ports:
+              - containerPort: 1433
+                protocol: TCP
+            resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: server
+  name: server
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    service: server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: db
+  name: db
+  namespace: default
+spec:
+  ports:
+    - name: "1433"
+      port: 1433
+      targetPort: 1433
+  selector:
+    service: db
+status:
+  loadBalancer: {}
