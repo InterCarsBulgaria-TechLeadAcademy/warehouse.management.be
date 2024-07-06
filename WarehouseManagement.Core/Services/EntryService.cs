@@ -70,7 +70,7 @@ public class EntryService : IEntryService
         return await repository.GetByIdAsync<Entry>(id) != null;
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses)
+    public async Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses = null)
     {
         var query = BuildQuery(statuses);
 
@@ -91,7 +91,7 @@ public class EntryService : IEntryService
 
     public async Task<IEnumerable<EntryDto>> GetAllByZoneAsync(
         int zoneId,
-        EntryStatuses[]? statuses
+        EntryStatuses[]? statuses = null
     )
     {
         var query = BuildQuery(statuses);
@@ -115,11 +115,11 @@ public class EntryService : IEntryService
     }
 
     public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(
-        int? zoneId,
-        EntryStatuses[]? statuses
+        int? zoneId = null,
+        EntryStatuses[]? statuses = null
     )
     {
-        var query = BuildQuery(statuses);
+        var query = BuildQuery(statuses, true);
 
         if (zoneId != null)
         {
@@ -165,26 +165,26 @@ public class EntryService : IEntryService
 
     public async Task MoveEntryToZoneWithId(int entryId, int zoneId)
     {
-        if (await ExistsByIdAsync(entryId))
+        if (!await ExistsByIdAsync(entryId))
         {
             throw new KeyNotFoundException(EntryWithIdNotFound);
         }
 
-        var entry = await repository.AllReadOnly<Entry>().FirstAsync(e => e.Id == entryId);
-        var zoneExists = await repository.AllReadOnly<Zone>().AnyAsync(z => z.Id == zoneId);
+        var entry = await repository.All<Entry>().FirstAsync(e => e.Id == entryId);
+        var zone = await repository.All<Zone>().FirstOrDefaultAsync(z => z.Id == zoneId);
 
-        if (!zoneExists)
+        if (zone == null)
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        entry.ZoneId = zoneId;
+        entry.Zone = zone;
         await repository.SaveChangesWithLogAsync();
     }
 
     public async Task RestoreAsync(int id)
     {
-        var entry = await repository.All<Entry>().FirstOrDefaultAsync(z => z.Id == id);
+        var entry = await repository.AllWithDeleted<Entry>().FirstOrDefaultAsync(z => z.Id == id);
 
         if (entry == null)
         {
@@ -200,9 +200,18 @@ public class EntryService : IEntryService
         await repository.SaveChangesAsync();
     }
 
-    private IQueryable<Entry> BuildQuery(EntryStatuses[]? statuses)
+    private IQueryable<Entry> BuildQuery(EntryStatuses[]? statuses, bool withDeleted = false)
     {
-        var query = repository.AllReadOnly<Entry>();
+        IQueryable<Entry> query;
+
+        if (withDeleted)
+        {
+            query = repository.AllWithDeletedReadOnly<Entry>();
+        }
+        else
+        {
+            query = repository.AllReadOnly<Entry>();
+        }
 
         if (statuses != null)
         {
@@ -213,14 +222,14 @@ public class EntryService : IEntryService
                 );
             }
 
-            if (statuses.Contains(EntryStatuses.Waiting))
+            if (statuses.Contains(EntryStatuses.Processing))
             {
                 query = query.Where(e =>
                     e.StartedProccessing != null && e.FinishedProccessing == null
                 );
             }
 
-            if (statuses.Contains(EntryStatuses.Waiting))
+            if (statuses.Contains(EntryStatuses.Finished))
             {
                 query = query.Where(e => e.FinishedProccessing != null);
             }
