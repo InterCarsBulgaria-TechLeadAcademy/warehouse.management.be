@@ -109,7 +109,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> StartProcessing(int id)
         {
-            await entryService.StartProccessingAsync(id);
+            await entryService.StartProcessingAsync(id);
 
             return Ok(EntryStartedProcessing);
         }
@@ -120,7 +120,7 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> FinishProcessing(int id)
         {
-            await entryService.FinishProccessingAsync(id);
+            await entryService.FinishProcessingAsync(id);
 
             return Ok(EntryFinishedProcessing);
         }

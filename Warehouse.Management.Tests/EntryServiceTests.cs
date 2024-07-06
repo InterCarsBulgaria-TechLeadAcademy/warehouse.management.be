@@ -10,6 +10,7 @@ using WarehouseManagement.Infrastructure.Data.Models;
 using WarehouseManagement.Common.Statuses;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
+using Castle.Components.DictionaryAdapter.Xml;
 
 namespace Warehouse.Management.Tests;
 
@@ -333,7 +334,7 @@ public class EntryServiceTests
             await entryService.GetByIdAsync(InvalidEntryId);
         });
 
-        Assert.That(ex.Message, Is.EqualTo(EntryWithIdNotFound));
+        Assert.That(ex.Message, Is.EqualTo($"{EntryWithIdNotFound} {InvalidEntryId}"));
     }
 
     [Test]
@@ -394,5 +395,94 @@ public class EntryServiceTests
         });
         
         Assert.That(ex.Message, Is.EqualTo(EntryNotDeleted));
+    }
+
+    [Test]
+    public async Task StartProcessingAsync_ShouldSetStartProcessingProperty_ToCurrentDate()
+    {
+        await entryService.StartProcessingAsync(waitingEntry.Id);
+
+        var entityChange = await dbContext.EntityChanges
+            .FirstAsync(change => int.Parse(change.EntityId) == waitingEntry.Id);
+
+        Assert.That(entityChange.OldValue, Is.EqualTo(null));
+        Assert.NotNull(waitingEntry.StartedProccessing);
+    }
+
+    [Test]
+    public void StartProcessingAsync_ThrowsKeyNotFoundException_WhenInvalidIdIsPassed()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.StartProcessingAsync(InvalidEntryId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryWithIdNotFound));
+    }
+
+    [Test]
+    public void StartProcessingAsync_ThrowsInvalidOperationException_WhenStartProcessingIsNotNull()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.StartProcessingAsync(processingEntry.Id);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo($"{EntryHasAlreadyStartedProcessing} {processingEntry.Id}"));
+    }
+
+    [Test]
+    public void StartProcessingAsync_ThrowsInvalidOperationException_WhenEntryHasAlreadyFinishedProcessing()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.StartProcessingAsync(finishedEntry.Id);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo($"{EntryHasAlreadyFinishedProcessing} {finishedEntry.Id}"));
+    }
+
+    [Test]
+    public async Task FinishProcessingAsync_ShouldSetFinishProcessingProperty_ToCurrentDate()
+    {
+        await entryService.FinishProcessingAsync(processingEntry.Id);
+
+        var entityChange = await dbContext.EntityChanges
+            .FirstAsync(change => int.Parse(change.EntityId) == processingEntry.Id);
+
+        Assert.That(entityChange.OldValue, Is.EqualTo(null));
+        Assert.NotNull(processingEntry.FinishedProccessing);
+    }
+
+    public void FinishProcessingAsync_ThrowsKeyNotFoundException_WhenInvalidIdIsPassed()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.FinishProcessingAsync(InvalidEntryId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryWithIdNotFound));
+    }
+
+    [Test]
+    public void FinishProcessingAsync_ThrowsInvalidOperationException_WhenFinishProcessingIsNotNull()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.FinishProcessingAsync(finishedEntry.Id);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo($"{EntryHasAlreadyFinishedProcessing} {finishedEntry.Id}"));
+    }
+
+    [Test]
+    public void FinishProcessingAsync_ThrowsInvalidOperationException_WhenEntryHasNotStartedProcessing()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.FinishProcessingAsync(waitingEntry.Id);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo($"{EntryHasNotStartedProcessing} {waitingEntry.Id}"));
     }
 }

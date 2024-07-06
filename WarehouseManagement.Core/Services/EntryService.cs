@@ -201,7 +201,7 @@ public class EntryService : IEntryService
         await repository.SaveChangesAsync();
     }
 
-    public async Task StartProccessingAsync(int entryId)
+    public async Task StartProcessingAsync(int entryId)
     {
         if (!await ExistsByIdAsync(entryId))
         {
@@ -210,40 +210,40 @@ public class EntryService : IEntryService
 
         var entry = (await repository.GetByIdAsync<Entry>(entryId))!;
 
-        ValidateStartProccessingOfEntry(entry);
+        ValidateStartProcessingOfEntry(entry);
 
         entry.StartedProccessing = DateTime.UtcNow;
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task FinishProccessingAsync(int entryId)
+    public async Task FinishProcessingAsync(int entryId)
     {
-        if (await ExistsByIdAsync(entryId))
+        if (!await ExistsByIdAsync(entryId))
         {
             throw new KeyNotFoundException(EntryWithIdNotFound);
         }
 
         var entry = (await repository.GetByIdAsync<Entry>(entryId))!;
 
-        ValidateFinishProccessingOfEntry(entry);
+        ValidateFinishProcessingOfEntry(entry);
 
         entry.FinishedProccessing = DateTime.UtcNow;
         await repository.SaveChangesWithLogAsync();
     }
 
-    private void ValidateStartProccessingOfEntry(Entry entry)
-    {
-        if (entry.StartedProccessing != null)
-        {
-            throw new InvalidOperationException($"{EntryHasAlreadyStartedProcessing} {entry.Id}");
-        }
-        else if (entry.FinishedProccessing != null)
+    private void ValidateStartProcessingOfEntry(Entry entry)
+    { 
+        if (entry.FinishedProccessing != null)
         {
             throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
         }
+        else if (entry.StartedProccessing != null)
+        {
+            throw new InvalidOperationException($"{EntryHasAlreadyStartedProcessing} {entry.Id}");
+        }
     }
 
-    private void ValidateFinishProccessingOfEntry(Entry entry)
+    private void ValidateFinishProcessingOfEntry(Entry entry)
     {
         if (entry.FinishedProccessing != null)
         {
