@@ -174,7 +174,7 @@ public class DeliveryService : IDeliveryService
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task<int> AddASync(DeliveryFormDto model, string userId)
+    public async Task<int> AddAsync(DeliveryFormDto model, string userId)
     {
         var delivery = new Delivery()
         {
@@ -341,28 +341,10 @@ public class DeliveryService : IDeliveryService
 
         if (delivery == null)
         {
-            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+            throw new KeyNotFoundException(DeliveryWithIdNotFound);
         }
 
-        DeliveryStatus expectedStatus;
-
-        if (delivery.Entries.All(e => e.StartedProccessing == null))
-        {
-            expectedStatus = DeliveryStatus.Waiting;
-        }
-        else if (delivery.Entries.Any(e => e.StartedProccessing != null) &&
-            delivery.Entries.Any(e => e.FinishedProccessing == null))
-        {
-            expectedStatus = DeliveryStatus.Processing;
-        }
-        else if (delivery.Entries.All(e => e.FinishedProccessing != null))
-        {
-            expectedStatus = DeliveryStatus.Finished;
-        }
-        else
-        {
-            throw new InvalidOperationException("The delivery entries are in an invalid state.");
-        }
+        DeliveryStatus expectedStatus = GetExpectedStatus(delivery);
 
         if (delivery.Status != expectedStatus)
         {
@@ -370,6 +352,42 @@ public class DeliveryService : IDeliveryService
 
             await SetDatesForDeliveryAsync(delivery, expectedStatus);
         }
+    }
+
+    private DeliveryStatus GetExpectedStatus(Delivery delivery)
+    {
+        if (AreAllEntriesWaiting(delivery.Entries))
+        {
+            return DeliveryStatus.Waiting;
+        }
+        else if (IsProcessingInProgress(delivery.Entries))
+        {
+            return DeliveryStatus.Processing;
+        }
+        else if (AreAllEntriesFinished(delivery.Entries))
+        {
+            return DeliveryStatus.Finished;
+        }
+        else
+        {
+            throw new InvalidOperationException("The delivery entries are in an invalid state.");
+        }
+    }
+
+    private bool AreAllEntriesWaiting(ICollection<Entry> entries)
+    {
+        return entries.All(e => e.StartedProccessing == null);
+    }
+
+    private bool IsProcessingInProgress(ICollection<Entry> entries)
+    {
+        return entries.Any(e => e.StartedProccessing != null) &&
+            entries.Any(e => e.FinishedProccessing == null);
+    }
+
+    private bool AreAllEntriesFinished(ICollection<Entry> entries)
+    {
+        return entries.All(e => e.FinishedProccessing != null);
     }
 
     private async Task SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)

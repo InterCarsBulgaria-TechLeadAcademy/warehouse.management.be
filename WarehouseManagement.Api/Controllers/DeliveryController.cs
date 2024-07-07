@@ -68,7 +68,7 @@ public class DeliveryController : ControllerBase
             );
         }
 
-        var deliveryId = await deliveryService.AddASync(model, User.Id());
+        var deliveryId = await deliveryService.AddAsync(model, User.Id());
 
         return Ok(deliveryId);
     }
