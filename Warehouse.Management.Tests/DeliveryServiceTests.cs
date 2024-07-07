@@ -146,8 +146,20 @@ public class DeliveryServiceTests
     [Test]
     public async Task GetHistoryAsync_ShouldReturnHistoryOfDelivery()
     {
-        var deliveryHistory = await deliveryService.GetHistoryAsync(delivery.Id);
+        // TODO:
+        // - Give processing entry status a value (finish processing of entry)
+        // - Test more cases
+        // - Move functionality will add more cases aswell (status of entry will change)
 
-        Assert.IsNotNull(deliveryHistory); // TODO: Change it
+        var history = await deliveryService.GetHistoryAsync(delivery.Id);
+
+        Assert.IsNotNull(history);
+        Assert.That(history.Id, Is.EqualTo(delivery.Id));
+
+        // Processing entry status set to finished
+        Assert.That(history.Changes.First().EntityId, Is.EqualTo(processingEntry.Id));
+        Assert.That(history.Changes.First().To, Is.EqualTo(processingEntry.FinishedProccessing.ToString()));
+
+        Assert.That(history.Changes.Skip(1).First().EntityId, Is.EqualTo(delivery.Id));
     }
 }
