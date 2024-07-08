@@ -102,6 +102,7 @@ public class MarkerService : IMarkerService
             .Paginate(paginationParams, filter)
             .Select(m => new MarkerDto
             {
+                Id = m.Id,
                 Name = m.Name,
                 Deliveries = m
                     .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
@@ -138,6 +139,7 @@ public class MarkerService : IMarkerService
             .Where(m => m.Id == id)
             .Select(m => new MarkerDto
             {
+                Id = m.Id,
                 Name = m.Name,
                 Deliveries = m
                     .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
