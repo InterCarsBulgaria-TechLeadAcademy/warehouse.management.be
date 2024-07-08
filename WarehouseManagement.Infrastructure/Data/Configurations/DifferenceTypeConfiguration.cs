@@ -3,12 +3,12 @@ using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data.Configurations;
 
-public class ZoneConfiguration : BaseConfiguration<Zone>
+public class DifferenceTypeConfiguration : BaseConfiguration<DifferenceType>
 {
-    public void Configure(EntityTypeBuilder<Zone> builder)
+    public void Configure(EntityTypeBuilder<DifferenceType> builder)
     {
         base.Configure(builder);
 
-        builder.Property(z => z.Name).HasMaxLength(255);
+        builder.Property(dt => dt.Name).HasMaxLength(250);
     }
 }
