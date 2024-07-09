@@ -216,6 +216,18 @@ public class EntryService : IEntryService
         await repository.SaveChangesWithLogAsync();
     }
 
+    private void ValidateStartProcessingOfEntry(Entry entry)
+    { 
+        if (entry.FinishedProccessing != null)
+        {
+            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
+        }
+        else if (entry.StartedProccessing != null)
+        {
+            throw new InvalidOperationException($"{EntryHasAlreadyStartedProcessing} {entry.Id}");
+        }
+    }
+
     public async Task FinishProcessingAsync(int entryId)
     {
         if (!await ExistsByIdAsync(entryId))
@@ -229,18 +241,6 @@ public class EntryService : IEntryService
 
         entry.FinishedProccessing = DateTime.UtcNow;
         await repository.SaveChangesWithLogAsync();
-    }
-
-    private void ValidateStartProcessingOfEntry(Entry entry)
-    { 
-        if (entry.FinishedProccessing != null)
-        {
-            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
-        }
-        else if (entry.StartedProccessing != null)
-        {
-            throw new InvalidOperationException($"{EntryHasAlreadyStartedProcessing} {entry.Id}");
-        }
     }
 
     private void ValidateFinishProcessingOfEntry(Entry entry)

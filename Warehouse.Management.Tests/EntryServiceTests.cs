@@ -407,6 +407,7 @@ public class EntryServiceTests
 
         Assert.That(entityChange.OldValue, Is.EqualTo(null));
         Assert.NotNull(waitingEntry.StartedProccessing);
+        Assert.IsNull(waitingEntry.FinishedProccessing);
     }
 
     [Test]
