@@ -4,6 +4,7 @@ namespace WarehouseManagement.Core.DTOs.Marker;
 
 public class MarkerDto
 {
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public ICollection<MarkerDeliveryDto> Deliveries { get; set; } =
         new HashSet<MarkerDeliveryDto>();
