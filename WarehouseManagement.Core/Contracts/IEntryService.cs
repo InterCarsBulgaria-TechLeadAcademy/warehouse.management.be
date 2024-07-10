@@ -15,4 +15,6 @@ public interface IEntryService
     Task RestoreAsync(int id);
     Task<bool> ExistsByIdAsync(int id);
     Task MoveEntryToZoneWithId(int entryId, int zoneId);
+    Task StartProcessingAsync(int entryId);
+    Task FinishProcessingAsync(int entryId);
 }
