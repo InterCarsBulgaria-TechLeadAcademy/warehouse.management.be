@@ -8,4 +8,5 @@ public static class DifferenceTypeMessageKeys
     public const string DifferenceTypeDeletedSuccessfully = "DifferenceTypeDeletedSuccessfully";
     public const string DifferenceTypeNotDeleted = "DifferenceTypeNotDeleted";
     public const string DifferenceTypeRestored = "DifferenceTypeRestored";
+    public const string DifferenceTypeInvalidData = "DifferenceTypeInvalidData";
 }
