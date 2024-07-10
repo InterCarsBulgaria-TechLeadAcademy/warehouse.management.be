@@ -171,6 +171,7 @@ public class EntryService : IEntryService
         }
 
         var entry = await repository.All<Entry>().FirstAsync(e => e.Id == entryId);
+
         var zone = await repository.All<Zone>().FirstOrDefaultAsync(z => z.Id == zoneId);
 
         if (zone == null)
@@ -198,6 +199,60 @@ public class EntryService : IEntryService
 
         repository.UnDelete(entry);
         await repository.SaveChangesAsync();
+    }
+
+    public async Task StartProcessingAsync(int entryId)
+    {
+        if (!await ExistsByIdAsync(entryId))
+        {
+            throw new KeyNotFoundException(EntryWithIdNotFound);
+        }
+
+        var entry = (await repository.GetByIdAsync<Entry>(entryId))!;
+
+        ValidateStartProcessingOfEntry(entry);
+
+        entry.StartedProccessing = DateTime.UtcNow;
+        await repository.SaveChangesWithLogAsync();
+    }
+
+    private void ValidateStartProcessingOfEntry(Entry entry)
+    { 
+        if (entry.FinishedProccessing != null)
+        {
+            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
+        }
+        else if (entry.StartedProccessing != null)
+        {
+            throw new InvalidOperationException($"{EntryHasAlreadyStartedProcessing} {entry.Id}");
+        }
+    }
+
+    public async Task FinishProcessingAsync(int entryId)
+    {
+        if (!await ExistsByIdAsync(entryId))
+        {
+            throw new KeyNotFoundException(EntryWithIdNotFound);
+        }
+
+        var entry = (await repository.GetByIdAsync<Entry>(entryId))!;
+
+        ValidateFinishProcessingOfEntry(entry);
+
+        entry.FinishedProccessing = DateTime.UtcNow;
+        await repository.SaveChangesWithLogAsync();
+    }
+
+    private void ValidateFinishProcessingOfEntry(Entry entry)
+    {
+        if (entry.FinishedProccessing != null)
+        {
+            throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
+        }
+        else if (entry.StartedProccessing == null)
+        {
+            throw new InvalidOperationException($"{EntryHasNotStartedProcessing} {entry.Id}");
+        }
     }
 
     private IQueryable<Entry> BuildQuery(EntryStatuses[]? statuses, bool withDeleted = false)
