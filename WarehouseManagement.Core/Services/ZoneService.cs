@@ -36,19 +36,17 @@ public class ZoneService : IZoneService
 
         await repository.AddAsync(zone);
 
-        var markers = await repository
+        var zoneMarkers = await repository
             .All<Marker>()
             .Where(m => model.MarkerIds.Contains(m.Id))
-            .ToListAsync();
-
-        foreach (var marker in markers)
-        {
-            await repository.AddAsync(new ZoneMarker()
+            .Select(m => new ZoneMarker
             {
                 Zone = zone,
-                Marker = marker
-            });
-        }
+                Marker = m
+            })
+            .ToListAsync();
+
+        zone.ZonesMarkers = zoneMarkers;
 
         await repository.SaveChangesAsync();
     }

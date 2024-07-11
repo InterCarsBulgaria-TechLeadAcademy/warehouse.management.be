@@ -139,19 +139,17 @@ namespace WarehouseManagement.Core.Services
 
             await repository.AddAsync(vendor);
 
-            var markers = await repository
+            var vendorMarkers = await repository
             .All<Marker>()
             .Where(m => model.MarkerIds.Contains(m.Id))
+            .Select(m => new VendorMarker
+            {
+                Vendor = vendor,
+                Marker = m
+            })
             .ToListAsync();
 
-            foreach (var marker in markers)
-            {
-                await repository.AddAsync(new VendorMarker()
-                {
-                    Vendor = vendor,
-                    Marker = marker
-                });
-            }
+            vendor.VendorsMarkers = vendorMarkers;
 
             await repository.SaveChangesAsync();
 
@@ -187,7 +185,7 @@ namespace WarehouseManagement.Core.Services
             var vendorMarkers = await repository
                 .All<Marker>()
                 .Where(m => model.MarkerIds.Contains(m.Id))
-                .Select(m => new VendorMarker()
+                .Select(m => new VendorMarker
                 {
                     Vendor = vendor,
                     Marker = m
