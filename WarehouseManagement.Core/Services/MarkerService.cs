@@ -91,6 +91,42 @@ public class MarkerService : IMarkerService
             .AnyAsync(m => m.Name.ToLower() == name.ToLower() && !m.IsDeleted);
     }
 
+    public async Task<IEnumerable<MarkerDto>> GetAllAsync()
+    {
+        var markers = await repository
+            .AllReadOnly<Marker>()
+            .Select(m => new MarkerDto
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Deliveries = m
+                    .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
+                    {
+                        DeliveryId = dm.DeliveryId,
+                        DeliverySystemNumber = dm.Delivery.SystemNumber
+                    })
+                    .ToList(),
+                Vendors = m
+                    .VendorsMarkers.Select(vm => new MarkerVendorDto
+                    {
+                        VendorId = vm.VendorId,
+                        VendorName = vm.Vendor.Name,
+                        VendorSystemNumber = vm.Vendor.SystemNumber
+                    })
+                    .ToList(),
+                Zones = m
+                    .ZonesMarkers.Select(zm => new MarkerZoneDto
+                    {
+                        ZoneId = zm.ZoneId,
+                        ZoneName = zm.Zone.Name
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
+
+        return markers;
+    }
+
     public async Task<IEnumerable<MarkerDto>> GetAllAsync(PaginationParameters paginationParams)
     {
         Expression<Func<Marker, bool>> filter = m =>
