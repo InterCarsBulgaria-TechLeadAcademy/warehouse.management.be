@@ -36,19 +36,17 @@ public class ZoneService : IZoneService
 
         await repository.AddAsync(zone);
 
-        var markers = await repository
+        var zoneMarkers = await repository
             .All<Marker>()
             .Where(m => model.MarkerIds.Contains(m.Id))
-            .ToListAsync();
-
-        foreach (var marker in markers)
-        {
-            await repository.AddAsync(new ZoneMarker()
+            .Select(m => new ZoneMarker
             {
                 Zone = zone,
-                Marker = marker
-            });
-        }
+                Marker = m
+            })
+            .ToListAsync();
+
+        zone.ZonesMarkers = zoneMarkers;
 
         await repository.SaveChangesAsync();
     }
@@ -92,16 +90,28 @@ public class ZoneService : IZoneService
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        if (await ExistsByNameAsync(model.Name))
+        var zone = (await repository.GetByIdAsync<Zone>(id))!;
+
+        if (await ExistsByNameAsync(model.Name) && model.Name != zone.Name)
         {
             throw new ArgumentException(ZoneWithNameExists);
         }
 
-        var zone = (await repository.GetByIdAsync<Zone>(id))!;
-
         zone.Name = model.Name;
+        zone.IsFinal = model.IsFinal ?? false;
         zone.LastModifiedAt = DateTime.UtcNow;
         zone.LastModifiedByUserId = userId;
+
+        var zoneMarkers = await repository
+            .All<Marker>()
+            .Where(m => model.MarkerIds.Contains(m.Id))
+            .Select(m => new ZoneMarker
+            {
+                Zone = zone,
+                Marker = m
+            }).ToListAsync();
+
+        zone.ZonesMarkers = zoneMarkers;
 
         await repository.SaveChangesWithLogAsync();
     }
