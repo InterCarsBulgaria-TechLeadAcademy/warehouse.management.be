@@ -30,7 +30,16 @@ public class MarkerController : ControllerBase
 
     [HttpGet("all")]
     [ProducesResponseType(200, Type = typeof(IEnumerable<MarkerDto>))]
-    public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParams)
+    public async Task<IActionResult> GetAll()
+    {
+        var model = await markerService.GetAllAsync();
+
+        return Ok(model);
+    }
+
+    [HttpGet("all-with-params")]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<MarkerDto>))]
+    public async Task<IActionResult> GetAllWithParams([FromQuery] PaginationParameters paginationParams)
     {
         var model = await markerService.GetAllAsync(paginationParams);
 

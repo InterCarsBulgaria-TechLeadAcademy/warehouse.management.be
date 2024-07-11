@@ -8,6 +8,7 @@ public interface IMarkerService
 {
     Task<MarkerDto> GetByIdAsync(int id);
     Task<bool> ExistByNameAsync(string name);
+    Task<IEnumerable<MarkerDto>> GetAllAsync();
     Task<IEnumerable<MarkerDto>> GetAllAsync(PaginationParameters paginationParams);
     Task<int> AddAsync(MarkerFormDto model, string userId);
     Task EditAsync(int id, MarkerFormDto model, string userId);

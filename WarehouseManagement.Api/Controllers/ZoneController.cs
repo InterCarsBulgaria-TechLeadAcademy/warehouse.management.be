@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.DTOs.Zone;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
@@ -36,6 +37,15 @@ namespace WarehouseManagement.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var zones = await zoneService.GetAllAsync();
+
+            return Ok(zones);
+        }
+
+        [HttpGet("all-with-params")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
+        public async Task<IActionResult> GetAllWithParams([FromQuery] PaginationParameters paginationParams)
+        {
+            var zones = await zoneService.GetAllAsync(paginationParams);
 
             return Ok(zones);
         }
@@ -93,6 +103,15 @@ namespace WarehouseManagement.Api.Controllers
         public async Task<IActionResult> AllWithDeleted()
         {
             var model = await zoneService.GetAllWithDeletedAsync();
+
+            return Ok(model);
+        }
+
+        [HttpGet("all-with-deleted-with-params")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
+        public async Task<IActionResult> AllWithDeletedWithParams([FromBody] PaginationParameters paginationParams)
+        {
+            var model = await zoneService.GetAllWithDeletedAsync(paginationParams);
 
             return Ok(model);
         }
