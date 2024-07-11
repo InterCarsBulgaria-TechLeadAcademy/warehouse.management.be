@@ -92,12 +92,12 @@ public class ZoneService : IZoneService
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        if (await ExistsByNameAsync(model.Name))
+        var zone = (await repository.GetByIdAsync<Zone>(id))!;
+
+        if (await ExistsByNameAsync(model.Name) && model.Name != zone.Name)
         {
             throw new ArgumentException(ZoneWithNameExists);
         }
-
-        var zone = (await repository.GetByIdAsync<Zone>(id))!;
 
         zone.Name = model.Name;
         zone.IsFinal = model.IsFinal ?? false;
