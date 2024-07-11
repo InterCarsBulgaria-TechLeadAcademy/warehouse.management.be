@@ -100,8 +100,20 @@ public class ZoneService : IZoneService
         var zone = (await repository.GetByIdAsync<Zone>(id))!;
 
         zone.Name = model.Name;
+        zone.IsFinal = model.IsFinal ?? false;
         zone.LastModifiedAt = DateTime.UtcNow;
         zone.LastModifiedByUserId = userId;
+
+        var zoneMarkers = await repository
+            .All<Marker>()
+            .Where(m => model.MarkerIds.Contains(m.Id))
+            .Select(m => new ZoneMarker
+            {
+                Zone = zone,
+                Marker = m
+            }).ToListAsync();
+
+        zone.ZonesMarkers = zoneMarkers;
 
         await repository.SaveChangesWithLogAsync();
     }
