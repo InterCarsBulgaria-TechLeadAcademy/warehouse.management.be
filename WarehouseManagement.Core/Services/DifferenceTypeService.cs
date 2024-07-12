@@ -50,12 +50,13 @@ public class DifferenceTypeService : IDifferenceTypeService
             throw new KeyNotFoundException(DifferenceTypeWithIdNotFound);
         }
 
-        if (await ExistsByNameAsync(model.Name))
+        var differenceType = await repository.
+            GetByIdAsync<DifferenceType>(id);
+
+        if (await ExistsByNameAsync(model.Name) && model.Name != differenceType!.Name)
         {
             throw new ArgumentException(DifferenceTypeWithNameExist);
         }
-
-        var differenceType = await repository.GetByIdAsync<DifferenceType>(id);
 
         differenceType!.Name = model.Name;
         differenceType!.LastModifiedByUserId = userId;
