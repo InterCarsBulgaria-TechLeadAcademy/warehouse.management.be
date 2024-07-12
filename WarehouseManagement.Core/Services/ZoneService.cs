@@ -102,18 +102,43 @@ public class ZoneService : IZoneService
         zone.LastModifiedAt = DateTime.UtcNow;
         zone.LastModifiedByUserId = userId;
 
-        var zoneMarkers = await repository
-            .All<Marker>()
-            .Where(m => model.MarkerIds.Contains(m.Id))
-            .Select(m => new ZoneMarker
-            {
-                Zone = zone,
-                Marker = m
-            }).ToListAsync();
-
-        zone.ZonesMarkers = zoneMarkers;
+        await HandleMarkersUpdate(zone, model.MarkerIds);
 
         await repository.SaveChangesWithLogAsync();
+    }
+
+    private async Task HandleMarkersUpdate(Zone zone, IEnumerable<int> inputMarkerIds)
+    {
+        var currentZoneMarkers = await repository
+            .All<ZoneMarker>()
+            .Where(zm => zm.ZoneId == zone.Id)
+            .ToListAsync();
+
+        var currentMarkerIds = currentZoneMarkers.Select(zm => zm.MarkerId).ToList();
+
+        var markersToRemove = currentZoneMarkers.Where(zm => !inputMarkerIds.Contains(zm.MarkerId)).ToList();
+        var markerIdsToAdd = inputMarkerIds.Where(id => !currentMarkerIds.Contains(id)).ToList();
+
+        foreach (var zoneMarker in markersToRemove)
+        {
+            repository.Delete(zoneMarker);
+        }
+
+        foreach (var markerId in markerIdsToAdd)
+        {
+            var marker = await repository.GetByIdAsync<Marker>(markerId);
+
+            if (marker != null)
+            {
+                var zoneMarker = new ZoneMarker
+                {
+                    Zone = zone,
+                    Marker = marker
+                };
+
+                await repository.AddAsync(zoneMarker);
+            }
+        }
     }
 
     public async Task<bool> ExistsByIdAsync(int id)
