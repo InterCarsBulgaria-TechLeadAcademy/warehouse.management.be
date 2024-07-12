@@ -51,15 +51,17 @@ public class MarkerService : IMarkerService
         }
 
         var usages = await GetMarkerUsagesAsync(id);
+
         if (usages.Any())
         {
             var usageMessage =
                 $"{MarkerHasUsages} "
-                + string.Join(" ", usages.Select(u => $"{u.Key}: {string.Join(",", u.Value)}"));
+                + string.Join(" ", usages.Select(u => $"{u.Key}: {string.Join(", ", u.Value)}"));
             throw new InvalidOperationException(usageMessage);
         }
 
         repository.SoftDelete(marker);
+
         await repository.SaveChangesAsync();
     }
 
@@ -266,6 +268,7 @@ public class MarkerService : IMarkerService
             .Include(zm => zm.Zone)
             .Select(zm => zm.Zone.Name)
             .ToListAsync();
+
         if (zoneMarkers.Any())
         {
             usages.Add("Zones", zoneMarkers);
@@ -277,6 +280,7 @@ public class MarkerService : IMarkerService
             .Include(vm => vm.Vendor)
             .Select(vm => vm.Vendor.SystemNumber)
             .ToListAsync();
+
         if (vendorMarkers.Any())
         {
             usages.Add("Vendors", vendorMarkers);
