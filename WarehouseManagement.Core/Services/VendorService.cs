@@ -138,6 +138,19 @@ namespace WarehouseManagement.Core.Services
             };
 
             await repository.AddAsync(vendor);
+
+            var vendorMarkers = await repository
+            .All<Marker>()
+            .Where(m => model.MarkerIds.Contains(m.Id))
+            .Select(m => new VendorMarker
+            {
+                Vendor = vendor,
+                Marker = m
+            })
+            .ToListAsync();
+
+            vendor.VendorsMarkers = vendorMarkers;
+
             await repository.SaveChangesAsync();
 
             return vendor.Id;
@@ -168,6 +181,18 @@ namespace WarehouseManagement.Core.Services
             vendor.SystemNumber = model.SystemNumber;
             vendor.LastModifiedAt = DateTime.UtcNow;
             vendor.LastModifiedByUserId = userId;
+
+            var vendorMarkers = await repository
+                .All<Marker>()
+                .Where(m => model.MarkerIds.Contains(m.Id))
+                .Select(m => new VendorMarker
+                {
+                    Vendor = vendor,
+                    Marker = m
+                })
+                .ToListAsync();
+
+            vendor.VendorsMarkers = vendorMarkers;
 
             await repository.SaveChangesWithLogAsync();
         }

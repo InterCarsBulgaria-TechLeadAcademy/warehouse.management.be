@@ -12,5 +12,7 @@ namespace WarehouseManagement.Core.DTOs.Vendor
         [Required(ErrorMessage = RequiredErrorMessage)]
         [StringLength(100, MinimumLength = 1)]
         public string SystemNumber { get; set; } = string.Empty;
+
+        public IEnumerable<int> MarkerIds { get; set; } = new List<int>();
     }
 }
