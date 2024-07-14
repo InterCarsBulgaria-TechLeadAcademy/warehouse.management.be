@@ -140,14 +140,10 @@ namespace WarehouseManagement.Core.Services
             await repository.AddAsync(vendor);
 
             var vendorMarkers = await repository
-            .All<Marker>()
-            .Where(m => model.MarkerIds.Contains(m.Id))
-            .Select(m => new VendorMarker
-            {
-                Vendor = vendor,
-                Marker = m
-            })
-            .ToListAsync();
+                .All<Marker>()
+                .Where(m => model.MarkerIds.Contains(m.Id))
+                .Select(m => new VendorMarker { Vendor = vendor, Marker = m })
+                .ToListAsync();
 
             vendor.VendorsMarkers = vendorMarkers;
 
@@ -158,7 +154,11 @@ namespace WarehouseManagement.Core.Services
 
         public async Task EditAsync(int id, VendorFormDto model, string userId)
         {
-            var vendor = await repository.GetByIdAsync<Vendor>(id);
+            var vendor = await repository
+                .All<Vendor>()
+                .Where(v => v.Id == id)
+                .Include(v => v.VendorsMarkers)
+                .FirstOrDefaultAsync();
 
             if (vendor == null)
             {
@@ -182,17 +182,14 @@ namespace WarehouseManagement.Core.Services
             vendor.LastModifiedAt = DateTime.UtcNow;
             vendor.LastModifiedByUserId = userId;
 
-            var vendorMarkers = await repository
-                .All<Marker>()
-                .Where(m => model.MarkerIds.Contains(m.Id))
-                .Select(m => new VendorMarker
-                {
-                    Vendor = vendor,
-                    Marker = m
-                })
-                .ToListAsync();
+            repository.DeleteRange(vendor.VendorsMarkers);
 
-            vendor.VendorsMarkers = vendorMarkers;
+            foreach (var markerId in model.MarkerIds)
+            {
+                var newVendorMarker = new VendorMarker() { MarkerId = markerId, VendorId = id, };
+
+                await repository.AddAsync(newVendorMarker);
+            }
 
             await repository.SaveChangesWithLogAsync();
         }
