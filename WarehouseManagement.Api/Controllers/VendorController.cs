@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Vendor;
@@ -12,10 +13,12 @@ namespace WarehouseManagement.Api.Controllers
     public class VendorController : ControllerBase
     {
         private readonly IVendorService vendorService;
+        private readonly IMarkerService markerService;
 
-        public VendorController(IVendorService vendorService)
+        public VendorController(IVendorService vendorService, IMarkerService markerService)
         {
             this.vendorService = vendorService;
+            this.markerService = markerService;
         }
 
         [HttpGet("{id}")]
@@ -54,6 +57,17 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Edit(int id, [FromBody] VendorFormDto model)
         {
+            var nonExistingMarkes = await markerService.GetNonExistingMarkerIdsAsync(
+                model.MarkerIds
+            );
+
+            if (nonExistingMarkes.Any())
+            {
+                return BadRequest(
+                    $"{MarkerMessageKeys.MarkerWithIdNotFound} {string.Join(",", nonExistingMarkes)}"
+                );
+            }
+
             await vendorService.EditAsync(id, model, User.Id());
 
             return Ok(VendorEditedSuccessfully);
