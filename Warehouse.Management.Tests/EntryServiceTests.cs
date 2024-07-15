@@ -21,6 +21,7 @@ public class EntryServiceTests
 
     private WarehouseManagementDbContext dbContext;
     private IEntryService entryService;
+    private IDeliveryService deliveryService;
     private Mock<IUserService> mockUserService;
 
     private Entry waitingEntry;
@@ -116,7 +117,8 @@ public class EntryServiceTests
 
         await dbContext.SaveChangesAsync();
 
-        entryService = new EntryService(new Repository(dbContext, mockUserService.Object));
+        deliveryService = new DeliveryService(new Repository(dbContext, mockUserService.Object));
+        entryService = new EntryService(new Repository(dbContext, mockUserService.Object), deliveryService);
     }
 
     [TearDown]

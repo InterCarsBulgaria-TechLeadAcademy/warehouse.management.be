@@ -12,10 +12,12 @@ namespace WarehouseManagement.Core.Services;
 public class EntryService : IEntryService
 {
     private readonly IRepository repository;
+    private readonly IDeliveryService deliveryService;
 
-    public EntryService(IRepository repository)
+    public EntryService(IRepository repository, IDeliveryService deliveryService)
     {
         this.repository = repository;
+        this.deliveryService = deliveryService;
     }
 
     public async Task CreateAsync(ICollection<EntryFormDto> model, string userId)
@@ -213,6 +215,8 @@ public class EntryService : IEntryService
         ValidateStartProcessingOfEntry(entry);
 
         entry.StartedProccessing = DateTime.UtcNow;
+        await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
+
         await repository.SaveChangesWithLogAsync();
     }
 
@@ -240,6 +244,8 @@ public class EntryService : IEntryService
         ValidateFinishProcessingOfEntry(entry);
 
         entry.FinishedProccessing = DateTime.UtcNow;
+        await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
+
         await repository.SaveChangesWithLogAsync();
     }
 

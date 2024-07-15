@@ -215,12 +215,7 @@ public class DeliveryService : IDeliveryService
 
     public async Task DeleteASync(int id)
     {
-        var deliveryToDelete = await repository.GetByIdAsync<Delivery>(id);
-
-        if (deliveryToDelete == null)
-        {
-            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
-        }
+        var deliveryToDelete = await RetrieveByIdAsync(id);
 
         repository.SoftDelete(deliveryToDelete);
 
@@ -300,12 +295,7 @@ public class DeliveryService : IDeliveryService
 
     public async Task<DeliveryHistoryDto> GetHistoryAsync(int id)
     {
-        var delivery = await repository.GetByIdAsync<Delivery>(id);
-
-        if (delivery == null)
-        {
-            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
-        }
+        var delivery = await RetrieveByIdAsync(id);
 
         var relatedEntriesIds = repository
             .AllReadOnly<Entry>()
@@ -337,12 +327,7 @@ public class DeliveryService : IDeliveryService
 
     public async Task ChangeDeliveryStatusIfNeeded(int id)
     {
-        var delivery = await repository.GetByIdAsync<Delivery>(id);
-
-        if (delivery == null)
-        {
-            throw new KeyNotFoundException(DeliveryWithIdNotFound);
-        }
+        var delivery = await RetrieveByIdAsync(id);
 
         DeliveryStatus expectedStatus = GetExpectedStatus(delivery);
 
@@ -350,8 +335,15 @@ public class DeliveryService : IDeliveryService
         {
             delivery.Status = expectedStatus;
 
-            await SetDatesForDeliveryAsync(delivery, expectedStatus);
+            SetDatesForDeliveryAsync(delivery, expectedStatus);
         }
+    }
+
+    private async Task<Delivery> RetrieveByIdAsync(int id)
+    {
+        var delivery = await RetrieveByIdAsync(id);
+
+        return delivery;
     }
 
     private DeliveryStatus GetExpectedStatus(Delivery delivery)
@@ -390,7 +382,7 @@ public class DeliveryService : IDeliveryService
         return entries.All(e => e.FinishedProccessing != null);
     }
 
-    private async Task SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
+    private void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
     {
         if (status == DeliveryStatus.Waiting)
         {
@@ -429,7 +421,5 @@ public class DeliveryService : IDeliveryService
             // TODO: Handle Approve if needed (probably approve will be handled by another method ApproveDelivery() and will not be part of this functionality)
             throw new InvalidOperationException("Operation for delivery with status 'Approved' currently not supported.");
         }
-
-        await repository.SaveChangesWithLogAsync();
     }
 }
