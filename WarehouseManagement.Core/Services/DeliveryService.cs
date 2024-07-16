@@ -30,14 +30,12 @@ public class DeliveryService : IDeliveryService
                 Id = d.Id,
                 Cmr = d.Cmr,
                 DeliveryTime = d.DeliveryTime,
-                IsApproved = d.IsApproved,
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
                 ReceptionNumber = d.ReceptionNumber,
                 SystemNumber = d.SystemNumber,
                 TruckNumber = d.TruckNumber,
-                VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Entries.Any()
                     ? d.Entries.All(e => e.FinishedProccessing.HasValue)
@@ -64,7 +62,13 @@ public class DeliveryService : IDeliveryService
                         MarkerId = dm.MarkerId,
                         MarkerName = dm.Marker.Name
                     })
-                    .ToList()
+                    .ToList(),
+                EntriesFinishedProcessing = d
+                    .Entries.Where(e => e.FinishedProccessing.HasValue)
+                    .Count(),
+                EntriesWaitingProcessing = d
+                    .Entries.Where(e => !e.FinishedProccessing.HasValue)
+                    .Count()
             })
             .FirstOrDefaultAsync();
 
@@ -91,7 +95,6 @@ public class DeliveryService : IDeliveryService
                 Id = d.Id,
                 Cmr = d.Cmr,
                 DeliveryTime = d.DeliveryTime,
-                IsApproved = d.IsApproved,
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -124,7 +127,13 @@ public class DeliveryService : IDeliveryService
                         MarkerId = dm.MarkerId,
                         MarkerName = dm.Marker.Name
                     })
-                    .ToList()
+                    .ToList(),
+                EntriesFinishedProcessing = d
+                    .Entries.Where(e => e.FinishedProccessing.HasValue)
+                    .Count(),
+                EntriesWaitingProcessing = d
+                    .Entries.Where(e => !e.FinishedProccessing.HasValue)
+                    .Count()
             })
             .ToListAsync();
 
@@ -149,7 +158,6 @@ public class DeliveryService : IDeliveryService
         deliveryToEdit.ReceptionNumber = model.ReceptionNumber;
         deliveryToEdit.VendorId = model.VendorId;
         deliveryToEdit.Cmr = model.Cmr;
-        deliveryToEdit.IsApproved = model.IsApproved;
         deliveryToEdit.Packages = model.Packages;
         deliveryToEdit.Pieces = model.Pieces;
         deliveryToEdit.Pallets = model.Pallets;
@@ -257,7 +265,6 @@ public class DeliveryService : IDeliveryService
                 Id = d.Id,
                 Cmr = d.Cmr,
                 DeliveryTime = d.DeliveryTime,
-                IsApproved = d.IsApproved,
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -295,5 +302,33 @@ public class DeliveryService : IDeliveryService
             .ToListAsync();
 
         return deliveries;
+    }
+
+    public async Task ApproveAsync(int id)
+    {
+        var deliveryToApprove = await repository
+            .All<Delivery>()
+            .Where(d => d.Id == id)
+            .Include(d => d.Entries)
+            .FirstOrDefaultAsync();
+
+        if (deliveryToApprove == null)
+        {
+            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+        }
+
+        if (deliveryToApprove.Entries.Any(e => !e.FinishedProccessing.HasValue))
+        {
+            throw new ArgumentException("The delivery has entries that processing is not finished");
+        }
+
+        if (deliveryToApprove.IsApproved == true)
+        {
+            throw new InvalidOperationException("The delivery is already approved!");
+        }
+
+        deliveryToApprove.IsApproved = true;
+
+        await repository.SaveChangesWithLogAsync();
     }
 }

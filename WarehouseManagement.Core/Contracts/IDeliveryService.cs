@@ -12,4 +12,5 @@ public interface IDeliveryService
     Task DeleteASync(int id);
     Task RestoreAsync(int id);
     Task<ICollection<DeliveryDto>> GetAllDeletedAsync();
+    Task ApproveAsync(int id);
 }
