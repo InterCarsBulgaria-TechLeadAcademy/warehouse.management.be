@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WarehouseManagement.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using WarehouseManagement.Infrastructure.Data;
 namespace WarehouseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(WarehouseManagementDbContext))]
-    partial class WarehouseManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240716193111_deliveredOnPropertyNullable")]
+    partial class deliveredOnPropertyNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
