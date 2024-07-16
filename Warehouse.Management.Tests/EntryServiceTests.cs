@@ -67,8 +67,8 @@ public class EntryServiceTests
             Packages = 6,
             Pieces = 0,
             Zone = zone1,
-            StartedProccessing = null,
-            FinishedProccessing = null,
+            StartedProcessing = null,
+            FinishedProcessing = null,
             CreatedByUserId = "User1"
         };
 
@@ -79,8 +79,8 @@ public class EntryServiceTests
             Packages = 0,
             Pieces = 0,
             Zone = zone1,
-            StartedProccessing = DateTime.UtcNow,
-            FinishedProccessing = null,
+            StartedProcessing = DateTime.UtcNow,
+            FinishedProcessing = null,
             CreatedByUserId = "User1"
         };
 
@@ -91,8 +91,8 @@ public class EntryServiceTests
             Packages = 0,
             Pieces = 8,
             Zone = zone2,
-            StartedProccessing = DateTime.UtcNow.AddDays(-7),
-            FinishedProccessing = DateTime.UtcNow,
+            StartedProcessing = DateTime.UtcNow.AddDays(-7),
+            FinishedProcessing = DateTime.UtcNow,
             CreatedByUserId = "User1"
         };
 
@@ -103,8 +103,8 @@ public class EntryServiceTests
             Packages = 0,
             Pieces = 5,
             Zone = zone1,
-            StartedProccessing = null,
-            FinishedProccessing = null,
+            StartedProcessing = null,
+            FinishedProcessing = null,
             CreatedByUserId = "User1",
             IsDeleted = true
         };
@@ -408,8 +408,8 @@ public class EntryServiceTests
             .FirstAsync(change => int.Parse(change.EntityId) == waitingEntry.Id);
 
         Assert.That(entityChange.OldValue, Is.EqualTo(null));
-        Assert.NotNull(waitingEntry.StartedProccessing);
-        Assert.IsNull(waitingEntry.FinishedProccessing);
+        Assert.NotNull(waitingEntry.StartedProcessing);
+        Assert.IsNull(waitingEntry.FinishedProcessing);
     }
 
     [Test]
@@ -454,7 +454,7 @@ public class EntryServiceTests
             .FirstAsync(change => int.Parse(change.EntityId) == processingEntry.Id);
 
         Assert.That(entityChange.OldValue, Is.EqualTo(null));
-        Assert.NotNull(processingEntry.FinishedProccessing);
+        Assert.NotNull(processingEntry.FinishedProcessing);
     }
 
     public void FinishProcessingAsync_ThrowsKeyNotFoundException_WhenInvalidIdIsPassed()

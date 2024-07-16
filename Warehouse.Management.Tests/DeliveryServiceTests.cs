@@ -62,7 +62,7 @@ public class DeliveryServiceTests
             Pallets = 10,
             Packages = 100,
             Pieces = 1000,
-            IsApproved = true,
+            IsApproved = false,
             Status = DeliveryStatus.Processing,
             StartedProcessing = null,
             FinishedProcessing = null,
@@ -91,8 +91,8 @@ public class DeliveryServiceTests
             Packages = 0,
             Pieces = 0,
             Zone = zone1,
-            StartedProccessing = null,
-            FinishedProccessing = null,
+            StartedProcessing = null,
+            FinishedProcessing = null,
             CreatedByUserId = "User1",
             Delivery = delivery
         };
@@ -104,8 +104,8 @@ public class DeliveryServiceTests
             Packages = 0,
             Pieces = 5,
             Zone = zone1,
-            StartedProccessing = DateTime.UtcNow,
-            FinishedProccessing = null,
+            StartedProcessing = DateTime.UtcNow,
+            FinishedProcessing = null,
             CreatedByUserId = "User1",
             Delivery = delivery
         };
@@ -117,14 +117,14 @@ public class DeliveryServiceTests
             Packages = 4,
             Pieces = 0,
             Zone = zone2,
-            StartedProccessing = DateTime.UtcNow.AddDays(-7),
-            FinishedProccessing = DateTime.UtcNow,
+            StartedProcessing = DateTime.UtcNow.AddDays(-7),
+            FinishedProcessing = DateTime.UtcNow,
             CreatedByUserId = "User1",
             Delivery = delivery
         };
 
         // Getting the earliest StartedProcessing 
-        delivery.StartedProcessing = finishedEntry.StartedProccessing; // Or call `ChangeDeliveryStatusIfNeeded` from DeliveryService
+        delivery.StartedProcessing = finishedEntry.StartedProcessing; // Or call `ChangeDeliveryStatusIfNeeded` from DeliveryService
 
         var entries = new List<Entry> { waitingEntry, processingEntry, finishedEntry };
         var zones = new List<Zone> { zone1, zone2 };
@@ -159,39 +159,135 @@ public class DeliveryServiceTests
 
         Assert.IsNotNull(history);
         Assert.That(history.Id, Is.EqualTo(delivery.Id));
+    }
+
+    [Test]
+    public async Task GetHistoryAsync_ShouldLogProcessingEntryFinishedProcessingChange()
+    {
+        await entryService.FinishProcessingAsync(processingEntry.Id);
+
+        var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var processingEntryFinishedProcessingChange = history.Changes.First(c => c.EntityId == processingEntry.Id);
 
         Assert.That(processingEntryFinishedProcessingChange.From, Is.EqualTo(null));
-        Assert.That(processingEntryFinishedProcessingChange.To, Is.EqualTo(processingEntry.FinishedProccessing.ToString()));
-        Assert.That(processingEntryFinishedProcessingChange.LogType, Is.EqualTo(LogType.EntryStatusChange));
+        Assert.That(processingEntryFinishedProcessingChange.To, Is.EqualTo(processingEntry.FinishedProcessing.ToString()));
         Assert.That(processingEntryFinishedProcessingChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Entry));
+    }
 
-        var waitingEntryStartedProcessingChange = history.Changes.First(c => c.EntityId == waitingEntry.Id && c.PropertyName == "StartedProcessing");
+    [Test]
+    public async Task GetHistoryAsync_ShouldLogWaitingEntryStartedProcessingChange()
+    {
+        await entryService.StartProcessingAsync(waitingEntry.Id);
+
+        var history = await deliveryService.GetHistoryAsync(delivery.Id);
+
+        var waitingEntryStartedProcessingChange = history.Changes.First(c => c.EntityId == waitingEntry.Id);
 
         Assert.That(waitingEntryStartedProcessingChange.From, Is.EqualTo(null));
-        Assert.That(waitingEntryStartedProcessingChange.To, Is.EqualTo(waitingEntry.StartedProccessing.ToString()));
+        Assert.That(waitingEntryStartedProcessingChange.To, Is.EqualTo(waitingEntry.StartedProcessing.ToString()));
         Assert.That(waitingEntryStartedProcessingChange.LogType, Is.EqualTo(LogType.EntryStatusChange));
         Assert.That(waitingEntryStartedProcessingChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Entry));
+    }
+
+    [Test]
+    public async Task GetHistoryAsync_ShouldLogWaitingEntryFinishedProcessingChange()
+    {
+        await entryService.StartProcessingAsync(waitingEntry.Id);
+        await entryService.FinishProcessingAsync(waitingEntry.Id);
+
+        var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var waitingEntryFinishedProcessingChange = history.Changes.First(c => c.EntityId == waitingEntry.Id && c.PropertyName == "FinishedProcessing");
 
-        Assert.That(waitingEntryStartedProcessingChange.From, Is.EqualTo(null));
-        Assert.That(waitingEntryStartedProcessingChange.To, Is.EqualTo(waitingEntry.FinishedProccessing.ToString()));
-        Assert.That(waitingEntryStartedProcessingChange.LogType, Is.EqualTo(LogType.EntryStatusChange));
-        Assert.That(waitingEntryStartedProcessingChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Entry));
+        Assert.That(waitingEntryFinishedProcessingChange.From, Is.EqualTo(null));
+        Assert.That(waitingEntryFinishedProcessingChange.To, Is.EqualTo(waitingEntry.FinishedProcessing.ToString()));
+        Assert.That(waitingEntryFinishedProcessingChange.LogType, Is.EqualTo(LogType.EntryStatusChange));
+        Assert.That(waitingEntryFinishedProcessingChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Entry));
+    }
+
+    [Test]
+    public async Task GetHistoryAsync_ShouldLogDeliveryStatusChange()
+    {
+        await entryService.FinishProcessingAsync(processingEntry.Id);
+
+        await entryService.StartProcessingAsync(waitingEntry.Id);
+        await entryService.FinishProcessingAsync(waitingEntry.Id);
+
+        var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var deliveryStatusChange = history.Changes.First(c => c.EntityId == delivery.Id && c.PropertyName == "Status");
 
         Assert.That(deliveryStatusChange.From, Is.EqualTo(DeliveryStatus.Processing.ToString()));
+        Assert.That(deliveryStatusChange.To, Is.EqualTo(DeliveryStatus.Finished.ToString()));
         Assert.That(deliveryStatusChange.LogType, Is.EqualTo(LogType.DeliveryStatusChange));
         Assert.That(deliveryStatusChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Delivery));
+    }
+
+    [Test]
+    public async Task GetHistoryAsync_ShouldLogDeliveryFinishedProcessingChange()
+    {
+        await entryService.FinishProcessingAsync(processingEntry.Id);
+
+        await entryService.StartProcessingAsync(waitingEntry.Id);
+        await entryService.FinishProcessingAsync(waitingEntry.Id);
+
+        var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var deliveryFinishedProcessingChange = history.Changes.First(c => c.EntityId == delivery.Id && c.PropertyName == "FinishedProcessing");
 
         Assert.That(deliveryFinishedProcessingChange.From, Is.EqualTo(null));
         Assert.That(deliveryFinishedProcessingChange.To, Is.EqualTo(delivery.FinishedProcessing.ToString()));
-        Assert.That(deliveryFinishedProcessingChange.LogType, Is.EqualTo(LogType.DeliveryStatusChange));
         Assert.That(deliveryFinishedProcessingChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Delivery));
+    }
+
+    [Test]
+    public async Task GetHistoryAsync_ShouldLogDeliveryStartedProcessingChange()
+    {
+        var newDelivery = new Delivery
+        {
+            Id = 999,
+            SystemNumber = "D46789",
+            ReceptionNumber = "R98735",
+            TruckNumber = "TB1234",
+            Cmr = "CMR101",
+            DeliveryTime = DateTime.Now,
+            Pallets = 12,
+            Packages = 155,
+            Pieces = 1020,
+            IsApproved = false,
+            StartedProcessing = null,
+            FinishedProcessing = null,
+            VendorId = vendor.Id,
+            Vendor = vendor
+        };
+
+        var newEntry = new Entry
+        {
+            Id = 55,
+            Pallets = 22,
+            Packages = 0,
+            Pieces = 0,
+            Zone = zone1,
+            StartedProcessing = null,
+            FinishedProcessing = null,
+            CreatedByUserId = "User1",
+            Delivery = newDelivery
+        };
+
+        await dbContext.Deliveries.AddAsync(newDelivery);
+        await dbContext.Entries.AddAsync(newEntry);
+        await dbContext.SaveChangesAsync();
+
+        await entryService.StartProcessingAsync(newEntry.Id);
+
+        var history = await deliveryService.GetHistoryAsync(newDelivery.Id);
+
+        var deliveryStatusChange = history.Changes.First(c => c.EntityId == newDelivery.Id && c.PropertyName == "Status");
+
+        Assert.That(deliveryStatusChange.From, Is.EqualTo(DeliveryStatus.Waiting.ToString()));
+        Assert.That(deliveryStatusChange.To, Is.EqualTo(DeliveryStatus.Processing.ToString()));
+        Assert.That(deliveryStatusChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Delivery));
+        Assert.That(deliveryStatusChange.LogType, Is.EqualTo(LogType.DeliveryStatusChange));
     }
 }

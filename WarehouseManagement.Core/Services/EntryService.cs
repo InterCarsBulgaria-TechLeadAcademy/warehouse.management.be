@@ -83,8 +83,8 @@ public class EntryService : IEntryService
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
-                StartedProccessing = e.StartedProccessing,
-                FinishedProccessing = e.FinishedProccessing,
+                StartedProccessing = e.StartedProcessing,
+                FinishedProccessing = e.FinishedProcessing,
                 ZoneId = e.ZoneId,
                 DeliveryId = e.DeliveryId
             })
@@ -106,8 +106,8 @@ public class EntryService : IEntryService
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
-                StartedProccessing = e.StartedProccessing,
-                FinishedProccessing = e.FinishedProccessing,
+                StartedProccessing = e.StartedProcessing,
+                FinishedProccessing = e.FinishedProcessing,
                 ZoneId = e.ZoneId,
                 DeliveryId = e.DeliveryId
             })
@@ -135,8 +135,8 @@ public class EntryService : IEntryService
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
-                StartedProccessing = e.StartedProccessing,
-                FinishedProccessing = e.FinishedProccessing,
+                StartedProccessing = e.StartedProcessing,
+                FinishedProccessing = e.FinishedProcessing,
                 ZoneId = e.ZoneId,
                 DeliveryId = e.DeliveryId
             })
@@ -158,8 +158,8 @@ public class EntryService : IEntryService
             Pallets = entry.Pallets,
             Packages = entry.Packages,
             Pieces = entry.Pieces,
-            StartedProccessing = entry.StartedProccessing,
-            FinishedProccessing = entry.FinishedProccessing,
+            StartedProccessing = entry.StartedProcessing,
+            FinishedProccessing = entry.FinishedProcessing,
             ZoneId = entry.ZoneId,
             DeliveryId = entry.DeliveryId
         };
@@ -214,7 +214,7 @@ public class EntryService : IEntryService
 
         ValidateStartProcessingOfEntry(entry);
 
-        entry.StartedProccessing = DateTime.UtcNow;
+        entry.StartedProcessing = DateTime.UtcNow;
         await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
 
         await repository.SaveChangesWithLogAsync();
@@ -222,11 +222,11 @@ public class EntryService : IEntryService
 
     private void ValidateStartProcessingOfEntry(Entry entry)
     { 
-        if (entry.FinishedProccessing != null)
+        if (entry.FinishedProcessing != null)
         {
             throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
         }
-        else if (entry.StartedProccessing != null)
+        else if (entry.StartedProcessing != null)
         {
             throw new InvalidOperationException($"{EntryHasAlreadyStartedProcessing} {entry.Id}");
         }
@@ -243,7 +243,7 @@ public class EntryService : IEntryService
 
         ValidateFinishProcessingOfEntry(entry);
 
-        entry.FinishedProccessing = DateTime.UtcNow;
+        entry.FinishedProcessing = DateTime.UtcNow;
         await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
 
         await repository.SaveChangesWithLogAsync();
@@ -251,11 +251,11 @@ public class EntryService : IEntryService
 
     private void ValidateFinishProcessingOfEntry(Entry entry)
     {
-        if (entry.FinishedProccessing != null)
+        if (entry.FinishedProcessing != null)
         {
             throw new InvalidOperationException($"{EntryHasAlreadyFinishedProcessing} {entry.Id}");
         }
-        else if (entry.StartedProccessing == null)
+        else if (entry.StartedProcessing == null)
         {
             throw new InvalidOperationException($"{EntryHasNotStartedProcessing} {entry.Id}");
         }
@@ -279,20 +279,20 @@ public class EntryService : IEntryService
             if (statuses.Contains(EntryStatuses.Waiting))
             {
                 query = query.Where(e =>
-                    e.StartedProccessing == null && e.FinishedProccessing == null
+                    e.StartedProcessing == null && e.FinishedProcessing == null
                 );
             }
 
             if (statuses.Contains(EntryStatuses.Processing))
             {
                 query = query.Where(e =>
-                    e.StartedProccessing != null && e.FinishedProccessing == null
+                    e.StartedProcessing != null && e.FinishedProcessing == null
                 );
             }
 
             if (statuses.Contains(EntryStatuses.Finished))
             {
-                query = query.Where(e => e.FinishedProccessing != null);
+                query = query.Where(e => e.FinishedProcessing != null);
             }
         }
 

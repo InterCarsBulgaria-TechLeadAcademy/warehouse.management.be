@@ -41,11 +41,11 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProccessing.HasValue)
+                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
                         ? d.IsApproved
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProccessing.HasValue)
+                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
                             ? DeliveryStatus.Processing.ToString()
                             : DeliveryStatus.Waiting.ToString()
                     : DeliveryStatus.Waiting.ToString(),
@@ -53,8 +53,8 @@ public class DeliveryService : IDeliveryService
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
                         Id = e.Id,
-                        FinishedProccessing = e.FinishedProccessing,
-                        StartedProccessing = e.StartedProccessing,
+                        FinishedProccessing = e.FinishedProcessing,
+                        StartedProccessing = e.StartedProcessing,
                         ZoneId = e.ZoneId
                     })
                     .ToList(),
@@ -102,11 +102,11 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProccessing.HasValue)
+                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
                         ? d.IsApproved
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProccessing.HasValue)
+                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
                             ? DeliveryStatus.Processing.ToString()
                             : DeliveryStatus.Waiting.ToString()
                     : DeliveryStatus.Waiting.ToString(),
@@ -114,8 +114,8 @@ public class DeliveryService : IDeliveryService
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
                         Id = e.Id,
-                        FinishedProccessing = e.FinishedProccessing,
-                        StartedProccessing = e.StartedProccessing,
+                        FinishedProccessing = e.FinishedProcessing,
+                        StartedProccessing = e.StartedProcessing,
                         ZoneId = e.ZoneId
                     })
                     .ToList(),
@@ -263,11 +263,11 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProccessing.HasValue)
+                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
                         ? d.IsApproved
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProccessing.HasValue)
+                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
                             ? DeliveryStatus.Processing.ToString()
                             : DeliveryStatus.Waiting.ToString()
                     : DeliveryStatus.Waiting.ToString(),
@@ -275,8 +275,8 @@ public class DeliveryService : IDeliveryService
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
                         Id = e.Id,
-                        FinishedProccessing = e.FinishedProccessing,
-                        StartedProccessing = e.StartedProccessing,
+                        FinishedProccessing = e.FinishedProcessing,
+                        StartedProccessing = e.StartedProcessing,
                         ZoneId = e.ZoneId
                     })
                     .ToList(),
@@ -316,7 +316,8 @@ public class DeliveryService : IDeliveryService
                 From = change.OldValue!,
                 To = change.NewValue!,
                 Type = change.EntityName == "Delivery" ? DeliveryHistoryChangeType.Delivery : DeliveryHistoryChangeType.Entry,
-                LogType = change.PropertyName == "Status" && change.EntityName == "Entry" ? LogType.EntryStatusChange :
+                LogType = (change.PropertyName == "StartedProcessing" ||
+                           change.PropertyName == "FinishedProcessing") && change.EntityName == "Entry" ? LogType.EntryStatusChange :
                     change.PropertyName == "Status" && change.EntityName == "Delivery" ? LogType.DeliveryStatusChange :
                     change.PropertyName == "ZoneId" ? LogType.ZoneChange : LogType.Split // May be refactored based on the Move functionality
             }).ToListAsync()
@@ -341,7 +342,12 @@ public class DeliveryService : IDeliveryService
 
     private async Task<Delivery> RetrieveByIdAsync(int id)
     {
-        var delivery = await RetrieveByIdAsync(id);
+        var delivery = await repository.GetByIdAsync<Delivery>(id);
+
+        if (delivery == null)
+        {
+            throw new KeyNotFoundException(DeliveryWithIdNotFound);
+        }
 
         return delivery;
     }
@@ -368,18 +374,18 @@ public class DeliveryService : IDeliveryService
 
     private bool AreAllEntriesWaiting(ICollection<Entry> entries)
     {
-        return entries.All(e => e.StartedProccessing == null);
+        return entries.All(e => e.StartedProcessing == null);
     }
 
     private bool IsProcessingInProgress(ICollection<Entry> entries)
     {
-        return entries.Any(e => e.StartedProccessing != null) &&
-            entries.Any(e => e.FinishedProccessing == null);
+        return entries.Any(e => e.StartedProcessing != null) &&
+            entries.Any(e => e.FinishedProcessing == null);
     }
 
     private bool AreAllEntriesFinished(ICollection<Entry> entries)
     {
-        return entries.All(e => e.FinishedProccessing != null);
+        return entries.All(e => e.FinishedProcessing != null);
     }
 
     private void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
@@ -394,25 +400,25 @@ public class DeliveryService : IDeliveryService
             delivery.FinishedProcessing = null; // Assure that delivery is not in finished state
 
             var startedProcessing = delivery.Entries
-                .OrderBy(e => e.StartedProccessing)
+                .OrderBy(e => e.StartedProcessing)
                 .First()
-                .StartedProccessing;
+                .StartedProcessing;
 
             delivery.StartedProcessing = startedProcessing;
         }
         else if (status == DeliveryStatus.Finished)
         {
             var startedProcessing = delivery.Entries
-                .OrderBy(e => e.StartedProccessing)
+                .OrderBy(e => e.StartedProcessing)
                 .First()
-                .StartedProccessing;
+                .StartedProcessing;
 
             delivery.StartedProcessing = startedProcessing; // TODO: Ask if necessary
 
             var finishedProcessing = delivery.Entries
-                .OrderByDescending(e => e.FinishedProccessing)
+                .OrderByDescending(e => e.FinishedProcessing)
                 .First()
-                .FinishedProccessing;
+                .FinishedProcessing;
 
             delivery.FinishedProcessing = finishedProcessing;
         }
