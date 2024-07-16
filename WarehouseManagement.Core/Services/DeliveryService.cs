@@ -322,12 +322,12 @@ public class DeliveryService : IDeliveryService
 
         if (deliveryToApprove.Entries.Any(e => !e.FinishedProccessing.HasValue))
         {
-            throw new ArgumentException("The delivery has entries that processing is not finished");
+            throw new ArgumentException(DeliveryHasNotFinishedEntries);
         }
 
         if (deliveryToApprove.IsApproved == true)
         {
-            throw new InvalidOperationException("The delivery is already approved!");
+            throw new InvalidOperationException(DeliveryIsAlreadyApproved);
         }
 
         deliveryToApprove.IsApproved = true;

@@ -140,6 +140,6 @@ public class DeliveryController : ControllerBase
     {
         await deliveryService.ApproveAsync(id);
 
-        return Ok(id + "has been approved");
+        return Ok($"{DeliverySuccessfullyApproved} {id}");
     }
 }
