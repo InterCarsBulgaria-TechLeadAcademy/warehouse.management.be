@@ -66,10 +66,10 @@ public class DeliveryService : IDeliveryService
                     })
                     .ToList(),
                 EntriesFinishedProcessing = d
-                    .Entries.Where(e => e.FinishedProccessing.HasValue)
+                    .Entries.Where(e => e.FinishedProcessing.HasValue)
                     .Count(),
                 EntriesWaitingProcessing = d
-                    .Entries.Where(e => !e.FinishedProccessing.HasValue)
+                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
                     .Count()
             })
             .FirstOrDefaultAsync();
@@ -132,10 +132,10 @@ public class DeliveryService : IDeliveryService
                     })
                     .ToList(),
                 EntriesFinishedProcessing = d
-                    .Entries.Where(e => e.FinishedProccessing.HasValue)
+                    .Entries.Where(e => e.FinishedProcessing.HasValue)
                     .Count(),
                 EntriesWaitingProcessing = d
-                    .Entries.Where(e => !e.FinishedProccessing.HasValue)
+                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
                     .Count()
             })
             .ToListAsync();
@@ -316,7 +316,7 @@ public class DeliveryService : IDeliveryService
             throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
         }
 
-        if (deliveryToApprove.Entries.Any(e => !e.FinishedProccessing.HasValue))
+        if (deliveryToApprove.Entries.Any(e => !e.FinishedProcessing.HasValue))
         {
             throw new ArgumentException(DeliveryHasNotFinishedEntries);
         }
