@@ -177,8 +177,8 @@ public class ZoneService : IZoneService
                     Pallets = e.Pallets,
                     Packages = e.Packages,
                     Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProccessing,
-                    FinishedProccessing = e.FinishedProccessing,
+                    StartedProccessing = e.StartedProcessing,
+                    FinishedProccessing = e.FinishedProcessing,
                     DeliveryId = e.DeliveryId
                 })
             })
@@ -215,8 +215,8 @@ public class ZoneService : IZoneService
                     Pallets = e.Pallets,
                     Packages = e.Packages,
                     Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProccessing,
-                    FinishedProccessing = e.FinishedProccessing,
+                    StartedProccessing = e.StartedProcessing,
+                    FinishedProccessing = e.FinishedProcessing,
                     DeliveryId = e.DeliveryId
                 })
             })
@@ -249,8 +249,8 @@ public class ZoneService : IZoneService
                     Pallets = e.Pallets,
                     Packages = e.Packages,
                     Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProccessing,
-                    FinishedProccessing = e.FinishedProccessing,
+                    StartedProccessing = e.StartedProcessing,
+                    FinishedProccessing = e.FinishedProcessing,
                     DeliveryId = e.DeliveryId
                 })
             })
@@ -287,8 +287,8 @@ public class ZoneService : IZoneService
                     Pallets = e.Pallets,
                     Packages = e.Packages,
                     Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProccessing,
-                    FinishedProccessing = e.FinishedProccessing,
+                    StartedProccessing = e.StartedProcessing,
+                    FinishedProccessing = e.FinishedProcessing,
                     DeliveryId = e.DeliveryId
                 })
             })
@@ -326,8 +326,8 @@ public class ZoneService : IZoneService
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
-                StartedProccessing = e.StartedProccessing,
-                FinishedProccessing = e.FinishedProccessing,
+                StartedProccessing = e.StartedProcessing,
+                FinishedProccessing = e.FinishedProcessing,
                 DeliveryId = e.DeliveryId
             })
         };

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data.Configurations;
@@ -14,6 +15,7 @@ public class DeliveryConfiguration : BaseConfiguration<Delivery>
         builder.Property(d => d.SystemNumber).HasMaxLength(255);
         builder.Property(d => d.ReceptionNumber).HasMaxLength(255);
         builder.Property(d => d.TruckNumber).HasMaxLength(255);
+        builder.Property(d => d.Status).HasDefaultValue(DeliveryStatus.Waiting);
         builder
             .HasOne(d => d.Vendor)
             .WithMany(v => v.Deliveries)
