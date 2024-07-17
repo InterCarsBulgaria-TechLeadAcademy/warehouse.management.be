@@ -9,4 +9,5 @@ public class DeliveryMessageKeys
     public const string DeliveryNotDeleted = "DeliveryNotDeleted";
     public const string DeliveryHasNotFinishedEntries = "DeliveryHasNotFinishedEntries";
     public const string DeliveryIsAlreadyApproved = "DeliveryIsAlreadyApproved";
+    public const string DeliverySuccessfullyApproved = "DeliverySuccessfullyApproved";
 }
