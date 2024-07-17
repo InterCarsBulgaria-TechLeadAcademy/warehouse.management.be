@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Enums;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
@@ -39,11 +40,11 @@ public class DeliveryService : IDeliveryService
                 TruckNumber = d.TruckNumber,
                 VendorName = d.Vendor.Name,
                 Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProccessing.HasValue)
+                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
                         ? d.IsApproved
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProccessing.HasValue)
+                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
                             ? DeliveryStatus.Processing.ToString()
                             : DeliveryStatus.Waiting.ToString()
                     : DeliveryStatus.Waiting.ToString(),
@@ -51,8 +52,8 @@ public class DeliveryService : IDeliveryService
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
                         Id = e.Id,
-                        FinishedProccessing = e.FinishedProccessing,
-                        StartedProccessing = e.StartedProccessing,
+                        FinishedProccessing = e.FinishedProcessing,
+                        StartedProccessing = e.StartedProcessing,
                         ZoneId = e.ZoneId
                     })
                     .ToList(),
@@ -106,11 +107,11 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProccessing.HasValue)
+                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
                         ? d.IsApproved
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProccessing.HasValue)
+                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
                             ? DeliveryStatus.Processing.ToString()
                             : DeliveryStatus.Waiting.ToString()
                     : DeliveryStatus.Waiting.ToString(),
@@ -118,8 +119,8 @@ public class DeliveryService : IDeliveryService
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
                         Id = e.Id,
-                        FinishedProccessing = e.FinishedProccessing,
-                        StartedProccessing = e.StartedProccessing,
+                        FinishedProccessing = e.FinishedProcessing,
+                        StartedProccessing = e.StartedProcessing,
                         ZoneId = e.ZoneId
                     })
                     .ToList(),
@@ -183,7 +184,7 @@ public class DeliveryService : IDeliveryService
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task<int> AddASync(DeliveryFormDto model, string userId)
+    public async Task<int> AddAsync(DeliveryFormDto model, string userId)
     {
         var delivery = new Delivery()
         {
@@ -224,12 +225,7 @@ public class DeliveryService : IDeliveryService
 
     public async Task DeleteASync(int id)
     {
-        var deliveryToDelete = await repository.GetByIdAsync<Delivery>(id);
-
-        if (deliveryToDelete == null)
-        {
-            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
-        }
+        var deliveryToDelete = await RetrieveByIdAsync(id);
 
         repository.SoftDelete(deliveryToDelete);
 
@@ -277,11 +273,11 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProccessing.HasValue)
+                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
                         ? d.IsApproved
                             ? DeliveryStatus.Approved.ToString()
                             : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProccessing.HasValue)
+                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
                             ? DeliveryStatus.Processing.ToString()
                             : DeliveryStatus.Waiting.ToString()
                     : DeliveryStatus.Waiting.ToString(),
@@ -289,8 +285,8 @@ public class DeliveryService : IDeliveryService
                     .Entries.Select(e => new DeliveryEntryDto()
                     {
                         Id = e.Id,
-                        FinishedProccessing = e.FinishedProccessing,
-                        StartedProccessing = e.StartedProccessing,
+                        FinishedProccessing = e.FinishedProcessing,
+                        StartedProccessing = e.StartedProcessing,
                         ZoneId = e.ZoneId
                     })
                     .ToList(),
@@ -334,5 +330,160 @@ public class DeliveryService : IDeliveryService
         deliveryToApprove.ApprovedOn = DateTime.UtcNow;
 
         await repository.SaveChangesWithLogAsync();
+    }
+
+    public async Task<DeliveryHistoryDto> GetHistoryAsync(int id)
+    {
+        var delivery = await RetrieveByIdAsync(id);
+
+        var relatedEntriesIds = repository
+            .AllReadOnly<Entry>()
+            .Where(e => e.DeliveryId == delivery.Id)
+            .Select(e => e.Id);
+
+        var changes = repository
+            .AllReadOnly<EntityChange>()
+            .Where(change =>
+                int.Parse(change.EntityId) == delivery.Id
+                || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId))
+            );
+
+        var deliveryHistory = new DeliveryHistoryDto
+        {
+            Id = delivery.Id,
+            Changes = await changes
+                .Select(change => new DeliveryHistoryDto.Change
+                {
+                    EntityId = int.Parse(change.EntityId),
+                    PropertyName = change.PropertyName,
+                    From = change.OldValue!,
+                    To = change.NewValue!,
+                    Type =
+                        change.EntityName == "Delivery"
+                            ? DeliveryHistoryChangeType.Delivery
+                            : DeliveryHistoryChangeType.Entry,
+                    LogType =
+                        (
+                            change.PropertyName == "StartedProcessing"
+                            || change.PropertyName == "FinishedProcessing"
+                        )
+                        && change.EntityName == "Entry"
+                            ? LogType.EntryStatusChange
+                            : change.PropertyName == "Status" && change.EntityName == "Delivery"
+                                ? LogType.DeliveryStatusChange
+                                : change.PropertyName == "ZoneId"
+                                    ? LogType.ZoneChange
+                                    : LogType.Split, // May be refactored based on the Move functionality
+                    ChangeDate = change.ChangedAt
+                })
+                .ToListAsync()
+        };
+
+        return deliveryHistory;
+    }
+
+    public async Task ChangeDeliveryStatusIfNeeded(int id)
+    {
+        var delivery = await RetrieveByIdAsync(id);
+
+        DeliveryStatus expectedStatus = GetExpectedStatus(delivery);
+
+        if (delivery.Status != expectedStatus)
+        {
+            delivery.Status = expectedStatus;
+
+            SetDatesForDeliveryAsync(delivery, expectedStatus);
+        }
+    }
+
+    private async Task<Delivery> RetrieveByIdAsync(int id)
+    {
+        var delivery = await repository.GetByIdAsync<Delivery>(id);
+
+        if (delivery == null)
+        {
+            throw new KeyNotFoundException(DeliveryWithIdNotFound);
+        }
+
+        return delivery;
+    }
+
+    private DeliveryStatus GetExpectedStatus(Delivery delivery)
+    {
+        if (AreAllEntriesWaiting(delivery.Entries))
+        {
+            return DeliveryStatus.Waiting;
+        }
+        else if (IsProcessingInProgress(delivery.Entries))
+        {
+            return DeliveryStatus.Processing;
+        }
+        else if (AreAllEntriesFinished(delivery.Entries))
+        {
+            return DeliveryStatus.Finished;
+        }
+        else
+        {
+            throw new InvalidOperationException("The delivery entries are in an invalid state.");
+        }
+    }
+
+    private bool AreAllEntriesWaiting(ICollection<Entry> entries)
+    {
+        return entries.All(e => e.StartedProcessing == null);
+    }
+
+    private bool IsProcessingInProgress(ICollection<Entry> entries)
+    {
+        return entries.Any(e => e.StartedProcessing != null)
+            && entries.Any(e => e.FinishedProcessing == null);
+    }
+
+    private bool AreAllEntriesFinished(ICollection<Entry> entries)
+    {
+        return entries.All(e => e.FinishedProcessing != null);
+    }
+
+    private void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
+    {
+        if (status == DeliveryStatus.Waiting)
+        {
+            delivery.StartedProcessing = null;
+            delivery.FinishedProcessing = null; // Assure that delivery is not in finished state
+        }
+        else if (status == DeliveryStatus.Processing)
+        {
+            delivery.FinishedProcessing = null; // Assure that delivery is not in finished state
+
+            var startedProcessing = delivery
+                .Entries.OrderBy(e => e.StartedProcessing)
+                .First()
+                .StartedProcessing;
+
+            delivery.StartedProcessing = startedProcessing;
+        }
+        else if (status == DeliveryStatus.Finished)
+        {
+            var startedProcessing = delivery
+                .Entries.OrderBy(e => e.StartedProcessing)
+                .First()
+                .StartedProcessing;
+
+            delivery.StartedProcessing = startedProcessing; // TODO: Ask if necessary
+
+            var finishedProcessing = delivery
+                .Entries.OrderByDescending(e => e.FinishedProcessing)
+                .First()
+                .FinishedProcessing;
+
+            delivery.FinishedProcessing = finishedProcessing;
+        }
+        else
+        {
+            // TODO: Handle Approve if needed (probably approve will be handled by another method ApproveDelivery() and will not be part of this functionality)
+            throw new InvalidOperationException(
+                "Operation for delivery with status 'Approved' currently not supported."
+            );
+        }
     }
 }
