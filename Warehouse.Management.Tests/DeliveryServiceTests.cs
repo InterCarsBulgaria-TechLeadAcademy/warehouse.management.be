@@ -290,4 +290,21 @@ public class DeliveryServiceTests
         Assert.That(deliveryStatusChange.Type, Is.EqualTo(DeliveryHistoryChangeType.Delivery));
         Assert.That(deliveryStatusChange.LogType, Is.EqualTo(LogType.DeliveryStatusChange));
     }
+
+    [Test]
+    public async Task GetHistoryAsync_ShouldReturnCorrectDateOfChange()
+    {
+        await entryService.FinishProcessingAsync(processingEntry.Id);
+
+        var entityChangeDateTime = (await dbContext.EntityChanges
+            .FirstAsync(change => int.Parse(change.EntityId) == processingEntry.Id))
+            .ChangedAt;
+
+        var history = await deliveryService.GetHistoryAsync(delivery.Id);
+        var processingEntryFinishedDateTime = history.Changes
+            .First(change => change.EntityId == processingEntry.Id)
+            .ChangeDate;
+
+        Assert.That(processingEntryFinishedDateTime, Is.EqualTo(entityChangeDateTime));
+    }
 }

@@ -239,7 +239,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 16, 15, 52, 26, 840, DateTimeKind.Utc).AddTicks(6359));
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 780, DateTimeKind.Utc).AddTicks(4744));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -335,7 +335,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 16, 15, 52, 26, 843, DateTimeKind.Utc).AddTicks(6443));
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(2382));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -420,7 +420,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 16, 15, 52, 26, 844, DateTimeKind.Utc).AddTicks(1736));
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(5748));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -485,7 +485,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 16, 15, 52, 26, 844, DateTimeKind.Utc).AddTicks(4656));
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(7662));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -529,7 +529,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 16, 15, 52, 26, 844, DateTimeKind.Utc).AddTicks(7277));
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(9266));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -607,7 +607,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 16, 15, 52, 26, 846, DateTimeKind.Utc).AddTicks(4730));
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 784, DateTimeKind.Utc).AddTicks(1482));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()

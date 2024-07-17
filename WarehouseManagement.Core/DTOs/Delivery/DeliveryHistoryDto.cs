@@ -21,5 +21,7 @@ public class DeliveryHistoryDto
         public DeliveryHistoryChangeType Type { get; set; }
 
         public LogType LogType { get; set; }
+
+        public DateTime ChangeDate { get; set; }
     }
 }

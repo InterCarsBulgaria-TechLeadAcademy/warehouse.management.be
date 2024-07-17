@@ -319,7 +319,8 @@ public class DeliveryService : IDeliveryService
                 LogType = (change.PropertyName == "StartedProcessing" ||
                            change.PropertyName == "FinishedProcessing") && change.EntityName == "Entry" ? LogType.EntryStatusChange :
                     change.PropertyName == "Status" && change.EntityName == "Delivery" ? LogType.DeliveryStatusChange :
-                    change.PropertyName == "ZoneId" ? LogType.ZoneChange : LogType.Split // May be refactored based on the Move functionality
+                    change.PropertyName == "ZoneId" ? LogType.ZoneChange : LogType.Split, // May be refactored based on the Move functionality
+                ChangeDate = change.ChangedAt
             }).ToListAsync()
         };
 

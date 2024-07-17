@@ -12,8 +12,8 @@ using WarehouseManagement.Infrastructure.Data;
 namespace WarehouseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(WarehouseManagementDbContext))]
-    [Migration("20240525100206_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240717084356_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,7 +240,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 780, DateTimeKind.Utc).AddTicks(4744));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -255,6 +257,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("DeliveryTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FinishedProcessing")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsApproved")
@@ -282,6 +287,12 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<string>("ReceptionNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StartedProcessing")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("SystemNumber")
                         .IsRequired()
@@ -314,6 +325,51 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.HasIndex("DeliveryId");
 
                     b.ToTable("DeliveriesMarkers");
+                });
+
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.DifferenceType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(2382));
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedByUserId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedByUserId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DifferenceType");
                 });
 
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.EntityChange", b =>
@@ -365,7 +421,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(5748));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -382,7 +440,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<int>("DeliveryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("FinishedProccessing")
+                    b.Property<DateTime?>("FinishedProcessing")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -404,7 +462,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<int>("Pieces")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("StartedProccessing")
+                    b.Property<DateTime?>("StartedProcessing")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ZoneId")
@@ -428,7 +486,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(7662));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -470,7 +530,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(9266));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -546,7 +608,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 784, DateTimeKind.Utc).AddTicks(1482));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
