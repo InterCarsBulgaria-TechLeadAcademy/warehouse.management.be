@@ -64,7 +64,13 @@ public class DeliveryService : IDeliveryService
                         MarkerId = dm.MarkerId,
                         MarkerName = dm.Marker.Name
                     })
-                    .ToList()
+                    .ToList(),
+                EntriesFinishedProcessing = d
+                    .Entries.Where(e => e.FinishedProcessing.HasValue)
+                    .Count(),
+                EntriesWaitingProcessing = d
+                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
+                    .Count()
             })
             .FirstOrDefaultAsync();
 
@@ -123,7 +129,13 @@ public class DeliveryService : IDeliveryService
                         MarkerId = dm.MarkerId,
                         MarkerName = dm.Marker.Name
                     })
-                    .ToList()
+                    .ToList(),
+                EntriesFinishedProcessing = d
+                    .Entries.Where(e => e.FinishedProcessing.HasValue)
+                    .Count(),
+                EntriesWaitingProcessing = d
+                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
+                    .Count()
             })
             .ToListAsync();
 
