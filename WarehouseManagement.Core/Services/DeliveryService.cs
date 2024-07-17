@@ -331,6 +331,7 @@ public class DeliveryService : IDeliveryService
         }
 
         deliveryToApprove.IsApproved = true;
+        deliveryToApprove.ApprovedOn = DateTime.UtcNow;
 
         await repository.SaveChangesWithLogAsync();
     }
