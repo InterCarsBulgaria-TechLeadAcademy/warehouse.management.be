@@ -1,7 +1,10 @@
-﻿using WarehouseManagement.Core.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Difference;
 using WarehouseManagement.Infrastructure.Data.Common;
+using WarehouseManagement.Infrastructure.Data.Models;
+using static WarehouseManagement.Common.MessageConstants.Keys.DifferenceMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -14,43 +17,146 @@ public class DifferenceService : IDifferenceService
         this.repository = repository;
     }
 
-    public Task CreateAsync(DifferenceFormDto model)
+    public async Task CreateAsync(DifferenceFormDto model)
     {
-        throw new NotImplementedException();
+        var difference = new Difference()
+        {
+            ReceptionNumber = model.ReceptionNumber,
+            InternalNumber = model.InternalNumber,
+            ActiveNumber = model.ActiveNumber,
+            Comment = model.Comment,
+            Count = model.Count,
+            Status = model.Status,
+            TypeId = model.DifferenceTypeId,
+            ZoneId = model.ZoneId,
+            DeliveryId = model.DeliveryId
+        };
+
+        await repository.AddAsync(difference);
+        await repository.SaveChangesAsync();
     }
 
-    public Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        if (!await ExistsByIdAsync(id))
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        await repository.SoftDeleteById<Difference>(id);
+        await repository.SaveChangesAsync();
     }
 
-    public Task EditAsync(int id, DifferenceFormDto model, string userId)
+    public async Task EditAsync(int id, DifferenceFormDto model, string userId)
     {
-        throw new NotImplementedException();
+        if (!await ExistsByIdAsync(id))
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        var difference = await repository.GetByIdAsync<Difference>(id);
+        
+        difference!.ReceptionNumber = model.ReceptionNumber;
+        difference.InternalNumber = model.InternalNumber;
+        difference.ActiveNumber = model.ActiveNumber;
+        difference.Comment = model.Comment;
+        difference.Count = model.Count;
+        difference.Status = model.Status;
+        difference.TypeId = model.DifferenceTypeId;
+        difference.ZoneId = model.ZoneId;
+        difference.DeliveryId = model.DeliveryId;
+        difference.LastModifiedAt = DateTime.UtcNow;
+        difference.LastModifiedByUserId = userId;
+
+        await repository.SaveChangesWithLogAsync();
     }
 
-    public Task<bool> ExistsByIdAsync(int id)
+    public async Task<bool> ExistsByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        return await repository.GetByIdAsync<Difference>(id) != null;
     }
 
-    public Task<IEnumerable<DifferenceDto>> GetAllAsync(PaginationParameters paginationParams)
+    public async Task<IEnumerable<DifferenceDto>> GetAllAsync(PaginationParameters paginationParams)
     {
-        throw new NotImplementedException();
+        var models = await repository
+            .AllReadOnly<Difference>()
+            .Select(d => new DifferenceDto()
+            {
+                Id = d.Id,
+                ReceptionNumber = d.ReceptionNumber,
+                InternalNumber = d.InternalNumber,
+                ActiveNumber = d.ActiveNumber,
+                Comment = d.Comment,
+                Count = d.Count,
+                Status = d.Status,
+                Type = d.Type.Name,
+                Zone = d.Zone.Name,
+                DeliverySystemNumber = d.Delivery.SystemNumber
+            }).ToListAsync();
+
+        return models;
     }
 
-    public Task<IEnumerable<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams)
+    public async Task<IEnumerable<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams)
     {
-        throw new NotImplementedException();
+        var models = await repository
+            .AllWithDeletedReadOnly<Difference>()
+            .Select(d => new DifferenceDto()
+            {
+                Id = d.Id,
+                ReceptionNumber = d.ReceptionNumber,
+                InternalNumber = d.InternalNumber,
+                ActiveNumber = d.ActiveNumber,
+                Comment = d.Comment,
+                Count = d.Count,
+                Status = d.Status,
+                Type = d.Type.Name,
+                Zone = d.Zone.Name,
+                DeliverySystemNumber = d.Delivery.SystemNumber
+            }).ToListAsync();
+
+        return models;
     }
 
-    public Task<DifferenceDto> GetByIdAsync(int id)
+    public async Task<DifferenceDto> GetByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        if (!await ExistsByIdAsync(id))
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        var model = await repository.GetByIdAsync<Difference>(id);
+
+        return new DifferenceDto()
+        {
+            Id = id,
+            ReceptionNumber = model!.ReceptionNumber,
+            InternalNumber = model.InternalNumber,
+            ActiveNumber = model.ActiveNumber,
+            Comment = model.Comment,
+            Count = model.Count,
+            Status = model.Status,
+            Type = model.Type.Name,
+            Zone = model.Zone.Name,
+            DeliverySystemNumber = model.Delivery.SystemNumber
+        };
     }
 
-    public Task RestoreAsync(int id)
+    public async Task RestoreAsync(int id)
     {
-        throw new NotImplementedException();
+        var difference = await repository.GetByIdAsync<Difference>(id);
+
+        if (difference == null)
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        if (!difference.IsDeleted)
+        {
+            throw new InvalidOperationException(DifferenceNotDeleted);
+        }
+
+        repository.UnDelete(difference);
+        await repository.SaveChangesAsync();
     }
 }

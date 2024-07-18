@@ -1,24 +1,40 @@
-﻿using WarehouseManagement.Common.Statuses;
+﻿using System.ComponentModel.DataAnnotations;
+using WarehouseManagement.Common.Statuses;
+using static WarehouseManagement.Common.ValidationConstants.DifferenceConstants;
 
 namespace WarehouseManagement.Core.DTOs.Difference;
 
 public class DifferenceFormDto
 {
+    [Required]
+    [Range(ReceptionNumberMinLength, ReceptionNumberMaxLength)]
     public string ReceptionNumber { get; set; } = string.Empty;
 
+    [Required]
+    [Range(InternalNumberMinLength, InternalNumberMaxLength)]
     public string InternalNumber { get; set; } = string.Empty;
 
+    [Required]
+    [Range(ActiveNumberMinLength, ActiveNumberMaxLength)]
     public string ActiveNumber { get; set; } = string.Empty;
 
+    [Required]
+    [StringLength(CommentMaxLength, MinimumLength = CommentMinLength)]
     public string Comment { get; set; } = string.Empty;
 
-    public string AdminComment { get; set; } = string.Empty;
-
+    [Required]
+    [Range(MinCount, MaxCount)]
     public int Count { get; set; }
 
+    [Required]
     public DifferenceStatus Status { get; set; }
 
-    public string Type { get; set; } = string.Empty;
+    [Required]
+    public int DifferenceTypeId { get; set; }
 
-    public string Zone { get; set; } = string.Empty;
+    [Required]
+    public int ZoneId { get; set; }
+
+    [Required]
+    public int DeliveryId { get; set; }
 }
