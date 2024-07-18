@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Difference;
@@ -173,5 +174,66 @@ public class DifferenceService : IDifferenceService
 
         repository.UnDelete(difference);
         await repository.SaveChangesAsync();
+    }
+
+    public async Task StartProcessing(int id)
+    {
+        var difference = await repository.GetByIdAsync<Difference>(id);
+
+        if (difference == null)
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        if (difference.Status == DifferenceStatus.Processing ||
+            difference.Status == DifferenceStatus.Finished ||
+            difference.Status == DifferenceStatus.NoDifferences)
+        {
+            throw new InvalidOperationException(DifferenceCannotProceedToProcessing);
+        }
+
+        difference.Status = DifferenceStatus.Processing;
+
+        await repository.SaveChangesWithLogAsync();
+    }
+
+    public async Task FinishProcessing(int id, string adminComment)
+    {
+        var difference = await repository.GetByIdAsync<Difference>(id);
+
+        if (difference == null)
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        if (difference.Status != DifferenceStatus.Processing)
+        {
+            throw new InvalidOperationException(DifferenceCannotBeFinished);
+        }
+
+        difference.Status = DifferenceStatus.Finished;
+        difference.AdminComment = adminComment;
+
+        await repository.SaveChangesWithLogAsync();
+    }
+
+    public async Task NoDifferences(int id, string adminComment)
+    {
+        var difference = await repository.GetByIdAsync<Difference>(id);
+
+        if (difference == null)
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        if (difference.Status != DifferenceStatus.Processing)
+        {
+            throw new InvalidOperationException(DifferenceCannotBeFinished);
+        }
+
+        difference.Status = DifferenceStatus.NoDifferences;
+        difference.AdminComment = adminComment;
+
+        await repository.SaveChangesWithLogAsync();
     }
 }

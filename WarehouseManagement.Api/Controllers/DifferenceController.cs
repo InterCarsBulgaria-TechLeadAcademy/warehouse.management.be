@@ -51,6 +51,11 @@ public class DifferenceController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> Add([FromBody] DifferenceFormDto model)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         await differenceService.CreateAsync(model, User.Id());
 
         return Ok(DifferenceAddedSuccessfully);
@@ -61,6 +66,11 @@ public class DifferenceController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Edit(int id, [FromBody] DifferenceFormDto model)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         await differenceService.EditAsync(id, model, User.Id());
 
         return Ok(DifferenceEditedSuccessfully);
@@ -77,10 +87,45 @@ public class DifferenceController : ControllerBase
 
     [HttpPatch("restore/{id}")]
     [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Restore(int id)
     {
         await differenceService.RestoreAsync(id);
 
         return Ok(DifferenceRestored);
+    }
+
+    [HttpPost("start")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> StartProcessing([FromBody] int id)
+    {
+        await differenceService.StartProcessing(id);
+
+        return Ok(DifferenceSuccessfullyStartedProcessing);
+    }
+
+    [HttpPost("finish")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> FinishProcessing([FromBody] int id, [FromBody] string adminComment)
+    {
+        await differenceService.FinishProcessing(id, adminComment);
+
+        return Ok(DifferenceSuccessfullyFinishedProcessing);
+    }
+
+    [HttpPost("noDifferences")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> NoDifferences([FromBody] int id, [FromBody] string adminComment)
+    {
+        await differenceService.NoDifferences(id, adminComment);
+
+        return Ok(DifferenceSuccessfullySetToNoDifferences);
     }
 }

@@ -20,4 +20,10 @@ public interface IDifferenceService
     Task RestoreAsync(int id);
 
     Task<bool> ExistsByIdAsync(int id);
+
+    Task StartProcessing(int id);
+
+    Task FinishProcessing(int id, string adminComment);
+
+    Task NoDifferences(int id, string adminComment);
 }
