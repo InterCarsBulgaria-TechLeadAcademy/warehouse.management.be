@@ -11,7 +11,7 @@ public interface IDifferenceService
 
     Task<IEnumerable<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams);
 
-    Task CreateAsync(DifferenceFormDto model);
+    Task CreateAsync(DifferenceFormDto model, string userId);
 
     Task EditAsync(int id, DifferenceFormDto model, string userId);
 

@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Difference;
+using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.DifferenceMessageKeys;
@@ -17,7 +19,7 @@ public class DifferenceService : IDifferenceService
         this.repository = repository;
     }
 
-    public async Task CreateAsync(DifferenceFormDto model)
+    public async Task CreateAsync(DifferenceFormDto model, string userId)
     {
         var difference = new Difference()
         {
@@ -29,7 +31,8 @@ public class DifferenceService : IDifferenceService
             Status = model.Status,
             TypeId = model.DifferenceTypeId,
             ZoneId = model.ZoneId,
-            DeliveryId = model.DeliveryId
+            DeliveryId = model.DeliveryId,
+            CreatedByUserId = userId
         };
 
         await repository.AddAsync(difference);
@@ -78,8 +81,14 @@ public class DifferenceService : IDifferenceService
 
     public async Task<IEnumerable<DifferenceDto>> GetAllAsync(PaginationParameters paginationParams)
     {
+        Expression<Func<Difference, bool>> filter = v =>
+            EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
+            || EF.Functions.Like(v.InternalNumber, $"%{paginationParams.SearchQuery}%")
+            || EF.Functions.Like(v.ActiveNumber, $"%{paginationParams.SearchQuery}%");
+
         var models = await repository
             .AllReadOnly<Difference>()
+            .Paginate(paginationParams, filter)
             .Select(d => new DifferenceDto()
             {
                 Id = d.Id,
@@ -99,8 +108,14 @@ public class DifferenceService : IDifferenceService
 
     public async Task<IEnumerable<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams)
     {
+        Expression<Func<Difference, bool>> filter = v =>
+            EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
+            || EF.Functions.Like(v.InternalNumber, $"%{paginationParams.SearchQuery}%")
+            || EF.Functions.Like(v.ActiveNumber, $"%{paginationParams.SearchQuery}%");
+
         var models = await repository
             .AllWithDeletedReadOnly<Difference>()
+            .Paginate(paginationParams, filter)
             .Select(d => new DifferenceDto()
             {
                 Id = d.Id,
