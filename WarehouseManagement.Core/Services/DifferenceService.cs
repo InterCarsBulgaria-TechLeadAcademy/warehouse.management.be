@@ -185,9 +185,7 @@ public class DifferenceService : IDifferenceService
             throw new KeyNotFoundException(DifferenceWithIdNotFound);
         }
 
-        if (difference.Status == DifferenceStatus.Processing ||
-            difference.Status == DifferenceStatus.Finished ||
-            difference.Status == DifferenceStatus.NoDifferences)
+        if (difference.Status != DifferenceStatus.Waiting)
         {
             throw new InvalidOperationException(DifferenceCannotProceedToProcessing);
         }
