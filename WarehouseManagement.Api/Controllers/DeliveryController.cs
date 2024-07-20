@@ -4,6 +4,7 @@ using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
+using WarehouseManagement.Core.DTOs.Vendor;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
@@ -139,5 +140,16 @@ public class DeliveryController : ControllerBase
         var history = await deliveryService.GetHistoryAsync(id);
 
         return Ok(history);
+    }
+
+    [HttpPut("Approve/{id}")]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<VendorDto>))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Approve(int id)
+    {
+        await deliveryService.ApproveAsync(id);
+
+        return Ok($"{DeliverySuccessfullyApproved} {id}");
     }
 }

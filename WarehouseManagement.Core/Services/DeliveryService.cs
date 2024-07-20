@@ -31,7 +31,6 @@ public class DeliveryService : IDeliveryService
                 Id = d.Id,
                 Cmr = d.Cmr,
                 DeliveryTime = d.DeliveryTime,
-                IsApproved = d.IsApproved,
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -65,7 +64,13 @@ public class DeliveryService : IDeliveryService
                         MarkerId = dm.MarkerId,
                         MarkerName = dm.Marker.Name
                     })
-                    .ToList()
+                    .ToList(),
+                EntriesFinishedProcessing = d
+                    .Entries.Where(e => e.FinishedProcessing.HasValue)
+                    .Count(),
+                EntriesWaitingProcessing = d
+                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
+                    .Count()
             })
             .FirstOrDefaultAsync();
 
@@ -92,7 +97,6 @@ public class DeliveryService : IDeliveryService
                 Id = d.Id,
                 Cmr = d.Cmr,
                 DeliveryTime = d.DeliveryTime,
-                IsApproved = d.IsApproved,
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -125,7 +129,13 @@ public class DeliveryService : IDeliveryService
                         MarkerId = dm.MarkerId,
                         MarkerName = dm.Marker.Name
                     })
-                    .ToList()
+                    .ToList(),
+                EntriesFinishedProcessing = d
+                    .Entries.Where(e => e.FinishedProcessing.HasValue)
+                    .Count(),
+                EntriesWaitingProcessing = d
+                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
+                    .Count()
             })
             .ToListAsync();
 
@@ -150,7 +160,6 @@ public class DeliveryService : IDeliveryService
         deliveryToEdit.ReceptionNumber = model.ReceptionNumber;
         deliveryToEdit.VendorId = model.VendorId;
         deliveryToEdit.Cmr = model.Cmr;
-        deliveryToEdit.IsApproved = model.IsApproved;
         deliveryToEdit.Packages = model.Packages;
         deliveryToEdit.Pieces = model.Pieces;
         deliveryToEdit.Pallets = model.Pallets;
@@ -253,7 +262,6 @@ public class DeliveryService : IDeliveryService
                 Id = d.Id,
                 Cmr = d.Cmr,
                 DeliveryTime = d.DeliveryTime,
-                IsApproved = d.IsApproved,
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -293,6 +301,35 @@ public class DeliveryService : IDeliveryService
         return deliveries;
     }
 
+    public async Task ApproveAsync(int id)
+    {
+        var deliveryToApprove = await repository
+            .All<Delivery>()
+            .Where(d => d.Id == id)
+            .Include(d => d.Entries)
+            .FirstOrDefaultAsync();
+
+        if (deliveryToApprove == null)
+        {
+            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+        }
+
+        if (deliveryToApprove.Entries.Any(e => !e.FinishedProcessing.HasValue))
+        {
+            throw new ArgumentException(DeliveryHasNotFinishedEntries);
+        }
+
+        if (deliveryToApprove.IsApproved == true)
+        {
+            throw new InvalidOperationException(DeliveryIsAlreadyApproved);
+        }
+
+        deliveryToApprove.IsApproved = true;
+        deliveryToApprove.ApprovedOn = DateTime.UtcNow;
+
+        await repository.SaveChangesWithLogAsync();
+    }
+
     public async Task<DeliveryHistoryDto> GetHistoryAsync(int id)
     {
         var delivery = await RetrieveByIdAsync(id);
@@ -304,24 +341,40 @@ public class DeliveryService : IDeliveryService
 
         var changes = repository
             .AllReadOnly<EntityChange>()
-            .Where(change => int.Parse(change.EntityId) == delivery.Id || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId)));
+            .Where(change =>
+                int.Parse(change.EntityId) == delivery.Id
+                || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId))
+            );
 
         var deliveryHistory = new DeliveryHistoryDto
         {
             Id = delivery.Id,
-            Changes = await changes.Select(change => new DeliveryHistoryDto.Change
-            {
-                EntityId = int.Parse(change.EntityId),
-                PropertyName = change.PropertyName,
-                From = change.OldValue!,
-                To = change.NewValue!,
-                Type = change.EntityName == "Delivery" ? DeliveryHistoryChangeType.Delivery : DeliveryHistoryChangeType.Entry,
-                LogType = (change.PropertyName == "StartedProcessing" ||
-                           change.PropertyName == "FinishedProcessing") && change.EntityName == "Entry" ? LogType.EntryStatusChange :
-                    change.PropertyName == "Status" && change.EntityName == "Delivery" ? LogType.DeliveryStatusChange :
-                    change.PropertyName == "ZoneId" ? LogType.ZoneChange : LogType.Split, // May be refactored based on the Move functionality
-                ChangeDate = change.ChangedAt
-            }).ToListAsync()
+            Changes = await changes
+                .Select(change => new DeliveryHistoryDto.Change
+                {
+                    EntityId = int.Parse(change.EntityId),
+                    PropertyName = change.PropertyName,
+                    From = change.OldValue!,
+                    To = change.NewValue!,
+                    Type =
+                        change.EntityName == "Delivery"
+                            ? DeliveryHistoryChangeType.Delivery
+                            : DeliveryHistoryChangeType.Entry,
+                    LogType =
+                        (
+                            change.PropertyName == "StartedProcessing"
+                            || change.PropertyName == "FinishedProcessing"
+                        )
+                        && change.EntityName == "Entry"
+                            ? LogType.EntryStatusChange
+                            : change.PropertyName == "Status" && change.EntityName == "Delivery"
+                                ? LogType.DeliveryStatusChange
+                                : change.PropertyName == "ZoneId"
+                                    ? LogType.ZoneChange
+                                    : LogType.Split, // May be refactored based on the Move functionality
+                    ChangeDate = change.ChangedAt
+                })
+                .ToListAsync()
         };
 
         return deliveryHistory;
@@ -380,8 +433,8 @@ public class DeliveryService : IDeliveryService
 
     private bool IsProcessingInProgress(ICollection<Entry> entries)
     {
-        return entries.Any(e => e.StartedProcessing != null) &&
-            entries.Any(e => e.FinishedProcessing == null);
+        return entries.Any(e => e.StartedProcessing != null)
+            && entries.Any(e => e.FinishedProcessing == null);
     }
 
     private bool AreAllEntriesFinished(ICollection<Entry> entries)
@@ -400,8 +453,8 @@ public class DeliveryService : IDeliveryService
         {
             delivery.FinishedProcessing = null; // Assure that delivery is not in finished state
 
-            var startedProcessing = delivery.Entries
-                .OrderBy(e => e.StartedProcessing)
+            var startedProcessing = delivery
+                .Entries.OrderBy(e => e.StartedProcessing)
                 .First()
                 .StartedProcessing;
 
@@ -409,15 +462,15 @@ public class DeliveryService : IDeliveryService
         }
         else if (status == DeliveryStatus.Finished)
         {
-            var startedProcessing = delivery.Entries
-                .OrderBy(e => e.StartedProcessing)
+            var startedProcessing = delivery
+                .Entries.OrderBy(e => e.StartedProcessing)
                 .First()
                 .StartedProcessing;
 
             delivery.StartedProcessing = startedProcessing; // TODO: Ask if necessary
 
-            var finishedProcessing = delivery.Entries
-                .OrderByDescending(e => e.FinishedProcessing)
+            var finishedProcessing = delivery
+                .Entries.OrderByDescending(e => e.FinishedProcessing)
                 .First()
                 .FinishedProcessing;
 
@@ -426,7 +479,9 @@ public class DeliveryService : IDeliveryService
         else
         {
             // TODO: Handle Approve if needed (probably approve will be handled by another method ApproveDelivery() and will not be part of this functionality)
-            throw new InvalidOperationException("Operation for delivery with status 'Approved' currently not supported.");
+            throw new InvalidOperationException(
+                "Operation for delivery with status 'Approved' currently not supported."
+            );
         }
     }
 }

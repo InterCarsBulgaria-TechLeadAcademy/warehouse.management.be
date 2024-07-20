@@ -8,10 +8,12 @@ public class DeliveryDto
     public string TruckNumber { get; set; } = string.Empty;
     public string Cmr { get; set; } = string.Empty;
     public DateTime DeliveryTime { get; set; }
+    public DateTime? ApprovedOn { get; set; }
     public int Pallets { get; set; }
     public int Packages { get; set; }
     public int Pieces { get; set; }
-    public bool IsApproved { get; set; }
+    public int EntriesWaitingProcessing { get; set; }
+    public int EntriesFinishedProcessing { get; set; }
     public int VendorId { get; set; }
     public string VendorName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
