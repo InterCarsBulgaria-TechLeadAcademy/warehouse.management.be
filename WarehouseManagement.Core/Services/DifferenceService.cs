@@ -29,7 +29,7 @@ public class DifferenceService : IDifferenceService
             ActiveNumber = model.ActiveNumber,
             Comment = model.Comment,
             Count = model.Count,
-            Status = model.Status,
+            Status = model.Status ?? DifferenceStatus.Waiting,
             TypeId = model.DifferenceTypeId,
             ZoneId = model.ZoneId,
             DeliveryId = model.DeliveryId,
@@ -65,7 +65,7 @@ public class DifferenceService : IDifferenceService
         difference.ActiveNumber = model.ActiveNumber;
         difference.Comment = model.Comment;
         difference.Count = model.Count;
-        difference.Status = model.Status;
+        difference.Status = model.Status ?? DifferenceStatus.Waiting;
         difference.TypeId = model.DifferenceTypeId;
         difference.ZoneId = model.ZoneId;
         difference.DeliveryId = model.DeliveryId;

@@ -1,18 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using System.Numerics;
 using WarehouseManagement.Api.Services.Contracts;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
+using WarehouseManagement.Core.DTOs.Difference;
 using WarehouseManagement.Core.Services;
 using WarehouseManagement.Infrastructure.Data;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using static WarehouseManagement.Common.MessageConstants.Keys.DifferenceMessageKeys;
 
 namespace Warehouse.Management.Tests;
 
 public class DifferenceServiceTests
 {
+    private const int InvalidDifferenceId = -1;
+
     private WarehouseManagementDbContext dbContext;
     private IDifferenceService differenceService;
     private Mock<IUserService> mockUserService;
@@ -20,6 +24,15 @@ public class DifferenceServiceTests
     private Difference difference1;
     private Difference difference2;
     private Difference difference3;
+
+    private DifferenceType diffType1;
+    private DifferenceType diffType2;
+    private DifferenceType diffType3;
+
+    private Delivery delivery;
+
+    private Zone zone1;
+    private Zone zone2;
 
     [SetUp]
     public async Task SetUp()
@@ -35,32 +48,32 @@ public class DifferenceServiceTests
 
         dbContext = new WarehouseManagementDbContext(options, mockUserService.Object);
 
-        var diffType1 = new DifferenceType()
+        diffType1 = new DifferenceType()
         {
             Id = 1,
             Name = "DiffType1"
         };
 
-        var diffType2 = new DifferenceType()
+        diffType2 = new DifferenceType()
         {
             Id = 2,
             Name = "DiffType2"
         };
 
-        var diffType3 = new DifferenceType()
+        diffType3 = new DifferenceType()
         {
             Id = 3,
             Name = "DiffType3"
         };
 
-        var zone1 = new Zone
+        zone1 = new Zone
         {
             Id = 1,
             Name = "Zone1",
             CreatedByUserId = "User1"
         };
 
-        var zone2 = new Zone
+        zone2 = new Zone
         {
             Id = 2,
             Name = "Zone2",
@@ -74,7 +87,7 @@ public class DifferenceServiceTests
             SystemNumber = "V12345"
         };
 
-        var delivery = new Delivery
+        delivery = new Delivery
         {
             Id = 1001,
             SystemNumber = "D56789",
@@ -154,5 +167,303 @@ public class DifferenceServiceTests
     {
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.DisposeAsync();
+    }
+
+    [Test]
+    public async Task CreateAsync_ShouldSuccessfullyAddDifference()
+    {
+        const int ExpectedTotalDifferencesCount = 4;
+
+        var model = new DifferenceFormDto()
+        {
+            ReceptionNumber = "133476",
+            InternalNumber = "A7C789",
+            ActiveNumber = "XYZ973",
+            Comment = "Samplesss",
+            Count = -18,
+            DifferenceTypeId = diffType1.Id,
+            DeliveryId = delivery.Id,
+            ZoneId = zone1.Id
+        };
+
+        await differenceService.CreateAsync(model, mockUserService.Object.UserId);
+
+        Assert.That(dbContext.Differences.Count(), Is.EqualTo(ExpectedTotalDifferencesCount));
+    }
+
+    [Test]
+    public async Task DeleteAsync_ShouldDeleteDifferenceSuccessfully()
+    {
+        const int ExpectedTotalDifferencesCount = 2;
+
+        await differenceService.DeleteAsync(difference1.Id);
+
+        Assert.That(dbContext.Differences.Count(), Is.EqualTo(ExpectedTotalDifferencesCount));
+    }
+
+    [Test]
+    public void DeleteAsync_ShouldThrowKeyNotFoundException_WhenInvalidIdIsProvided()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await differenceService.DeleteAsync(InvalidDifferenceId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
+    }
+
+    [Test]
+    public async Task EditAsync_ShouldSuccessfullyUpdateDifference()
+    {
+        const string UpdatedComment = "Updated comment";
+
+        var model = new DifferenceFormDto()
+        {
+            ReceptionNumber = difference1.ReceptionNumber,
+            InternalNumber = difference1.InternalNumber,
+            ActiveNumber = difference1.ActiveNumber,
+            Comment = UpdatedComment,
+            Count = difference1.Count,
+            DifferenceTypeId = difference1.TypeId,
+            DeliveryId = difference1.DeliveryId,
+            ZoneId = difference1.ZoneId
+        };
+
+        await differenceService.EditAsync(difference1.Id, model, mockUserService.Object.UserId);
+
+        var updatedDifference = await dbContext.Differences.FindAsync(difference1.Id);
+
+        Assert.That(updatedDifference.Comment, Is.EqualTo(UpdatedComment));
+        Assert.That(updatedDifference.LastModifiedByUserId, Is.EqualTo(mockUserService.Object.UserId));
+    }
+
+    [Test]
+    public void EditAsync_ShouldThrowKeyNotFoundException_WhenInvalidIdIsProvided()
+    {
+        var model = new DifferenceFormDto()
+        {
+            ReceptionNumber = "NewReception",
+            InternalNumber = "NewInternal",
+            ActiveNumber = "NewActive",
+            Comment = "NewComment",
+            Count = 5,
+            DifferenceTypeId = diffType1.Id,
+            DeliveryId = delivery.Id,
+            ZoneId = zone1.Id
+        };
+
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await differenceService.EditAsync(InvalidDifferenceId, model, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
+    }
+
+    [Test]
+    public async Task ExistsByIdAsync_ShouldReturnTrue_WhenDifferenceExists()
+    {
+        var exists = await differenceService.ExistsByIdAsync(difference1.Id);
+
+        Assert.IsTrue(exists);
+    }
+
+    [Test]
+    public async Task ExistsByIdAsync_ShouldReturnFalse_WhenDifferenceDoesNotExist()
+    {
+        var exists = await differenceService.ExistsByIdAsync(InvalidDifferenceId);
+
+        Assert.IsFalse(exists);
+    }
+
+    [Test]
+    public async Task GetAllAsync_ShouldReturnAllDifferences()
+    {
+        var paginationParams = new PaginationParameters { PageNumber = 1, PageSize = 10 };
+
+        var result = await differenceService.GetAllAsync(paginationParams);
+
+        Assert.That(result.Count(), Is.EqualTo(3));
+    }
+
+    [Test]
+    public async Task GetAllWithDeletedAsync_ShouldReturnAllDifferencesIncludingDeleted()
+    {
+        const int ExpectedTotalDifferencesCount = 3;
+
+        await differenceService.DeleteAsync(difference1.Id);
+
+        var paginationParams = new PaginationParameters { PageNumber = 1, PageSize = 10 };
+
+        var result = await differenceService.GetAllWithDeletedAsync(paginationParams);
+
+        Assert.That(result.Count(), Is.EqualTo(ExpectedTotalDifferencesCount));
+    }
+
+    [Test]
+    public async Task GetByIdAsync_ShouldReturnCorrectDifference()
+    {
+        var result = await differenceService.GetByIdAsync(difference1.Id);
+
+        Assert.That(result.Id, Is.EqualTo(difference1.Id));
+    }
+
+    [Test]
+    public void GetByIdAsync_ShouldThrowKeyNotFoundException_WhenInvalidIdIsProvided()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await differenceService.GetByIdAsync(InvalidDifferenceId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
+    }
+
+    [Test]
+    public async Task RestoreAsync_ShouldRestoreDeletedDifference()
+    {
+        await differenceService.DeleteAsync(difference1.Id);
+
+        await differenceService.RestoreAsync(difference1.Id);
+
+        var restoredDifference = await dbContext.Differences.FindAsync(difference1.Id);
+
+        Assert.That(restoredDifference.IsDeleted, Is.False);
+    }
+
+    [Test]
+    public void RestoreAsync_ShouldThrowKeyNotFoundException_WhenInvalidIdIsProvided()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await differenceService.RestoreAsync(InvalidDifferenceId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
+    }
+
+    [Test]
+    public void RestoreAsync_ShouldThrowInvalidOperationException_WhenDifferenceIsNotDeleted()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await differenceService.RestoreAsync(difference1.Id);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceNotDeleted));
+    }
+
+    [Test]
+    public async Task StartProcessing_ShouldChangeStatusToProcessing()
+    {
+        await differenceService.StartProcessing(difference1.Id);
+
+        var difference = await dbContext.Differences.FindAsync(difference1.Id);
+
+        Assert.That(difference.Status, Is.EqualTo(DifferenceStatus.Processing));
+    }
+
+    [Test]
+    public void StartProcessing_ShouldThrowKeyNotFoundException_WhenInvalidIdIsProvided()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await differenceService.StartProcessing(InvalidDifferenceId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
+    }
+
+    [Test]
+    public void StartProcessing_ShouldThrowInvalidOperationException_WhenStatusIsNotWaiting()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await differenceService.StartProcessing(difference2.Id);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceCannotProceedToProcessing));
+    }
+
+    [Test]
+    public async Task FinishProcessing_ShouldChangeStatusToFinishedAndAddAdminComment()
+    {
+        const string AdminComment = "Finished processing";
+
+        await differenceService.StartProcessing(difference1.Id);
+
+        await differenceService.FinishProcessing(difference1.Id, AdminComment);
+
+        var difference = await dbContext.Differences.FindAsync(difference1.Id);
+
+        Assert.That(difference.Status, Is.EqualTo(DifferenceStatus.Finished));
+        Assert.That(difference.AdminComment, Is.EqualTo(AdminComment));
+    }
+
+    [Test]
+    public void FinishProcessing_ShouldThrowKeyNotFoundException_WhenInvalidIdIsProvided()
+    {
+        const string AdminComment = "Finished processing";
+
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await differenceService.FinishProcessing(InvalidDifferenceId, AdminComment);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
+    }
+
+    [Test]
+    public void FinishProcessing_ShouldThrowInvalidOperationException_WhenStatusIsNotProcessing()
+    {
+        const string AdminComment = "Finished processing";
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await differenceService.FinishProcessing(difference1.Id, AdminComment);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceCannotBeFinished));
+    }
+
+    [Test]
+    public async Task NoDifferences_ShouldChangeStatusToNoDifferencesAndAddAdminComment()
+    {
+        const string AdminComment = "No differences found";
+
+        await differenceService.StartProcessing(difference1.Id);
+
+        await differenceService.NoDifferences(difference1.Id, AdminComment);
+
+        var difference = await dbContext.Differences.FindAsync(difference1.Id);
+
+        Assert.That(difference.Status, Is.EqualTo(DifferenceStatus.NoDifferences));
+        Assert.That(difference.AdminComment, Is.EqualTo(AdminComment));
+    }
+
+    [Test]
+    public void NoDifferences_ShouldThrowKeyNotFoundException_WhenInvalidIdIsProvided()
+    {
+        const string AdminComment = "No differences found";
+
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await differenceService.NoDifferences(InvalidDifferenceId, AdminComment);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
+    }
+
+    [Test]
+    public void NoDifferences_ShouldThrowInvalidOperationException_WhenStatusIsNotProcessing()
+    {
+        const string AdminComment = "No differences found";
+
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await differenceService.NoDifferences(difference1.Id, AdminComment);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(DifferenceCannotBeFinished));
     }
 }

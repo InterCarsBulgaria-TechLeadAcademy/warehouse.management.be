@@ -26,8 +26,7 @@ public class DifferenceFormDto
     [Range(MinCount, MaxCount)]
     public int Count { get; set; }
 
-    [Required]
-    public DifferenceStatus Status { get; set; }
+    public DifferenceStatus? Status { get; set; }
 
     [Required]
     public int DifferenceTypeId { get; set; }
