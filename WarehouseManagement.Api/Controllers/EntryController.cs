@@ -20,9 +20,9 @@ namespace WarehouseManagement.Api.Controllers
             this.deliveryService = deliveryService;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
-        public async Task<IActionResult> All([FromBody] EntryRequest request)
+        public async Task<IActionResult> All([FromQuery] EntryRequest request)
         {
             if (request.ZoneId != null)
             {
