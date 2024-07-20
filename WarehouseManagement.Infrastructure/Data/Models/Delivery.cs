@@ -9,6 +9,7 @@ public class Delivery : BaseClass
     public string TruckNumber { get; set; } = string.Empty;
     public string Cmr { get; set; } = string.Empty;
     public DateTime DeliveryTime { get; set; }
+    public DateTime? ApprovedOn { get; set; }
     public int Pallets { get; set; }
     public int Packages { get; set; }
     public int Pieces { get; set; }

@@ -14,4 +14,5 @@ public interface IDeliveryService
     Task<ICollection<DeliveryDto>> GetAllDeletedAsync();
     Task ChangeDeliveryStatusIfNeeded(int id);
     Task<DeliveryHistoryDto> GetHistoryAsync(int id);
+    Task ApproveAsync(int id);
 }
