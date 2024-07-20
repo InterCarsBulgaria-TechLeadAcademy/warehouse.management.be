@@ -18,7 +18,7 @@ public class DifferenceTypeController : ControllerBase
     }
 
     [HttpGet("all")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<DifferenceTypeDto>))]
     public async Task<IActionResult> All()
     {
         var models = await differenceTypeService.GetAllAsync();
@@ -27,7 +27,7 @@ public class DifferenceTypeController : ControllerBase
     }
 
     [HttpGet("all-with-deleted")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<DifferenceTypeDto>))]
     public async Task<IActionResult> AllWithDeleted()
     {
         var models = await differenceTypeService.GetAllWithDeletedAsync();
