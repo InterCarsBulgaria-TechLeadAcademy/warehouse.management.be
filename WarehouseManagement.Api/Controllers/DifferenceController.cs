@@ -111,9 +111,9 @@ public class DifferenceController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> FinishProcessing([FromBody] int id, [FromBody] string adminComment)
+    public async Task<IActionResult> FinishProcessing([FromBody] DifferenceAdminCommentDto adminCommentDto)
     {
-        await differenceService.FinishProcessing(id, adminComment);
+        await differenceService.FinishProcessing(adminCommentDto);
 
         return Ok(DifferenceSuccessfullyFinishedProcessing);
     }
@@ -122,9 +122,9 @@ public class DifferenceController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> NoDifferences([FromBody] int id, [FromBody] string adminComment)
+    public async Task<IActionResult> NoDifferences([FromBody] DifferenceAdminCommentDto adminCommentDto)
     {
-        await differenceService.NoDifferences(id, adminComment);
+        await differenceService.NoDifferences(adminCommentDto);
 
         return Ok(DifferenceSuccessfullySetToNoDifferences);
     }
