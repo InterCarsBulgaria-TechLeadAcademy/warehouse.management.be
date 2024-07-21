@@ -7,4 +7,5 @@ public class Zone : BaseClass
     public ICollection<ZoneMarker> ZonesMarkers { get; set; } = new HashSet<ZoneMarker>();
     public ICollection<VendorZone> VendorsZones { get; set; } = new HashSet<VendorZone>();
     public ICollection<Entry> Entries { get; set; } = new HashSet<Entry>();
+    public ICollection<Difference> Differences { get; set; } = new HashSet<Difference>();
 }
