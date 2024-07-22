@@ -15,4 +15,8 @@ public static class EntryMessageKey
     public const string EntryStartedProcessing = "EntryStartedProcessing";
     public const string EntryFinishedProcessing = "EntryFinishedProcessing";
     public const string EntryCanHaveOnlyOneTypeSet = "EntryCanHaveOnlyOneTypeSet";
+    public const string EntryMovedSuccessfully = "EntryMovedSuccessfully";
+    public const string EntrySplitSuccessfully = "EntrySplitSuccessfully";
+    public const string EntryCannotBeMovedToSameZone = "EntryCannotBeMovedToSameZone";
+    public const string EntryHasFinishedProcessingAndCannotBeMoved = "EntryHasFinishedProcessingAndCannotBeMoved";
 }

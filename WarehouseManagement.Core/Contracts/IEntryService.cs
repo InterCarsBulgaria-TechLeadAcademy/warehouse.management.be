@@ -17,4 +17,6 @@ public interface IEntryService
     Task MoveEntryToZoneWithId(int entryId, int zoneId);
     Task StartProcessingAsync(int entryId);
     Task FinishProcessingAsync(int entryId);
+    Task MoveAsync(int id, int newZoneId, string userId);
+    Task SplitAsync(int id, int newZoneId, int count, string userId);
 }

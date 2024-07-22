@@ -249,6 +249,40 @@ public class EntryService : IEntryService
         await repository.SaveChangesWithLogAsync();
     }
 
+    public async Task MoveAsync(int id, int newZoneId, string userId)
+    {
+        var entry = await repository.GetByIdAsync<Entry>(id);
+
+        if (entry == null)
+        {
+            throw new KeyNotFoundException(EntryWithIdNotFound);
+        }
+
+        if (entry.FinishedProcessing != null)
+        {
+            throw new InvalidOperationException(EntryHasFinishedProcessingAndCannotBeMoved);
+        }
+
+        var newZone = await repository.GetByIdAsync<Zone>(newZoneId);
+
+        if (newZone == null)
+        {
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
+        }
+
+        if (newZoneId == entry.ZoneId)
+        {
+            throw new InvalidOperationException(EntryCannotBeMovedToSameZone);
+        }
+
+        entry.Zone = newZone;
+        entry.StartedProcessing = null;
+        entry.LastModifiedAt = DateTime.UtcNow;
+        entry.LastModifiedByUserId = userId;
+
+        await repository.SaveChangesWithLogAsync();
+    }
+
     private void ValidateFinishProcessingOfEntry(Entry entry)
     {
         if (entry.FinishedProcessing != null)
@@ -358,5 +392,10 @@ public class EntryService : IEntryService
         }
 
         await repository.AddAsync(newEntry);
+    }
+
+    public Task SplitAsync(int id, int newZoneId, int count, string userId)
+    {
+        throw new NotImplementedException();
     }
 }

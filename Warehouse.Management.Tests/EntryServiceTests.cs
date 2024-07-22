@@ -488,4 +488,57 @@ public class EntryServiceTests
 
         Assert.That(ex.Message, Is.EqualTo($"{EntryHasNotStartedProcessing} {waitingEntry.Id}"));
     }
+
+    [Test]
+    public async Task MoveAsync_ShouldMoveEntryToNewZoneSuccessfully()
+    {
+        await entryService.MoveAsync(processingEntry.Id, zone2.Id, mockUserService.Object.UserId);
+
+        Assert.That(processingEntry.ZoneId, Is.EqualTo(zone2.Id));
+        Assert.That(processingEntry.StartedProcessing, Is.Null);
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsKeyNotFoundException_WhenEntryWithIdNotFound()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.MoveAsync(InvalidEntryId, zone2.Id, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryWithIdNotFound));
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsInvalidOperationException_WhenEntryHasFinishedProcessing()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.MoveAsync(finishedEntry.Id, zone2.Id, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryHasFinishedProcessingAndCannotBeMoved));
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsKeyNotFoundException_WhenZoneWithIdNotFound()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.MoveAsync(waitingEntry.Id, InvalidZoneId, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(ZoneWithIdNotFound));
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsInvalidOperationException_WhenNewZoneIdMatchesOldOne()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.MoveAsync(waitingEntry.Id, zone1.Id, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryCannotBeMovedToSameZone));
+    }
 }
