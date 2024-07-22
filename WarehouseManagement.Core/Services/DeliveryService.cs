@@ -204,14 +204,12 @@ public class DeliveryService : IDeliveryService
 
         await repository.AddAsync(delivery);
 
-        await repository.SaveChangesAsync();
-
         foreach (var markerId in model.Markers)
         {
             var newDeliveryMarker = new DeliveryMarker()
             {
-                DeliveryId = delivery.Id,
-                MarkerId = markerId
+                Delivery = delivery,
+                Marker = (await repository.GetByIdAsync<Marker>(markerId))!
             };
 
             delivery.DeliveriesMarkers.Add(newDeliveryMarker);
@@ -222,7 +220,7 @@ public class DeliveryService : IDeliveryService
         return delivery.Id;
     }
 
-    public async Task DeleteASync(int id)
+    public async Task DeleteAsync(int id)
     {
         var deliveryToDelete = await RetrieveByIdAsync(id);
 
