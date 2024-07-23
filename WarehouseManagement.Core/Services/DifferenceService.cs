@@ -198,9 +198,9 @@ public class DifferenceService : IDifferenceService
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task FinishProcessing(int id, string adminComment)
+    public async Task FinishProcessing(DifferenceAdminCommentDto adminCommentDto)
     {
-        var difference = await repository.GetByIdAsync<Difference>(id);
+        var difference = await repository.GetByIdAsync<Difference>(adminCommentDto.DifferenceId);
 
         if (difference == null)
         {
@@ -213,14 +213,14 @@ public class DifferenceService : IDifferenceService
         }
 
         difference.Status = DifferenceStatus.Finished;
-        difference.AdminComment = adminComment;
+        difference.AdminComment = adminCommentDto.AdminComment;
 
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task NoDifferences(int id, string adminComment)
+    public async Task NoDifferences(DifferenceAdminCommentDto adminCommentDto)
     {
-        var difference = await repository.GetByIdAsync<Difference>(id);
+        var difference = await repository.GetByIdAsync<Difference>(adminCommentDto.DifferenceId);
 
         if (difference == null)
         {
@@ -233,7 +233,7 @@ public class DifferenceService : IDifferenceService
         }
 
         difference.Status = DifferenceStatus.NoDifferences;
-        difference.AdminComment = adminComment;
+        difference.AdminComment = adminCommentDto.AdminComment;
 
         await repository.SaveChangesWithLogAsync();
     }
