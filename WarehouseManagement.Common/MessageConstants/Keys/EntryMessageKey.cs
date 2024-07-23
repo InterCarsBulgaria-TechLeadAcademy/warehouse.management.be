@@ -19,4 +19,6 @@ public static class EntryMessageKey
     public const string EntrySplitSuccessfully = "EntrySplitSuccessfully";
     public const string EntryCannotBeMovedToSameZone = "EntryCannotBeMovedToSameZone";
     public const string EntryHasFinishedProcessingAndCannotBeMoved = "EntryHasFinishedProcessingAndCannotBeMoved";
+    public const string EntryHasFinishedProcessingAndCannotBeSplit = "EntryHasFinishedProcessingAndCannotBeSplit";
+    public const string InsufficientAmountToSplit = "InsufficientAmountToSplit";
 }

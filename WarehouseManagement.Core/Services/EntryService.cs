@@ -165,26 +165,6 @@ public class EntryService : IEntryService
         };
     }
 
-    public async Task MoveEntryToZoneWithId(int entryId, int zoneId)
-    {
-        if (!await ExistsByIdAsync(entryId))
-        {
-            throw new KeyNotFoundException(EntryWithIdNotFound);
-        }
-
-        var entry = await repository.All<Entry>().FirstAsync(e => e.Id == entryId);
-
-        var zone = await repository.All<Zone>().FirstOrDefaultAsync(z => z.Id == zoneId);
-
-        if (zone == null)
-        {
-            throw new KeyNotFoundException(ZoneWithIdNotFound);
-        }
-
-        entry.Zone = zone;
-        await repository.SaveChangesWithLogAsync();
-    }
-
     public async Task RestoreAsync(int id)
     {
         var entry = await repository.AllWithDeleted<Entry>().FirstOrDefaultAsync(z => z.Id == id);
@@ -281,6 +261,72 @@ public class EntryService : IEntryService
         entry.LastModifiedByUserId = userId;
 
         await repository.SaveChangesWithLogAsync();
+    }
+
+    public async Task SplitAsync(int id, EntrySplitDto splitDto, string userId)
+    {
+        var entry = await repository.GetByIdAsync<Entry>(id);
+
+        if (entry == null)
+        {
+            throw new KeyNotFoundException(EntryWithIdNotFound);
+        }
+
+        if (entry.FinishedProcessing != null)
+        {
+            throw new InvalidOperationException(EntryHasFinishedProcessingAndCannotBeSplit);
+        }
+
+        var zone = await repository.GetByIdAsync<Zone>(splitDto.NewZoneId);
+
+        if (zone == null)
+        {
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
+        }
+
+        var isCountValid = splitDto.Count > 0 &&
+            (splitDto.Count < entry.Pallets ||
+            splitDto.Count < entry.Packages ||
+            splitDto.Count < entry.Pieces);
+
+        if (!isCountValid)
+        {
+            throw new InvalidOperationException(InsufficientAmountToSplit);
+        }
+
+        var newEntry = SplitItemsAndCreateNewEntry(entry, splitDto.Count, splitDto.NewZoneId);
+
+        await repository.AddAsync(newEntry);
+        await repository.SaveChangesAsync();
+    }
+
+    private Entry SplitItemsAndCreateNewEntry(Entry entry, int countToSplit, int newZoneId)
+    {
+        var newEntry = new Entry()
+        {
+            ZoneId = newZoneId,
+            DeliveryId = entry.DeliveryId
+        };
+
+        if (entry.Pallets > 0)
+        {
+            entry.Pallets -= countToSplit;
+            newEntry.Pallets = countToSplit;
+        }
+
+        if (entry.Packages > 0)
+        {
+            entry.Packages -= countToSplit;
+            newEntry.Packages = countToSplit;
+        }
+
+        if (entry.Pieces > 0)
+        {
+            entry.Pieces -= countToSplit;
+            newEntry.Pieces = countToSplit;
+        }
+
+        return newEntry;
     }
 
     private void ValidateFinishProcessingOfEntry(Entry entry)
@@ -392,10 +438,5 @@ public class EntryService : IEntryService
         }
 
         await repository.AddAsync(newEntry);
-    }
-
-    public Task SplitAsync(int id, int newZoneId, int count, string userId)
-    {
-        throw new NotImplementedException();
     }
 }
