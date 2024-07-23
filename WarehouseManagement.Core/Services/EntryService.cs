@@ -294,18 +294,19 @@ public class EntryService : IEntryService
             throw new InvalidOperationException(InsufficientAmountToSplit);
         }
 
-        var newEntry = SplitItemsAndCreateNewEntry(entry, splitDto.Count, splitDto.NewZoneId);
+        var newEntry = SplitItemsAndCreateNewEntry(entry, splitDto.Count, splitDto.NewZoneId, userId);;
 
         await repository.AddAsync(newEntry);
         await repository.SaveChangesAsync();
     }
 
-    private Entry SplitItemsAndCreateNewEntry(Entry entry, int countToSplit, int newZoneId)
+    private Entry SplitItemsAndCreateNewEntry(Entry entry, int countToSplit, int newZoneId, string userId)
     {
         var newEntry = new Entry()
         {
             ZoneId = newZoneId,
-            DeliveryId = entry.DeliveryId
+            DeliveryId = entry.DeliveryId,
+            CreatedByUserId = userId
         };
 
         if (entry.Pallets > 0)
@@ -325,6 +326,9 @@ public class EntryService : IEntryService
             entry.Pieces -= countToSplit;
             newEntry.Pieces = countToSplit;
         }
+
+        entry.LastModifiedAt = DateTime.UtcNow;
+        entry.LastModifiedByUserId = userId;
 
         return newEntry;
     }
@@ -404,7 +408,6 @@ public class EntryService : IEntryService
                 Pallets = entry.Pallets,
                 Packages = 0,
                 Pieces = 0,
-                CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = userId,
                 DeliveryId = entry.DeliveryId,
                 ZoneId = entry.ZoneId,
