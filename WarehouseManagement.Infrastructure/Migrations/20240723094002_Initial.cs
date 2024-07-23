@@ -51,13 +51,13 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DifferenceType",
+                name: "DifferenceTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(2382)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(3317)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -67,7 +67,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DifferenceType", x => x.Id);
+                    table.PrimaryKey("PK_DifferenceTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,7 +95,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(7662)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(8671)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -116,7 +116,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SystemNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(9266)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 23, 9, 39, 58, 366, DateTimeKind.Utc).AddTicks(418)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -137,7 +137,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsFinal = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 17, 8, 43, 52, 784, DateTimeKind.Utc).AddTicks(1482)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 23, 9, 39, 58, 367, DateTimeKind.Utc).AddTicks(4580)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -267,6 +267,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     TruckNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Cmr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DeliveryTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ApprovedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Pallets = table.Column<int>(type: "int", nullable: false),
                     Packages = table.Column<int>(type: "int", nullable: false),
                     Pieces = table.Column<int>(type: "int", nullable: false),
@@ -275,7 +276,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     StartedProcessing = table.Column<DateTime>(type: "datetime2", nullable: true),
                     FinishedProcessing = table.Column<DateTime>(type: "datetime2", nullable: true),
                     VendorId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 17, 8, 43, 52, 780, DateTimeKind.Utc).AddTicks(4744)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 23, 9, 39, 58, 364, DateTimeKind.Utc).AddTicks(152)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -391,6 +392,53 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Differences",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReceptionNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InternalNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActiveNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdminComment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Count = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    TypeId = table.Column<int>(type: "int", nullable: false),
+                    DeliveryId = table.Column<int>(type: "int", nullable: false),
+                    ZoneId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(717)),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Differences", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Differences_Deliveries_DeliveryId",
+                        column: x => x.DeliveryId,
+                        principalTable: "Deliveries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Differences_DifferenceTypes_TypeId",
+                        column: x => x.TypeId,
+                        principalTable: "DifferenceTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Differences_Zones_ZoneId",
+                        column: x => x.ZoneId,
+                        principalTable: "Zones",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Entries",
                 columns: table => new
                 {
@@ -403,7 +451,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     FinishedProcessing = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ZoneId = table.Column<int>(type: "int", nullable: false),
                     DeliveryId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(5748)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(6415)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -478,6 +526,21 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 column: "DeliveryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Differences_DeliveryId",
+                table: "Differences",
+                column: "DeliveryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Differences_TypeId",
+                table: "Differences",
+                column: "TypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Differences_ZoneId",
+                table: "Differences",
+                column: "ZoneId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Entries_DeliveryId",
                 table: "Entries",
                 column: "DeliveryId");
@@ -525,7 +588,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 name: "DeliveriesMarkers");
 
             migrationBuilder.DropTable(
-                name: "DifferenceType");
+                name: "Differences");
 
             migrationBuilder.DropTable(
                 name: "EntityChanges");
@@ -547,6 +610,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "DifferenceTypes");
 
             migrationBuilder.DropTable(
                 name: "Deliveries");

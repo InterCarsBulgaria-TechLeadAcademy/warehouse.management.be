@@ -323,7 +323,8 @@ public class EntryService : IEntryService
         {
             throw new KeyNotFoundException(DeliveryWithIdNotFound);
         }
-        else if (zone == null)
+
+        if (zone == null)
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }

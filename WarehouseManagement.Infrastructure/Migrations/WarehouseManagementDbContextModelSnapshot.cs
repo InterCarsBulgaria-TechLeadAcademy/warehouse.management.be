@@ -232,6 +232,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("ApprovedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Cmr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -239,7 +242,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 780, DateTimeKind.Utc).AddTicks(4744));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 9, 39, 58, 364, DateTimeKind.Utc).AddTicks(152));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -324,6 +327,86 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.ToTable("DeliveriesMarkers");
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Difference", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActiveNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdminComment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(717));
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedByUserId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("DeliveryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InternalNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedByUserId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ReceptionNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ZoneId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeliveryId");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("Differences");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.DifferenceType", b =>
                 {
                     b.Property<int>("Id")
@@ -335,7 +418,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(2382));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(3317));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -366,7 +449,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DifferenceType");
+                    b.ToTable("DifferenceTypes");
                 });
 
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.EntityChange", b =>
@@ -420,7 +503,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(5748));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(6415));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -485,7 +568,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(7662));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 9, 39, 58, 365, DateTimeKind.Utc).AddTicks(8671));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -529,7 +612,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 782, DateTimeKind.Utc).AddTicks(9266));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 9, 39, 58, 366, DateTimeKind.Utc).AddTicks(418));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -607,7 +690,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 17, 8, 43, 52, 784, DateTimeKind.Utc).AddTicks(1482));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 9, 39, 58, 367, DateTimeKind.Utc).AddTicks(4580));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -739,6 +822,33 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("Marker");
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Difference", b =>
+                {
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.Delivery", "Delivery")
+                        .WithMany("Differences")
+                        .HasForeignKey("DeliveryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.DifferenceType", "Type")
+                        .WithMany("Differences")
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.Zone", "Zone")
+                        .WithMany("Differences")
+                        .HasForeignKey("ZoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Delivery");
+
+                    b.Navigation("Type");
+
+                    b.Navigation("Zone");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Entry", b =>
                 {
                     b.HasOne("WarehouseManagement.Infrastructure.Data.Models.Delivery", "Delivery")
@@ -819,7 +929,14 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 {
                     b.Navigation("DeliveriesMarkers");
 
+                    b.Navigation("Differences");
+
                     b.Navigation("Entries");
+                });
+
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.DifferenceType", b =>
+                {
+                    b.Navigation("Differences");
                 });
 
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Marker", b =>
@@ -842,6 +959,8 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Zone", b =>
                 {
+                    b.Navigation("Differences");
+
                     b.Navigation("Entries");
 
                     b.Navigation("VendorsZones");

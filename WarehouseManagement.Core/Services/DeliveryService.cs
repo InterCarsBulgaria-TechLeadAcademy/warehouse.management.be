@@ -203,13 +203,14 @@ public class DeliveryService : IDeliveryService
         };
 
         await repository.AddAsync(delivery);
+        await repository.SaveChangesAsync();
 
         foreach (var markerId in model.Markers)
         {
             var newDeliveryMarker = new DeliveryMarker()
             {
-                Delivery = delivery,
-                Marker = (await repository.GetByIdAsync<Marker>(markerId))!
+                DeliveryId = delivery.Id,
+                MarkerId = markerId
             };
 
             delivery.DeliveriesMarkers.Add(newDeliveryMarker);
