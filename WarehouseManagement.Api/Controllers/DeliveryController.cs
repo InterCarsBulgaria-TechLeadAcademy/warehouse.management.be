@@ -107,7 +107,7 @@ public class DeliveryController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(int id)
     {
-        await deliveryService.DeleteASync(id);
+        await deliveryService.DeleteAsync(id);
 
         return Ok(DeliveryDeletedSuccessfully);
     }

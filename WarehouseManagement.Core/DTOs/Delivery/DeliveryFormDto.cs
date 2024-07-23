@@ -25,5 +25,5 @@ public class DeliveryFormDto
     public int Packages { get; set; }
     public int Pieces { get; set; }
     public int VendorId { get; set; }
-    public ICollection<int> Markers { get; set; } = new HashSet<int>();
+    public ICollection<int> Markers { get; set; } = new List<int>();
 }
