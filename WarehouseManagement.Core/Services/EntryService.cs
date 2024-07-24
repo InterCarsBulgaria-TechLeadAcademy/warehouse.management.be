@@ -6,6 +6,7 @@ using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
+using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -24,7 +25,7 @@ public class EntryService : IEntryService
     {
         foreach (var entry in model)
         {
-            if (HasExactlyOneTypeSet(entry) == false)
+            if (!HasExactlyOneTypeSet(entry))
             {
                 throw new ArgumentException(EntryCanHaveOnlyOneTypeSet);
             }
@@ -32,7 +33,7 @@ public class EntryService : IEntryService
 
         foreach (var entry in model)
         {
-            await MapnNewEntriesAndAddToEntriesAsync(entry, userId);
+            await MapAndAddNewEntryAsync(entry, userId);
         }
 
         await repository.SaveChangesAsync();
@@ -397,8 +398,21 @@ public class EntryService : IEntryService
         return count == 1;
     }
 
-    private async Task MapnNewEntriesAndAddToEntriesAsync(EntryFormDto entry, string userId)
+    private async Task MapAndAddNewEntryAsync(EntryFormDto entry, string userId)
     {
+        var delivery = await repository.GetByIdAsync<Delivery>(entry.DeliveryId);
+        var zone = await repository.GetByIdAsync<Zone>(entry.ZoneId);
+
+        if (delivery == null)
+        {
+            throw new KeyNotFoundException(DeliveryWithIdNotFound);
+        }
+
+        if (zone == null)
+        {
+            throw new KeyNotFoundException(ZoneWithIdNotFound);
+        }
+
         Entry newEntry;
 
         if (entry.Pallets > 0)

@@ -392,8 +392,8 @@ public class DifferenceServiceTests
 
         await differenceService.StartProcessing(difference1.Id);
 
-        await differenceService.FinishProcessing(difference1.Id, AdminComment);
-
+        await differenceService.FinishProcessing(new DifferenceAdminCommentDto() { DifferenceId = difference1.Id, AdminComment = AdminComment });
+        
         var difference = await dbContext.Differences.FindAsync(difference1.Id);
 
         Assert.That(difference.Status, Is.EqualTo(DifferenceStatus.Finished));
@@ -407,7 +407,7 @@ public class DifferenceServiceTests
 
         var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
         {
-            await differenceService.FinishProcessing(InvalidDifferenceId, AdminComment);
+            await differenceService.FinishProcessing(new DifferenceAdminCommentDto() { DifferenceId = InvalidDifferenceId, AdminComment = AdminComment });
         });
 
         Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
@@ -420,7 +420,7 @@ public class DifferenceServiceTests
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await differenceService.FinishProcessing(difference1.Id, AdminComment);
+            await differenceService.FinishProcessing(new DifferenceAdminCommentDto() { DifferenceId = difference1.Id, AdminComment = AdminComment });
         });
 
         Assert.That(ex.Message, Is.EqualTo(DifferenceCannotBeFinished));
@@ -433,7 +433,7 @@ public class DifferenceServiceTests
 
         await differenceService.StartProcessing(difference1.Id);
 
-        await differenceService.NoDifferences(difference1.Id, AdminComment);
+        await differenceService.NoDifferences(new DifferenceAdminCommentDto() { DifferenceId = difference1.Id, AdminComment = AdminComment });
 
         var difference = await dbContext.Differences.FindAsync(difference1.Id);
 
@@ -448,7 +448,7 @@ public class DifferenceServiceTests
 
         var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
         {
-            await differenceService.NoDifferences(InvalidDifferenceId, AdminComment);
+            await differenceService.NoDifferences(new DifferenceAdminCommentDto() { DifferenceId = InvalidDifferenceId, AdminComment = AdminComment });
         });
 
         Assert.That(ex.Message, Is.EqualTo(DifferenceWithIdNotFound));
@@ -461,7 +461,7 @@ public class DifferenceServiceTests
 
         var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
-            await differenceService.NoDifferences(difference1.Id, AdminComment);
+            await differenceService.NoDifferences(new DifferenceAdminCommentDto() { DifferenceId = difference1.Id, AdminComment = AdminComment });
         });
 
         Assert.That(ex.Message, Is.EqualTo(DifferenceCannotBeFinished));

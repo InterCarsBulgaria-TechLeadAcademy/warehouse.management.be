@@ -9,7 +9,7 @@ public interface IDeliveryService
     Task<ICollection<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams);
     Task EditAsync(int id, DeliveryFormDto model, string userId);
     Task<int> AddAsync(DeliveryFormDto model, string userId);
-    Task DeleteASync(int id);
+    Task DeleteAsync(int id);
     Task RestoreAsync(int id);
     Task<ICollection<DeliveryDto>> GetAllDeletedAsync();
     Task ChangeDeliveryStatusIfNeeded(int id);

@@ -12,7 +12,7 @@ namespace WarehouseManagement.Api.Controllers
     public class EntryController : ControllerBase
     {
         private readonly IEntryService entryService;
-        private readonly IDeliveryService deliveryService; // TODO: Change delivery status in StartProcessing and FinishProcessing actions if needed when processing entry PR gets approved
+        private readonly IDeliveryService deliveryService;
 
         public EntryController(IEntryService entryService, IDeliveryService deliveryService)
         {
