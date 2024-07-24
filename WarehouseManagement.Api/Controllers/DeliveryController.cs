@@ -135,7 +135,7 @@ public class DeliveryController : ControllerBase
     [HttpGet("history/{id}")]
     [ProducesResponseType(200, Type = typeof(DeliveryHistoryDto))]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetHistory([FromQuery] int id)
+    public async Task<IActionResult> GetHistory(int id)
     {
         var history = await deliveryService.GetHistoryAsync(id);
 
