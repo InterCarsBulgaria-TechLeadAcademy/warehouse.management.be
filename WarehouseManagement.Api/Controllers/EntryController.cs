@@ -126,5 +126,27 @@ namespace WarehouseManagement.Api.Controllers
 
             return Ok(EntryFinishedProcessing);
         }
+
+        [HttpPost("move")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Move([FromQuery] int id, [FromBody] int newZoneId)
+        {
+            await entryService.MoveAsync(id, newZoneId, User.Id());
+
+            return Ok(EntryMovedSuccessfully);
+        }
+
+        [HttpPost("split")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Split([FromQuery] int id, [FromBody] EntrySplitDto splitDto)
+        {
+            await entryService.SplitAsync(id, splitDto, User.Id());
+
+            return Ok(EntrySplitSuccessfully);
+        }
     }
 }

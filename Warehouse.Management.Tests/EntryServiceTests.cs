@@ -340,36 +340,6 @@ public class EntryServiceTests
     }
 
     [Test]
-    public async Task MoveEntryToZoneWithId_ShouldSuccessfullyMoveEntry()
-    {
-        await entryService.MoveEntryToZoneWithId(waitingEntry.Id, zone2.Id);
-
-        Assert.That(waitingEntry.ZoneId, Is.EqualTo(zone2.Id));
-    }
-
-    [Test]
-    public void MoveEntryToZoneWithId_ThrowsKeyNotFoundException_WithInvalidEntryId()
-    {
-        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-        {
-            await entryService.MoveEntryToZoneWithId(InvalidEntryId, zone2.Id);
-        });
-
-        Assert.That(ex.Message, Is.EqualTo(EntryWithIdNotFound));
-    }
-
-    [Test]
-    public void MoveEntryToZoneWithId_ThrowsKeyNotFoundException_WithInvalidZoneId()
-    {
-        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-        {
-            await entryService.MoveEntryToZoneWithId(processingEntry.Id, InvalidZoneId);
-        });
-
-        Assert.That(ex.Message, Is.EqualTo(ZoneWithIdNotFound));
-    }
-
-    [Test]
     public async Task RestoreAsync_SuccessfullyUndeletesEntry()
     {
         await entryService.RestoreAsync(deletedEntry.Id);
@@ -487,5 +457,161 @@ public class EntryServiceTests
         });
 
         Assert.That(ex.Message, Is.EqualTo($"{EntryHasNotStartedProcessing} {waitingEntry.Id}"));
+    }
+
+    [Test]
+    public async Task MoveAsync_ShouldMoveEntryToNewZoneSuccessfully()
+    {
+        await entryService.MoveAsync(processingEntry.Id, zone2.Id, mockUserService.Object.UserId);
+
+        Assert.That(processingEntry.ZoneId, Is.EqualTo(zone2.Id));
+        Assert.That(processingEntry.StartedProcessing, Is.Null);
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsKeyNotFoundException_WhenEntryWithIdNotFound()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.MoveAsync(InvalidEntryId, zone2.Id, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryWithIdNotFound));
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsInvalidOperationException_WhenEntryHasFinishedProcessing()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.MoveAsync(finishedEntry.Id, zone2.Id, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryHasFinishedProcessingAndCannotBeMoved));
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsKeyNotFoundException_WhenZoneWithIdNotFound()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.MoveAsync(waitingEntry.Id, InvalidZoneId, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(ZoneWithIdNotFound));
+    }
+
+    [Test]
+    public void MoveAsync_ThrowsInvalidOperationException_WhenNewZoneIdMatchesOldOne()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.MoveAsync(waitingEntry.Id, zone1.Id, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryCannotBeMovedToSameZone));
+    }
+
+    [Test]
+    public async Task SplitAsync_ShouldSuccessfullySplitEntry_IntoNewZone()
+    {
+        const int ExpectedRemainingPallets = 1;
+        const int CountToSplit = 3;
+
+        await entryService.SplitAsync(processingEntry.Id, new EntrySplitDto() { Count = CountToSplit, NewZoneId = zone2.Id}, mockUserService.Object.UserId);
+
+        Assert.NotNull(processingEntry.StartedProcessing);
+        Assert.That(processingEntry.Pallets, Is.EqualTo(ExpectedRemainingPallets));
+        Assert.IsTrue(await dbContext.Entries.AnyAsync(e => e.ZoneId == zone2.Id && e.Pallets == CountToSplit));
+    }
+
+    [Test]
+    public async Task SplitAsync_ShouldSuccessfullySplitEntry_IntoSameZone()
+    {
+        const int ExpectedRemainingPallets = 1;
+        const int CountToSplit = 3;
+
+        await entryService.SplitAsync(processingEntry.Id, new EntrySplitDto() { Count = CountToSplit, NewZoneId = zone1.Id }, mockUserService.Object.UserId);
+
+        Assert.NotNull(processingEntry.StartedProcessing);
+        Assert.That(processingEntry.Pallets, Is.EqualTo(ExpectedRemainingPallets));
+        Assert.IsTrue(await dbContext.Entries.AnyAsync(e => e.ZoneId == zone1.Id && e.Pallets == CountToSplit));
+    }
+
+    [Test]
+    public void SplitAsync_ThrowsKeyNotFoundException_WhenEntryWithIdNotFound()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.SplitAsync(InvalidEntryId, new EntrySplitDto() { Count = 1, NewZoneId = zone2.Id }, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryWithIdNotFound));
+    }
+
+    [Test]
+    public void SplitAsync_ThrowsInvalidOperationException_WhenEntryHasFinishedProcessing()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.SplitAsync(finishedEntry.Id, new EntrySplitDto() { Count = 1, NewZoneId = zone1.Id }, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(EntryHasFinishedProcessingAndCannotBeSplit));
+    }
+
+    [Test]
+    public void SplitAsync_ThrowsKeyNotFoundException_WhenZoneWithIdNotFound()
+    {
+        var ex = Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await entryService.SplitAsync(waitingEntry.Id, new EntrySplitDto () { Count = 1, NewZoneId = InvalidZoneId }, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(ZoneWithIdNotFound));
+    }
+
+    [Test]
+    public void SplitAsync_ThrowsInvalidOperationException_WhenCountIsNegative()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.SplitAsync(processingEntry.Id, new EntrySplitDto() { Count = -1, NewZoneId = zone2.Id }, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(InsufficientAmountToSplit));
+    }
+
+    [Test]
+    public void SplitAsync_ThrowsInvalidOperationException_WhenCountIsZero()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.SplitAsync(processingEntry.Id, new EntrySplitDto() { Count = 0, NewZoneId = zone2.Id }, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(InsufficientAmountToSplit));
+    }
+
+    [Test]
+    public void SplitAsync_ThrowsInvalidOperationException_WhenCountIsEqualToTheCountOfItemsTheEntryContains()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.SplitAsync(processingEntry.Id, new EntrySplitDto() { Count = 4, NewZoneId = zone2.Id }, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(InsufficientAmountToSplit));
+    }
+
+    [Test]
+    public void SplitAsync_ThrowsInvalidOperationException_WhenCountIsMoreThanTheCountOfItemsTheEntryContains()
+    {
+        var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await entryService.SplitAsync(processingEntry.Id, new EntrySplitDto() { Count = 5, NewZoneId = zone2.Id }, mockUserService.Object.UserId);
+        });
+
+        Assert.That(ex.Message, Is.EqualTo(InsufficientAmountToSplit));
     }
 }

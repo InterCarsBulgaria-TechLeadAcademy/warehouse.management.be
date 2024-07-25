@@ -14,7 +14,8 @@ public interface IEntryService
     Task DeleteAsync(int id, string userId);
     Task RestoreAsync(int id);
     Task<bool> ExistsByIdAsync(int id);
-    Task MoveEntryToZoneWithId(int entryId, int zoneId);
     Task StartProcessingAsync(int entryId);
     Task FinishProcessingAsync(int entryId);
+    Task MoveAsync(int id, int newZoneId, string userId);
+    Task SplitAsync(int id, EntrySplitDto splitDto, string userId);
 }
