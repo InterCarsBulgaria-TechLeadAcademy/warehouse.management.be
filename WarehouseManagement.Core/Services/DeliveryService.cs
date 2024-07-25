@@ -341,22 +341,24 @@ public class DeliveryService : IDeliveryService
     {
         var delivery = await RetrieveByIdAsync(id);
 
-        var relatedEntriesIds = repository
+        var relatedEntriesIds = await repository
             .AllReadOnly<Entry>()
             .Where(e => e.DeliveryId == delivery.Id)
-            .Select(e => e.Id);
+            .Select(e => e.Id)
+            .ToListAsync();
 
-        var changes = repository
+        var changes = await repository
             .AllReadOnly<EntityChange>()
             .Where(change =>
                 int.Parse(change.EntityId) == delivery.Id
                 || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId))
-            );
+            )
+            .ToListAsync();
 
         var deliveryHistory = new DeliveryHistoryDto
         {
             Id = delivery.Id,
-            Changes = await changes
+            Changes = changes
                 .Select(change => new DeliveryHistoryDto.Change
                 {
                     EntityId = int.Parse(change.EntityId),
@@ -381,7 +383,7 @@ public class DeliveryService : IDeliveryService
                                     : LogType.Split, // May be refactored based on the Move functionality
                     ChangeDate = change.ChangedAt
                 })
-                .ToListAsync()
+                .ToList()
         };
 
         return deliveryHistory;
