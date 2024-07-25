@@ -6,4 +6,8 @@ public class PageDto<T>
     public int Count { get; set; }
 
     public IEnumerable<T> Results { get; set; } = new HashSet<T>();
+
+    public bool HasPrevious { get; set; }
+
+    public bool HasNext { get; set; }
 }

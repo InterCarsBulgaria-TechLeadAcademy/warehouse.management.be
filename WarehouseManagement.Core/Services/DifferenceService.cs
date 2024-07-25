@@ -105,10 +105,14 @@ public class DifferenceService : IDifferenceService
                 DeliverySystemNumber = d.Delivery.SystemNumber
             }).ToListAsync();
 
+        var totalItems = repository.AllReadOnly<Difference>().Count();
+
         return new PageDto<DifferenceDto>()
         {
-            Count = repository.AllReadOnly<Difference>().Count(),
-            Results = differences
+            Count = totalItems,
+            Results = differences,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
         };
     }
 
@@ -137,10 +141,14 @@ public class DifferenceService : IDifferenceService
                 DeliverySystemNumber = d.Delivery.SystemNumber
             }).ToListAsync();
 
+        var totalItems = repository.AllReadOnly<Difference>().Count();
+
         return new PageDto<DifferenceDto>()
         {
-            Count = repository.AllReadOnly<Difference>().Count(),
-            Results = differences
+            Count = totalItems,
+            Results = differences,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
         };
     }
 

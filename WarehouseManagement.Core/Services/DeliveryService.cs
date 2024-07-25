@@ -139,10 +139,14 @@ public class DeliveryService : IDeliveryService
             })
             .ToListAsync();
 
+        var totalItems = repository.AllReadOnly<Delivery>().Count();
+
         return new PageDto<DeliveryDto>()
         {
-            Count = repository.AllReadOnly<Delivery>().Count(),
-            Results = deliveries
+            Count = totalItems,
+            Results = deliveries,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
         };
     }
 

@@ -1,4 +1,5 @@
 ﻿using WarehouseManagement.Common.Statuses;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Entry;
 
 namespace WarehouseManagement.Core.Contracts;
@@ -6,9 +7,9 @@ namespace WarehouseManagement.Core.Contracts;
 public interface IEntryService
 {
     Task<EntryDto> GetByIdAsync(int id);
-    Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses = null);
-    Task<IEnumerable<EntryDto>> GetAllByZoneAsync(int zoneId, EntryStatuses[]? statuses = null);
-    Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(int? zoneId = null, EntryStatuses[]? statuses = null);
+    Task<PageDto<EntryDto>> GetAllAsync(PaginationParameters paginationParams, EntryStatuses[]? statuses = null);
+    Task<PageDto<EntryDto>> GetAllByZoneAsync(PaginationParameters paginationParams, int zoneId, EntryStatuses[]? statuses = null);
+    Task<PageDto<EntryDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams, int? zoneId = null, EntryStatuses[]? statuses = null);
     Task CreateAsync(ICollection<EntryFormDto> model, string userId);
     Task EditAsync(int id, EntryFormDto model, string userId);
     Task DeleteAsync(int id, string userId);

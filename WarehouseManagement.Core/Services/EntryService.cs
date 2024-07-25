@@ -7,6 +7,8 @@ using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
+using WarehouseManagement.Core.DTOs;
+using WarehouseManagement.Core.Extensions;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -73,11 +75,12 @@ public class EntryService : IEntryService
         return await repository.GetByIdAsync<Entry>(id) != null;
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllAsync(EntryStatuses[]? statuses = null)
+    public async Task<PageDto<EntryDto>> GetAllAsync(PaginationParameters paginationParams, EntryStatuses[]? statuses = null)
     {
-        var query = BuildQuery(statuses);
+        var query = BuildQuery(statuses)
+            .Paginate(paginationParams, null);
 
-        return await query
+        var entries = await query
             .Select(e => new EntryDto()
             {
                 Id = e.Id,
@@ -90,14 +93,26 @@ public class EntryService : IEntryService
                 DeliveryId = e.DeliveryId
             })
             .ToListAsync();
+
+        var count = repository.AllReadOnly<Entry>().Count();
+
+        return new PageDto<EntryDto>
+        {
+            Count = count,
+            Results = entries,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < count
+        };
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllByZoneAsync(
+    public async Task<PageDto<EntryDto>> GetAllByZoneAsync(
+        PaginationParameters paginationParams,
         int zoneId,
         EntryStatuses[]? statuses = null
     )
     {
-        var query = BuildQuery(statuses);
+        var query = BuildQuery(statuses)
+            .Paginate(paginationParams, null);
 
         var entries = await query
             .Where(e => e.ZoneId == zoneId)
@@ -114,22 +129,32 @@ public class EntryService : IEntryService
             })
             .ToListAsync();
 
-        return entries;
+        var count = repository.AllReadOnly<Entry>().Count();
+
+        return new PageDto<EntryDto>
+        {
+            Count = count,
+            Results = entries,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < count
+        };
     }
 
-    public async Task<IEnumerable<EntryDto>> GetAllWithDeletedAsync(
+    public async Task<PageDto<EntryDto>> GetAllWithDeletedAsync(
+        PaginationParameters paginationParams,
         int? zoneId = null,
         EntryStatuses[]? statuses = null
     )
     {
-        var query = BuildQuery(statuses, true);
+        var query = BuildQuery(statuses, true)
+            .Paginate(paginationParams, null);
 
         if (zoneId != null)
         {
             query = query.Where(e => e.ZoneId == zoneId);
         }
 
-        return await query
+        var entries = await query
             .Select(e => new EntryDto()
             {
                 Id = e.Id,
@@ -142,6 +167,16 @@ public class EntryService : IEntryService
                 DeliveryId = e.DeliveryId
             })
             .ToListAsync();
+
+        var count = repository.AllReadOnly<Entry>().Count();
+
+        return new PageDto<EntryDto>
+        {
+            Count = count,
+            Results = entries,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < count
+        };
     }
 
     public async Task<EntryDto> GetByIdAsync(int id)

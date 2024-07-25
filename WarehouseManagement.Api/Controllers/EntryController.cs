@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.DTOs.Requests;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
@@ -21,17 +22,17 @@ namespace WarehouseManagement.Api.Controllers
         }
 
         [HttpGet("all")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
-        public async Task<IActionResult> All([FromQuery] EntryRequest request)
+        [ProducesResponseType(200, Type = typeof(PageDto<EntryDto>))]
+        public async Task<IActionResult> All([FromQuery] PaginationParameters paginationParams, [FromQuery] EntryRequest request)
         {
             if (request.ZoneId != null)
             {
                 return Ok(
-                    await entryService.GetAllByZoneAsync((int)request.ZoneId, request.Statuses)
+                    await entryService.GetAllByZoneAsync(paginationParams, (int)request.ZoneId, request.Statuses)
                 );
             }
 
-            return Ok(await entryService.GetAllAsync(request.Statuses));
+            return Ok(await entryService.GetAllAsync(paginationParams, request.Statuses));
         }
 
         [HttpGet("{id}")]
@@ -46,14 +47,15 @@ namespace WarehouseManagement.Api.Controllers
 
         [HttpGet("all-with-deleted")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
-        public async Task<IActionResult> AllWithDeleted([FromBody] EntryRequest request)
+        public async Task<IActionResult> AllWithDeleted([FromQuery] PaginationParameters paginationParams, [FromQuery] EntryRequest request)
         {
-            var entries = await entryService.GetAllWithDeletedAsync(
+            var pageDto = await entryService.GetAllWithDeletedAsync(
+                paginationParams,
                 request.ZoneId,
                 request.Statuses
             );
 
-            return Ok(entries);
+            return Ok(pageDto);
         }
 
         [HttpPost("add")]

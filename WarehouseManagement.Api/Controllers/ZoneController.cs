@@ -117,13 +117,13 @@ namespace WarehouseManagement.Api.Controllers
         }
 
         [HttpGet("entries")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
+        [ProducesResponseType(200, Type = typeof(PageDto<EntryDto>))]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Entries(int zoneId, [FromQuery] EntryStatuses[]? statuses)
+        public async Task<IActionResult> Entries(int zoneId, [FromQuery] EntryStatuses[]? statuses, [FromQuery] PaginationParameters paginationParams)
         {
-            IEnumerable<EntryDto> entries = await entryService.GetAllByZoneAsync(zoneId, statuses);
+            var pageDto = await entryService.GetAllByZoneAsync(paginationParams, zoneId, statuses);
 
-            return Ok(entries);
+            return Ok(pageDto);
         }
     }
 }

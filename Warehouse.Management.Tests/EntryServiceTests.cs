@@ -11,6 +11,7 @@ using WarehouseManagement.Common.Statuses;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 using Castle.Components.DictionaryAdapter.Xml;
+using WarehouseManagement.Core.DTOs;
 
 namespace Warehouse.Management.Tests;
 
@@ -267,57 +268,57 @@ public class EntryServiceTests
     [Test]
     public async Task GetAllAsync_ShouldReturnAllEntries()
     {
-        var entries = await entryService.GetAllAsync();
+        var entries = await entryService.GetAllAsync(new PaginationParameters());
 
-        Assert.That(entries.Count(), Is.EqualTo(3));
+        Assert.That(entries.Results.Count(), Is.EqualTo(3));
     }
 
     [Test]
     public async Task GetAllAsync_ShouldReturnAllEntries_WithTheProvidedStatus()
     {
-        var entries = await entryService.GetAllAsync([EntryStatuses.Waiting]);
+        var entries = await entryService.GetAllAsync(new PaginationParameters(), [EntryStatuses.Waiting]);
 
-        Assert.That(entries.Count(), Is.EqualTo(1));
+        Assert.That(entries.Results.Count(), Is.EqualTo(1));
     }
 
     [Test]
     public async Task GetAllByZoneAsync_ShouldReturnAllEntries_ForTheGivenZone()
     {
-        var entries = await entryService.GetAllByZoneAsync(1);
+        var entries = await entryService.GetAllByZoneAsync(new PaginationParameters(), 1);
 
-        Assert.That(entries.Count(), Is.EqualTo(2));
+        Assert.That(entries.Results.Count(), Is.EqualTo(2));
     }
 
     [Test]
     public async Task GetAllByZoneAsync_ShouldReturnAllEntries_WithTheProvidedStatus_ForTheGivenZone()
     {
-        var entries = await entryService.GetAllByZoneAsync(1, [EntryStatuses.Waiting]);
+        var entries = await entryService.GetAllByZoneAsync(new PaginationParameters(), 1, [EntryStatuses.Waiting]);
 
-        Assert.That(entries.Count(), Is.EqualTo(1));
+        Assert.That(entries.Results.Count(), Is.EqualTo(1));
     }
 
     [Test]
     public async Task GetAllWithDeletedAsync_ShouldReturnAllEntries_IncludingTheDeleted()
     {
-        var entries = await entryService.GetAllWithDeletedAsync();
+        var entries = await entryService.GetAllWithDeletedAsync(new PaginationParameters());
 
-        Assert.That(entries.Count(), Is.EqualTo(4));
+        Assert.That(entries.Results.Count(), Is.EqualTo(4));
     }
 
     [Test]
     public async Task GetAllWithDeletedAsync_ShouldReturnAllEntries_IncludingTheDeleted_ForTheGivenZone_WheZoneIdIsProvided()
     {
-        var entries = await entryService.GetAllWithDeletedAsync(1);
+        var entries = await entryService.GetAllWithDeletedAsync(new PaginationParameters(), 1);
 
-        Assert.That(entries.Count(), Is.EqualTo(3));
+        Assert.That(entries.Results.Count(), Is.EqualTo(3));
     }
 
     [Test]
     public async Task GetAllWithDeletedAsync_ShouldReturnAllEntries_IncludingTheDeleted_ForTheGivenZone_WithTheProvidedStatus()
     {
-        var entries = await entryService.GetAllWithDeletedAsync(1, [EntryStatuses.Waiting]);
+        var entries = await entryService.GetAllWithDeletedAsync(new PaginationParameters(), 1, [EntryStatuses.Waiting]);
 
-        Assert.That(entries.Count(), Is.EqualTo(2));
+        Assert.That(entries.Results.Count(), Is.EqualTo(2));
     }
 
     [Test]
