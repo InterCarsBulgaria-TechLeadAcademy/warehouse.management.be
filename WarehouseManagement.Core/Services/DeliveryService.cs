@@ -9,6 +9,7 @@ using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
+using static WarehouseManagement.Core.DTOs.Delivery.DeliveryHistoryDto;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -349,11 +350,12 @@ public class DeliveryService : IDeliveryService
 
         var changes = await repository
             .AllReadOnly<EntityChange>()
-            .Where(change =>
-                int.Parse(change.EntityId) == delivery.Id
-                || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId))
-            )
             .ToListAsync();
+
+        changes = changes
+            .Where(change => int.Parse(change.EntityId) == delivery.Id ||
+                relatedEntriesIds.Any(id => id == int.Parse(change.EntityId)))
+            .ToList();
 
         var deliveryHistory = new DeliveryHistoryDto
         {
