@@ -314,7 +314,7 @@ public class ZoneServiceTests
     {
         var zones = await zoneService.GetAllWithDeletedAsync();
 
-        Assert.That(zones.Count, Is.EqualTo(3));
+        Assert.That(zones.Count, Is.EqualTo(4));
     }
 
     [Test]
