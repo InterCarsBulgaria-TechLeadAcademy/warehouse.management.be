@@ -80,14 +80,14 @@ public class DifferenceService : IDifferenceService
         return await repository.GetByIdAsync<Difference>(id) != null;
     }
 
-    public async Task<IEnumerable<DifferenceDto>> GetAllAsync(PaginationParameters paginationParams)
+    public async Task<PageDto<DifferenceDto>> GetAllAsync(PaginationParameters paginationParams)
     {
         Expression<Func<Difference, bool>> filter = v =>
             EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
             || EF.Functions.Like(v.InternalNumber, $"%{paginationParams.SearchQuery}%")
             || EF.Functions.Like(v.ActiveNumber, $"%{paginationParams.SearchQuery}%");
 
-        var models = await repository
+        var differences = await repository
             .AllReadOnly<Difference>()
             .Paginate(paginationParams, filter)
             .Select(d => new DifferenceDto()
@@ -105,17 +105,25 @@ public class DifferenceService : IDifferenceService
                 DeliverySystemNumber = d.Delivery.SystemNumber
             }).ToListAsync();
 
-        return models;
+        var totalItems = repository.AllReadOnly<Difference>().Count();
+
+        return new PageDto<DifferenceDto>()
+        {
+            Count = totalItems,
+            Results = differences,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
+        };
     }
 
-    public async Task<IEnumerable<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams)
+    public async Task<PageDto<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams)
     {
         Expression<Func<Difference, bool>> filter = v =>
             EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
             || EF.Functions.Like(v.InternalNumber, $"%{paginationParams.SearchQuery}%")
             || EF.Functions.Like(v.ActiveNumber, $"%{paginationParams.SearchQuery}%");
 
-        var models = await repository
+        var differences = await repository
             .AllWithDeletedReadOnly<Difference>()
             .Paginate(paginationParams, filter)
             .Select(d => new DifferenceDto()
@@ -133,7 +141,15 @@ public class DifferenceService : IDifferenceService
                 DeliverySystemNumber = d.Delivery.SystemNumber
             }).ToListAsync();
 
-        return models;
+        var totalItems = repository.AllReadOnly<Difference>().Count();
+
+        return new PageDto<DifferenceDto>()
+        {
+            Count = totalItems,
+            Results = differences,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
+        };
     }
 
     public async Task<DifferenceDto> GetByIdAsync(int id)

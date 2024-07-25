@@ -281,9 +281,9 @@ public class DifferenceServiceTests
     {
         var paginationParams = new PaginationParameters { PageNumber = 1, PageSize = 10 };
 
-        var result = await differenceService.GetAllAsync(paginationParams);
+        var model = await differenceService.GetAllAsync(paginationParams);
 
-        Assert.That(result.Count(), Is.EqualTo(3));
+        Assert.That(model.Results.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -297,7 +297,7 @@ public class DifferenceServiceTests
 
         var result = await differenceService.GetAllWithDeletedAsync(paginationParams);
 
-        Assert.That(result.Count(), Is.EqualTo(ExpectedTotalDifferencesCount));
+        Assert.That(result.Results.Count(), Is.EqualTo(ExpectedTotalDifferencesCount));
     }
 
     [Test]

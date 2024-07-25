@@ -1,4 +1,6 @@
-﻿namespace WarehouseManagement.Core.DTOs.Delivery;
+﻿using WarehouseManagement.Core.DTOs.Entry;
+
+namespace WarehouseManagement.Core.DTOs.Delivery;
 
 public class DeliveryDto
 {
@@ -17,6 +19,6 @@ public class DeliveryDto
     public int VendorId { get; set; }
     public string VendorName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
-    public ICollection<DeliveryEntryDto> Entries { get; set; } = new List<DeliveryEntryDto>();
+    public ICollection<EntryDto> Entries { get; set; } = new List<EntryDto>();
     public ICollection<DeliveryMarkerDto> Markers { get; set; } = new List<DeliveryMarkerDto>();
 }

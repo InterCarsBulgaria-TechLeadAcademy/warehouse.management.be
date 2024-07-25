@@ -40,7 +40,7 @@ public class DeliveryController : ControllerBase
     }
 
     [HttpGet("all")]
-    [ProducesResponseType(200, Type = typeof(ICollection<DeliveryDto>))]
+    [ProducesResponseType(200, Type = typeof(PageDto<DeliveryDto>))]
     public async Task<IActionResult> GetDeliveries(
         [FromQuery] PaginationParameters paginationParams
     )

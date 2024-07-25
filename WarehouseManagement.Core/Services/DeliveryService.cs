@@ -5,6 +5,8 @@ using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
+using WarehouseManagement.Core.DTOs.Entry;
+using WarehouseManagement.Core.DTOs.Zone;
 using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
@@ -39,22 +41,23 @@ public class DeliveryService : IDeliveryService
                 TruckNumber = d.TruckNumber,
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
-                Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
-                        ? d.IsApproved
-                            ? DeliveryStatus.Approved.ToString()
-                            : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
-                            ? DeliveryStatus.Processing.ToString()
-                            : DeliveryStatus.Waiting.ToString()
-                    : DeliveryStatus.Waiting.ToString(),
+                Status = d.Status.ToString(),
                 Entries = d
-                    .Entries.Select(e => new DeliveryEntryDto()
+                    .Entries.Select(e => new EntryDto()
                     {
                         Id = e.Id,
+                        Packages = e.Packages,
+                        Pallets = e.Pallets,
+                        Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
-                        ZoneId = e.ZoneId
+                        Zone = new ZoneDto()
+                        {
+                            Id = e.ZoneId,
+                            Name = e.Zone.Name,
+                            IsFinal = e.Zone.IsFinal
+                        },
+                        DeliveryId = e.DeliveryId,
                     })
                     .ToList(),
                 Markers = d
@@ -82,7 +85,7 @@ public class DeliveryService : IDeliveryService
         return delivery;
     }
 
-    public async Task<ICollection<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams)
+    public async Task<PageDto<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams)
     {
         Expression<Func<Delivery, bool>> filter = v =>
             EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
@@ -105,22 +108,23 @@ public class DeliveryService : IDeliveryService
                 TruckNumber = d.TruckNumber,
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
-                Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
-                        ? d.IsApproved
-                            ? DeliveryStatus.Approved.ToString()
-                            : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
-                            ? DeliveryStatus.Processing.ToString()
-                            : DeliveryStatus.Waiting.ToString()
-                    : DeliveryStatus.Waiting.ToString(),
+                Status = d.Status.ToString(),
                 Entries = d
-                    .Entries.Select(e => new DeliveryEntryDto()
+                    .Entries.Select(e => new EntryDto()
                     {
                         Id = e.Id,
+                        Packages = e.Packages,
+                        Pallets = e.Pallets,
+                        Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
-                        ZoneId = e.ZoneId
+                        Zone = new ZoneDto()
+                        {
+                            Id = e.ZoneId,
+                            Name = e.Zone.Name,
+                            IsFinal = e.Zone.IsFinal
+                        },
+                        DeliveryId = e.DeliveryId,
                     })
                     .ToList(),
                 Markers = d
@@ -139,7 +143,15 @@ public class DeliveryService : IDeliveryService
             })
             .ToListAsync();
 
-        return deliveries;
+        var totalItems = repository.AllReadOnly<Delivery>().Count();
+
+        return new PageDto<DeliveryDto>()
+        {
+            Count = totalItems,
+            Results = deliveries,
+            HasPrevious = paginationParams.PageNumber > 1,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
+        };
     }
 
     public async Task EditAsync(int id, DeliveryFormDto model, string userId)
@@ -269,22 +281,23 @@ public class DeliveryService : IDeliveryService
                 TruckNumber = d.TruckNumber,
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
-                Status = d.Entries.Any()
-                    ? d.Entries.All(e => e.FinishedProcessing.HasValue)
-                        ? d.IsApproved
-                            ? DeliveryStatus.Approved.ToString()
-                            : DeliveryStatus.Finished.ToString()
-                        : d.Entries.Any(e => e.StartedProcessing.HasValue)
-                            ? DeliveryStatus.Processing.ToString()
-                            : DeliveryStatus.Waiting.ToString()
-                    : DeliveryStatus.Waiting.ToString(),
+                Status = d.Status.ToString(),
                 Entries = d
-                    .Entries.Select(e => new DeliveryEntryDto()
+                    .Entries.Select(e => new EntryDto()
                     {
                         Id = e.Id,
+                        Packages = e.Packages,
+                        Pallets = e.Pallets,
+                        Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
-                        ZoneId = e.ZoneId
+                        Zone = new ZoneDto()
+                        {
+                            Id = e.ZoneId,
+                            Name = e.Zone.Name,
+                            IsFinal = e.Zone.IsFinal
+                        },
+                        DeliveryId = e.DeliveryId,
                     })
                     .ToList(),
                 Markers = d
@@ -333,22 +346,25 @@ public class DeliveryService : IDeliveryService
     {
         var delivery = await RetrieveByIdAsync(id);
 
-        var relatedEntriesIds = repository
+        var relatedEntriesIds = await repository
             .AllReadOnly<Entry>()
             .Where(e => e.DeliveryId == delivery.Id)
-            .Select(e => e.Id);
+            .Select(e => e.Id)
+            .ToListAsync();
 
-        var changes = repository
+        var changes = await repository
             .AllReadOnly<EntityChange>()
-            .Where(change =>
-                int.Parse(change.EntityId) == delivery.Id
-                || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId))
-            );
+            .ToListAsync();
+
+        changes = changes
+            .Where(change => int.Parse(change.EntityId) == delivery.Id ||
+                relatedEntriesIds.Any(id => id == int.Parse(change.EntityId)))
+            .ToList();
 
         var deliveryHistory = new DeliveryHistoryDto
         {
             Id = delivery.Id,
-            Changes = await changes
+            Changes = changes
                 .Select(change => new DeliveryHistoryDto.Change
                 {
                     EntityId = int.Parse(change.EntityId),
@@ -373,7 +389,7 @@ public class DeliveryService : IDeliveryService
                                     : LogType.Split, // May be refactored based on the Move functionality
                     ChangeDate = change.ChangedAt
                 })
-                .ToListAsync()
+                .ToList()
         };
 
         return deliveryHistory;
