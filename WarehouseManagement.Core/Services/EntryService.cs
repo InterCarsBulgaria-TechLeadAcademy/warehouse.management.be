@@ -4,11 +4,12 @@ using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using WarehouseManagement.Core.DTOs;
+using WarehouseManagement.Core.Extensions;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
-using WarehouseManagement.Core.DTOs;
-using WarehouseManagement.Core.Extensions;
+using WarehouseManagement.Core.DTOs.Zone;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -89,7 +90,12 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
-                ZoneId = e.ZoneId,
+                Zone = new ZoneDto()
+                {
+                    Id = e.ZoneId,
+                    Name = e.Zone.Name,
+                    IsFinal = e.Zone.IsFinal
+                },
                 DeliveryId = e.DeliveryId
             })
             .ToListAsync();
@@ -124,7 +130,12 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
-                ZoneId = e.ZoneId,
+                Zone = new ZoneDto()
+                {
+                    Id = e.ZoneId,
+                    Name = e.Zone.Name,
+                    IsFinal = e.Zone.IsFinal
+                },
                 DeliveryId = e.DeliveryId
             })
             .ToListAsync();
@@ -163,7 +174,12 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
-                ZoneId = e.ZoneId,
+                Zone = new ZoneDto()
+                {
+                    Id = e.ZoneId,
+                    Name = e.Zone.Name,
+                    IsFinal = e.Zone.IsFinal
+                },
                 DeliveryId = e.DeliveryId
             })
             .ToListAsync();
@@ -196,7 +212,12 @@ public class EntryService : IEntryService
             Pieces = entry.Pieces,
             StartedProccessing = entry.StartedProcessing,
             FinishedProccessing = entry.FinishedProcessing,
-            ZoneId = entry.ZoneId,
+            Zone = new ZoneDto()
+            {
+                Id = entry.ZoneId,
+                Name = entry.Zone.Name,
+                IsFinal = entry.Zone.IsFinal
+            },
             DeliveryId = entry.DeliveryId
         };
     }

@@ -1,4 +1,6 @@
-﻿namespace WarehouseManagement.Core.DTOs.Entry;
+﻿using WarehouseManagement.Core.DTOs.Zone;
+
+namespace WarehouseManagement.Core.DTOs.Entry;
 
 public class EntryDto
 {
@@ -8,6 +10,6 @@ public class EntryDto
     public int Pieces { get; set; }
     public DateTime? StartedProccessing { get; set; }
     public DateTime? FinishedProccessing { get; set; }
-    public int ZoneId { get; set; }
+    public ZoneDto Zone { get; set; } = null!;
     public int DeliveryId { get; set; }
 }
