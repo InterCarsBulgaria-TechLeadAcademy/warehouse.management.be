@@ -82,7 +82,7 @@ public class DeliveryService : IDeliveryService
         return delivery;
     }
 
-    public async Task<ICollection<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams)
+    public async Task<PageDto<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams)
     {
         Expression<Func<Delivery, bool>> filter = v =>
             EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
@@ -139,7 +139,11 @@ public class DeliveryService : IDeliveryService
             })
             .ToListAsync();
 
-        return deliveries;
+        return new PageDto<DeliveryDto>()
+        {
+            Count = repository.AllReadOnly<Delivery>().Count(),
+            Results = deliveries
+        };
     }
 
     public async Task EditAsync(int id, DeliveryFormDto model, string userId)

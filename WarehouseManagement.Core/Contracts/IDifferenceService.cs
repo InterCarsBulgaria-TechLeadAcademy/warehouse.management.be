@@ -7,9 +7,9 @@ public interface IDifferenceService
 {
     Task<DifferenceDto> GetByIdAsync(int id);
 
-    Task<IEnumerable<DifferenceDto>> GetAllAsync(PaginationParameters paginationParams);
+    Task<PageDto<DifferenceDto>> GetAllAsync(PaginationParameters paginationParams);
 
-    Task<IEnumerable<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams);
+    Task<PageDto<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams);
 
     Task CreateAsync(DifferenceFormDto model, string userId);
 

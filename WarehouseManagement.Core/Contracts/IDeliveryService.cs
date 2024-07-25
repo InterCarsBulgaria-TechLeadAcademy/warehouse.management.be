@@ -6,7 +6,7 @@ namespace WarehouseManagement.Core.Contracts;
 public interface IDeliveryService
 {
     Task<DeliveryDto> GetByIdAsync(int id);
-    Task<ICollection<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams);
+    Task<PageDto<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams);
     Task EditAsync(int id, DeliveryFormDto model, string userId);
     Task<int> AddAsync(DeliveryFormDto model, string userId);
     Task DeleteAsync(int id);

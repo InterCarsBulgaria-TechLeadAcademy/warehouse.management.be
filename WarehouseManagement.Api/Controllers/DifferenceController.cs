@@ -19,21 +19,21 @@ public class DifferenceController : ControllerBase
     }
 
     [HttpGet("all")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<DifferenceDto>))]
+    [ProducesResponseType(200, Type = typeof(PageDto<DifferenceDto>))]
     public async Task<IActionResult> All([FromQuery] PaginationParameters paginationParams)
     {
-        var models = await differenceService.GetAllAsync(paginationParams);
+        var pageDto = await differenceService.GetAllAsync(paginationParams);
 
-        return Ok(models);
+        return Ok(pageDto);
     }
 
     [HttpGet("all-with-deleted")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<DifferenceDto>))]
+    [ProducesResponseType(200, Type = typeof(PageDto<DifferenceDto>))]
     public async Task<IActionResult> AllWithDeleted([FromQuery] PaginationParameters paginationParams)
     {
-        var models = await differenceService.GetAllWithDeletedAsync(paginationParams);
+        var pageDto = await differenceService.GetAllWithDeletedAsync(paginationParams);
 
-        return Ok(models);
+        return Ok(pageDto);
     }
 
     [HttpGet("{id}")]
