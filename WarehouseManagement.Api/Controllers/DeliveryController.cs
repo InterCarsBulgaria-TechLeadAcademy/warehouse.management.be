@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Core.Contracts;
@@ -41,6 +42,7 @@ public class DeliveryController : ControllerBase
 
     [HttpGet("all")]
     [ProducesResponseType(200, Type = typeof(PageDto<DeliveryDto>))]
+    [ProducesResponseType(401)]
     public async Task<IActionResult> GetDeliveries(
         [FromQuery] PaginationParameters paginationParams
     )

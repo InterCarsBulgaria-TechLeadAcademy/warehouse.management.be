@@ -1,10 +1,12 @@
-﻿namespace WarehouseManagement.Core.Contracts;
+﻿using WarehouseManagement.Core.DTOs.Auth;
+
+namespace WarehouseManagement.Core.Contracts;
 
 public interface IAuthService
 {
     string GenerateJwtToken(string userId, string username, string email);
 
-    Task RegisterAsync();
+    Task<string> RegisterAsync(RegisterDto registerDto);
 
-    Task LoginAsync();
+    Task<string> LoginAsync(LoginDto loginDto);
 }
