@@ -90,6 +90,7 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
+                CreatedAt = e.CreatedAt,
                 Zone = new ZoneDto()
                 {
                     Id = e.ZoneId,
@@ -130,6 +131,7 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
+                CreatedAt = e.CreatedAt,
                 Zone = new ZoneDto()
                 {
                     Id = e.ZoneId,
@@ -174,6 +176,7 @@ public class EntryService : IEntryService
                 Pieces = e.Pieces,
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
+                CreatedAt = e.CreatedAt,
                 Zone = new ZoneDto()
                 {
                     Id = e.ZoneId,
@@ -212,6 +215,7 @@ public class EntryService : IEntryService
             Pieces = entry.Pieces,
             StartedProccessing = entry.StartedProcessing,
             FinishedProccessing = entry.FinishedProcessing,
+            CreatedAt = entry.CreatedAt,
             Zone = new ZoneDto()
             {
                 Id = entry.ZoneId,
@@ -490,7 +494,6 @@ public class EntryService : IEntryService
                 Pallets = 0,
                 Packages = entry.Packages,
                 Pieces = 0,
-                CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = userId,
                 DeliveryId = entry.DeliveryId,
                 ZoneId = entry.ZoneId,
@@ -503,7 +506,6 @@ public class EntryService : IEntryService
                 Pallets = 0,
                 Packages = 0,
                 Pieces = entry.Pieces,
-                CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = userId,
                 DeliveryId = entry.DeliveryId,
                 ZoneId = entry.ZoneId,

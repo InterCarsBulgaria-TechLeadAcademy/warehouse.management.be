@@ -8,6 +8,8 @@ public class ZoneDto
 
     public bool IsFinal { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
     public IEnumerable<ZoneMarkerDto> Markers { get; set; } = new HashSet<ZoneMarkerDto>();
 
     public IEnumerable<ZoneVendorDto> Vendors { get; set; } = new HashSet<ZoneVendorDto>();

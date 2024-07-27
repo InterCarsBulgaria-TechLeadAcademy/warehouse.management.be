@@ -10,6 +10,7 @@ public class EntryDto
     public int Pieces { get; set; }
     public DateTime? StartedProccessing { get; set; }
     public DateTime? FinishedProccessing { get; set; }
+    public DateTime CreatedAt { get; set; }
     public ZoneDto Zone { get; set; } = null!;
     public int DeliveryId { get; set; }
 }

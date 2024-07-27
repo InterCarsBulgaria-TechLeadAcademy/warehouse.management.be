@@ -160,6 +160,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
+                CreatedAt = z.CreatedAt,
                 Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
                 {
                     MarkerId = zm.MarkerId,
@@ -198,6 +199,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
+                CreatedAt = z.CreatedAt,
                 Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
                 {
                     MarkerId = zm.MarkerId,
@@ -232,6 +234,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
+                CreatedAt = z.CreatedAt,
                 Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
                 {
                     MarkerId = zm.MarkerId,
@@ -270,6 +273,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
+                CreatedAt = z.CreatedAt,
                 Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
                 {
                     MarkerId = zm.MarkerId,
@@ -309,6 +313,7 @@ public class ZoneService : IZoneService
             Id = zone.Id,
             Name = zone.Name,
             IsFinal = zone.IsFinal,
+            CreatedAt = zone.CreatedAt,
             Markers = zone.ZonesMarkers.Select(zm => new ZoneMarkerDto()
             {
                 MarkerId = zm.MarkerId,
