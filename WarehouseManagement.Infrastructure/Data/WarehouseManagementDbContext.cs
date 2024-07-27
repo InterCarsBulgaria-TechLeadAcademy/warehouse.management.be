@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -7,7 +8,7 @@ using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data
 {
-    public class WarehouseManagementDbContext : IdentityDbContext
+    public class WarehouseManagementDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         private readonly IUserService userService;
 
