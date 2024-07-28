@@ -101,6 +101,7 @@ public class MarkerService : IMarkerService
             {
                 Id = m.Id,
                 Name = m.Name,
+                CreatedAt = m.CreatedAt,
                 Deliveries = m
                     .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
                     {
@@ -142,6 +143,7 @@ public class MarkerService : IMarkerService
             {
                 Id = m.Id,
                 Name = m.Name,
+                CreatedAt = m.CreatedAt,
                 Deliveries = m
                     .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
                     {
@@ -179,6 +181,7 @@ public class MarkerService : IMarkerService
             {
                 Id = m.Id,
                 Name = m.Name,
+                CreatedAt = m.CreatedAt,
                 Deliveries = m
                     .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
                     {

@@ -29,6 +29,7 @@ namespace WarehouseManagement.Core.Services
                     Id = v.Id,
                     Name = v.Name,
                     SystemNumber = v.SystemNumber,
+                    CreatedAt = v.CreatedAt,
                     Markers = v
                         .VendorsMarkers.Select(vm => new VendorMarkerDto()
                         {
@@ -69,6 +70,7 @@ namespace WarehouseManagement.Core.Services
                     Id = v.Id,
                     Name = v.Name,
                     SystemNumber = v.SystemNumber,
+                    CreatedAt = v.CreatedAt,
                     Markers = v
                         .VendorsMarkers.Select(vm => new VendorMarkerDto()
                         {
@@ -98,6 +100,7 @@ namespace WarehouseManagement.Core.Services
                     Id = v.Id,
                     Name = v.Name,
                     SystemNumber = v.SystemNumber,
+                    CreatedAt = v.CreatedAt,
                     Markers = v
                         .VendorsMarkers.Select(vm => new VendorMarkerDto()
                         {
@@ -133,7 +136,6 @@ namespace WarehouseManagement.Core.Services
             {
                 Name = model.Name,
                 SystemNumber = model.SystemNumber,
-                CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = userId,
             };
 

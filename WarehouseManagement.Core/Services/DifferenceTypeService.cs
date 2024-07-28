@@ -87,6 +87,7 @@ public class DifferenceTypeService : IDifferenceTypeService
             {
                 Id = dt.Id,
                 Name = dt.Name,
+                CreatedAt = dt.CreatedAt
             }).ToListAsync();
     }
 
@@ -98,6 +99,7 @@ public class DifferenceTypeService : IDifferenceTypeService
             {
                 Id = dt.Id,
                 Name = dt.Name,
+                CreatedAt = dt.CreatedAt
             }).ToListAsync();
     }
 
@@ -114,6 +116,7 @@ public class DifferenceTypeService : IDifferenceTypeService
         {
             Id = differenceType!.Id,
             Name = differenceType.Name,
+            CreatedAt = differenceType.CreatedAt
         };
     }
 

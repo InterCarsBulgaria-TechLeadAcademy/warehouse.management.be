@@ -42,6 +42,7 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
+                CreatedAt = d.CreatedAt,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
                     {
@@ -109,6 +110,7 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
+                CreatedAt = d.CreatedAt,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
                     {
@@ -282,6 +284,7 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
+                CreatedAt = d.CreatedAt,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
                     {

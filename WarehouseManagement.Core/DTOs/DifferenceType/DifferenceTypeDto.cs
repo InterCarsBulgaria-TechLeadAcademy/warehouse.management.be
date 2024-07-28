@@ -6,5 +6,5 @@ public class DifferenceTypeDto
 
     public string Name { get; set; } = string.Empty;
 
-    // TODO: Later add Differences property
+    public DateTime CreatedAt { get; set; }
 }
