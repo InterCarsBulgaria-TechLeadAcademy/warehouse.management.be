@@ -51,10 +51,9 @@ public class AuthService : IAuthService
         {
             UserName = registerDto.Username,
             Email = registerDto.Email,
-            PasswordHash = HashPassword(registerDto.Password)
         };
 
-        var result = await userManager.CreateAsync(user);
+        var result = await userManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded)
         {
@@ -66,29 +65,20 @@ public class AuthService : IAuthService
 
     public async Task<string> LoginAsync(LoginDto loginDto)
     {
-        var result = await signInManager.PasswordSignInAsync(loginDto.Username, loginDto.Password, false, lockoutOnFailure: false);
+        var user = await userManager.FindByNameAsync(loginDto.Username);
+
+        if (user == null)
+        {
+            throw new ArgumentException("Email or password is incorrect.");
+        }
+
+        var result = await signInManager.PasswordSignInAsync(user.UserName, loginDto.Password, false, false);
 
         if (!result.Succeeded)
         {
             throw new Exception("Invalid login attempt.");
         }
 
-        var user = await userManager.FindByNameAsync(loginDto.Username);
-
         return GenerateJwtToken(user!.Id.ToString(), user.UserName!, user.Email!);
-    }
-
-    private string HashPassword(string password)
-    {
-        var salt = RandomNumberGenerator.GetBytes(128 / 8);
-
-        var hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            password,
-            salt,
-            KeyDerivationPrf.HMACSHA256,
-            100000,
-            256 / 8));
-
-        return hashed;
     }
 }
