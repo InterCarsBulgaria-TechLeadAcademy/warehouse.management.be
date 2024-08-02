@@ -1,43 +1,45 @@
-﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Auth;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
-
-namespace WarehouseManagement.Core.Services;
+using static WarehouseManagement.Common.MessageConstants.Keys.AuthMassegeKeys;
 
 public class AuthService : IAuthService
 {
     private readonly IRepository repository;
-
     private readonly SignInManager<ApplicationUser> signInManager;
     private readonly UserManager<ApplicationUser> userManager;
+    private readonly IConfiguration configuration;
 
-    public AuthService(
-        IRepository repository, 
-        SignInManager<ApplicationUser> signInManager, 
-        UserManager<ApplicationUser> userManager)
+    public AuthService(IRepository repository, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IConfiguration configuration)
     {
         this.repository = repository;
         this.signInManager = signInManager;
         this.userManager = userManager;
+        this.configuration = configuration;
     }
 
     public string GenerateJwtToken(string userId, string username, string email)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("u2vXj3t8P9pL4cQ7rS6sW1e0bG5zK7aD2nS3yU8oJ9lF6dA9gH");
+        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]!);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] { new Claim("id", userId), new Claim("username", username), new Claim("email", email) }),
-            Expires = DateTime.UtcNow.AddDays(7),
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Email, email)
+            }),
+            Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
@@ -45,7 +47,59 @@ public class AuthService : IAuthService
         return tokenHandler.WriteToken(token);
     }
 
-    public async Task<string> RegisterAsync(RegisterDto registerDto)
+    public async Task<string> GenerateRefreshToken(string userId)
+    {
+        var refreshToken = new RefreshToken()
+        {
+            Token = Guid.NewGuid().ToString().Replace("-", ""),
+            ExpirationDate = DateTime.UtcNow.AddDays(7),
+            UserId = Guid.Parse(userId)
+        };
+
+        await repository.AddAsync(refreshToken);
+        await repository.SaveChangesAsync();
+
+        return refreshToken.Token;
+    }
+
+    public async Task<string> GenerateAccessTokenFromRefreshToken(string refreshToken)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]!);
+
+        var refreshTokenEntity = await repository
+            .All<RefreshToken>()
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Token == refreshToken);
+
+        if (refreshTokenEntity == null)
+        {
+            throw new KeyNotFoundException(RefreshTokenNotFound);
+        }
+
+        if (refreshTokenEntity.ExpirationDate < DateTime.UtcNow)
+        {
+            throw new InvalidOperationException(RefreshTokenHasExpired);
+        }
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, refreshTokenEntity.UserId.ToString()),
+                new Claim(ClaimTypes.Name, refreshTokenEntity.User.UserName!),
+                new Claim(ClaimTypes.Email, refreshTokenEntity.User.Email!)
+            }),
+            Expires = DateTime.UtcNow.AddMinutes(15),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        return tokenHandler.WriteToken(token);
+    }
+
+    public async Task RegisterAsync(RegisterDto registerDto)
     {
         var user = new ApplicationUser
         {
@@ -59,8 +113,6 @@ public class AuthService : IAuthService
         {
             throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
         }
-
-        return GenerateJwtToken(user.Id.ToString(), user.UserName, user.Email);
     }
 
     public async Task<string> LoginAsync(LoginDto loginDto)
@@ -72,7 +124,7 @@ public class AuthService : IAuthService
             throw new ArgumentException("Email or password is incorrect.");
         }
 
-        var result = await signInManager.PasswordSignInAsync(user.UserName, loginDto.Password, false, false);
+        var result = await signInManager.PasswordSignInAsync(user.UserName!, loginDto.Password, false, false);
 
         if (!result.Succeeded)
         {
@@ -80,5 +132,16 @@ public class AuthService : IAuthService
         }
 
         return GenerateJwtToken(user!.Id.ToString(), user.UserName!, user.Email!);
+    }
+
+    public async Task LogoutAsync(string userId)
+    {
+        var refreshToken = await repository
+            .All<RefreshToken>()
+            .FirstAsync(t => t.UserId.ToString() == userId);
+
+        refreshToken.IsRevoked = true;
+
+        await signInManager.SignOutAsync();
     }
 }

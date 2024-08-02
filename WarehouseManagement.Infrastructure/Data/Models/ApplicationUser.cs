@@ -8,4 +8,6 @@ public class ApplicationUser : IdentityUser<Guid>
     {
         this.Id = Guid.NewGuid();
     }
+
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new HashSet<RefreshToken>();
 }

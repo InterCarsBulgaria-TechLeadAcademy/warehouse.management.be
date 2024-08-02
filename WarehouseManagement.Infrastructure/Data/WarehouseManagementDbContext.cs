@@ -28,6 +28,7 @@ namespace WarehouseManagement.Infrastructure.Data
         public DbSet<Zone> Zones { get; set; } = null!;
         public DbSet<DifferenceType> DifferenceTypes { get; set; } = null!;
         public DbSet<Difference> Differences { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<DeliveryMarker> DeliveriesMarkers { get; set; } = null!;
         public DbSet<VendorMarker> VendorsMarkers { get; set; } = null!;
         public DbSet<VendorZone> VendorsZones { get; set; } = null!;

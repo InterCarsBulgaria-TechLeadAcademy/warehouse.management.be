@@ -241,7 +241,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 27, 13, 31, 48, 590, DateTimeKind.Utc).AddTicks(5682));
+                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 809, DateTimeKind.Utc).AddTicks(9375));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -351,7 +351,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 27, 13, 31, 48, 591, DateTimeKind.Utc).AddTicks(3418));
+                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 810, DateTimeKind.Utc).AddTicks(7301));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -417,7 +417,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 27, 13, 31, 48, 591, DateTimeKind.Utc).AddTicks(5668));
+                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 810, DateTimeKind.Utc).AddTicks(9196));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -502,7 +502,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 27, 13, 31, 48, 591, DateTimeKind.Utc).AddTicks(9350));
+                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(2597));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -567,7 +567,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 27, 13, 31, 48, 592, DateTimeKind.Utc).AddTicks(1218));
+                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(4344));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -600,6 +600,34 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.ToTable("Markers");
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Vendor", b =>
                 {
                     b.Property<int>("Id")
@@ -611,7 +639,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 27, 13, 31, 48, 592, DateTimeKind.Utc).AddTicks(2974));
+                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(7197));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -689,7 +717,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 27, 13, 31, 48, 594, DateTimeKind.Utc).AddTicks(1170));
+                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 812, DateTimeKind.Utc).AddTicks(9136));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -867,6 +895,17 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("Zone");
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.RefreshToken", b =>
+                {
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.ApplicationUser", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.VendorMarker", b =>
                 {
                     b.HasOne("WarehouseManagement.Infrastructure.Data.Models.Marker", "Marker")
@@ -922,6 +961,11 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("Marker");
 
                     b.Navigation("Zone");
+                });
+
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Delivery", b =>
