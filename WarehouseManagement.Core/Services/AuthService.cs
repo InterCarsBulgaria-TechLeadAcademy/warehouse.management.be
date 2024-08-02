@@ -29,7 +29,7 @@ public class AuthService : IAuthService
     public string GenerateJwtToken(string userId, string username, string email)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]!);
+        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -67,7 +67,7 @@ public class AuthService : IAuthService
     public async Task<string> GenerateAccessTokenFromRefreshToken(string refreshToken)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Secret"]!);
+        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
 
         var refreshTokenEntity = await repository
             .All<RefreshToken>()
