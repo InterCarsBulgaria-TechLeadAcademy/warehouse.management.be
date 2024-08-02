@@ -39,6 +39,8 @@ public class AuthService : IAuthService
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Email, email)
             }),
+            Issuer = "https://localhost:7226",
+            Audience = "https://localhost:7226",
             Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
