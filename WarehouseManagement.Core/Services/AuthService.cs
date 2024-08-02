@@ -31,22 +31,9 @@ public class AuthService : IAuthService
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
 
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Email, email)
-            }),
-            Issuer = "https://localhost:7226",
-            Audience = "https://localhost:7226",
-            Expires = DateTime.UtcNow.AddMinutes(10),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
+        var token = ComposeAccessToken(userId, userId, email);
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        return token;
     }
 
     public async Task<string> GenerateRefreshToken(string userId)
@@ -66,9 +53,6 @@ public class AuthService : IAuthService
 
     public async Task<string> GenerateAccessTokenFromRefreshToken(string refreshToken)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
-
         var refreshTokenEntity = await repository
             .All<RefreshToken>()
             .Include(t => t.User)
@@ -84,20 +68,31 @@ public class AuthService : IAuthService
             throw new InvalidOperationException(RefreshTokenHasExpired);
         }
 
+        var token = ComposeAccessToken(refreshTokenEntity.UserId.ToString(), refreshTokenEntity.User.UserName!, refreshTokenEntity.User.Email!);
+
+        return token;
+    }
+
+    private string ComposeAccessToken(string userId, string username, string email)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, refreshTokenEntity.UserId.ToString()),
-                new Claim(ClaimTypes.Name, refreshTokenEntity.User.UserName!),
-                new Claim(ClaimTypes.Email, refreshTokenEntity.User.Email!)
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Email, email)
             }),
-            Expires = DateTime.UtcNow.AddMinutes(15),
+            Issuer = "https://localhost:7226",
+            Audience = "https://localhost:7226",
+            Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-
         return tokenHandler.WriteToken(token);
     }
 
@@ -119,7 +114,10 @@ public class AuthService : IAuthService
 
     public async Task<string> LoginAsync(LoginDto loginDto)
     {
-        var user = await userManager.FindByNameAsync(loginDto.Username);
+        var user = await repository
+            .All<ApplicationUser>()
+            .Include(u => u.RefreshTokens)
+            .FirstAsync(u => u.UserName == loginDto.Username);
 
         if (user == null)
         {
@@ -133,7 +131,22 @@ public class AuthService : IAuthService
             throw new Exception("Invalid login attempt.");
         }
 
+        await RevokeOldRefreshTokens(user);
         return GenerateJwtToken(user!.Id.ToString(), user.UserName!, user.Email!);
+    }
+
+    private async Task RevokeOldRefreshTokens(ApplicationUser user)
+    {
+        foreach (var refreshToken in user.RefreshTokens)
+        {
+            // Maybe directly to delete them from the DB
+            if (!refreshToken.IsRevoked)
+            {
+                refreshToken.IsRevoked = true;
+            }
+        }
+
+        await repository.SaveChangesAsync();
     }
 
     public async Task LogoutAsync(string userId)
