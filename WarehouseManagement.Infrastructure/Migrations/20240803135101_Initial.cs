@@ -57,7 +57,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 2, 8, 16, 25, 810, DateTimeKind.Utc).AddTicks(9196)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(2246)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -95,7 +95,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(4344)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(7273)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -109,6 +109,19 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoutePermissions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ActionName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ControllerName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoutePermissions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Vendors",
                 columns: table => new
                 {
@@ -116,7 +129,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SystemNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(7197)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 3, 13, 50, 59, 992, DateTimeKind.Utc).AddTicks(7570)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -137,7 +150,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsFinal = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 2, 8, 16, 25, 812, DateTimeKind.Utc).AddTicks(9136)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 3, 13, 50, 59, 993, DateTimeKind.Utc).AddTicks(9493)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -279,6 +292,30 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoleRoutePermission",
+                columns: table => new
+                {
+                    RoutePermissionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleRoutePermission", x => new { x.RoleId, x.RoutePermissionId });
+                    table.ForeignKey(
+                        name: "FK_RoleRoutePermission_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RoleRoutePermission_RoutePermissions_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "RoutePermissions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Deliveries",
                 columns: table => new
                 {
@@ -298,7 +335,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     StartedProcessing = table.Column<DateTime>(type: "datetime2", nullable: true),
                     FinishedProcessing = table.Column<DateTime>(type: "datetime2", nullable: true),
                     VendorId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 2, 8, 16, 25, 809, DateTimeKind.Utc).AddTicks(9375)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 3, 13, 50, 59, 990, DateTimeKind.Utc).AddTicks(3153)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -429,7 +466,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     TypeId = table.Column<int>(type: "int", nullable: false),
                     DeliveryId = table.Column<int>(type: "int", nullable: false),
                     ZoneId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 2, 8, 16, 25, 810, DateTimeKind.Utc).AddTicks(7301)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(463)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -473,7 +510,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     FinishedProcessing = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ZoneId = table.Column<int>(type: "int", nullable: false),
                     DeliveryId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(2597)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(5416)),
                     CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
@@ -627,6 +664,9 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
+                name: "RoleRoutePermission");
+
+            migrationBuilder.DropTable(
                 name: "VendorsMarkers");
 
             migrationBuilder.DropTable(
@@ -636,9 +676,6 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 name: "ZonesMarkers");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
                 name: "DifferenceTypes");
 
             migrationBuilder.DropTable(
@@ -646,6 +683,12 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "RoutePermissions");
 
             migrationBuilder.DropTable(
                 name: "Markers");

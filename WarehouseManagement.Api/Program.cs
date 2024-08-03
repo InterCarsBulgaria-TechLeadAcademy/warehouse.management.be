@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WarehouseManagement.Api.Extensions;
 using WarehouseManagement.Api.Middlewares;
 using WarehouseManagement.Infrastructure.Data;
+using WarehouseManagement.Infrastructure.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,7 +60,6 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
 
@@ -68,5 +69,24 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
+    var roles = new string[] { "Admin" };
+
+    foreach (var role in roles)
+    {
+        var exists = await roleManager.RoleExistsAsync(role);
+
+        if (!exists)
+        {
+            await roleManager.CreateAsync(new ApplicationRole() { Name = role });
+        }
+    }
+}
+
+// TODO: Seed user as admin
 
 await app.RunAsync();

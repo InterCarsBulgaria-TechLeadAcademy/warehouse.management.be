@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -8,7 +7,7 @@ using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data
 {
-    public class WarehouseManagementDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class WarehouseManagementDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
         private readonly IUserService userService;
 
@@ -29,6 +28,8 @@ namespace WarehouseManagement.Infrastructure.Data
         public DbSet<DifferenceType> DifferenceTypes { get; set; } = null!;
         public DbSet<Difference> Differences { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<RoutePermission> RoutePermissions { get; set; } = null!;
+        public DbSet<RoleRoutePermission> RoleRoutePermission { get; set; } = null!;
         public DbSet<DeliveryMarker> DeliveriesMarkers { get; set; } = null!;
         public DbSet<VendorMarker> VendorsMarkers { get; set; } = null!;
         public DbSet<VendorZone> VendorsZones { get; set; } = null!;

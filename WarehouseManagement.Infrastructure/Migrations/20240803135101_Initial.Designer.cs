@@ -12,7 +12,7 @@ using WarehouseManagement.Infrastructure.Data;
 namespace WarehouseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(WarehouseManagementDbContext))]
-    [Migration("20240802081626_Initial")]
+    [Migration("20240803135101_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,34 +24,6 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -160,6 +132,34 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.ApplicationRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -244,7 +244,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 809, DateTimeKind.Utc).AddTicks(9375));
+                        .HasDefaultValue(new DateTime(2024, 8, 3, 13, 50, 59, 990, DateTimeKind.Utc).AddTicks(3153));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -354,7 +354,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 810, DateTimeKind.Utc).AddTicks(7301));
+                        .HasDefaultValue(new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(463));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -420,7 +420,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 810, DateTimeKind.Utc).AddTicks(9196));
+                        .HasDefaultValue(new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(2246));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -505,7 +505,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(2597));
+                        .HasDefaultValue(new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(5416));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -570,7 +570,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(4344));
+                        .HasDefaultValue(new DateTime(2024, 8, 3, 13, 50, 59, 991, DateTimeKind.Utc).AddTicks(7273));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -631,6 +631,38 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.RoleRoutePermission", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoutePermissionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RoleId", "RoutePermissionId");
+
+                    b.ToTable("RoleRoutePermission");
+                });
+
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.RoutePermission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ActionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ControllerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RoutePermissions");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Vendor", b =>
                 {
                     b.Property<int>("Id")
@@ -642,7 +674,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 811, DateTimeKind.Utc).AddTicks(7197));
+                        .HasDefaultValue(new DateTime(2024, 8, 3, 13, 50, 59, 992, DateTimeKind.Utc).AddTicks(7570));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -720,7 +752,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 8, 2, 8, 16, 25, 812, DateTimeKind.Utc).AddTicks(9136));
+                        .HasDefaultValue(new DateTime(2024, 8, 3, 13, 50, 59, 993, DateTimeKind.Utc).AddTicks(9493));
 
                     b.Property<string>("CreatedByUserId")
                         .IsRequired()
@@ -773,7 +805,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -800,7 +832,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -909,6 +941,25 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.RoleRoutePermission", b =>
+                {
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.ApplicationRole", "Role")
+                        .WithMany("RoleRoutePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.RoutePermission", "RoutePermission")
+                        .WithMany("RoleRoutePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("RoutePermission");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.VendorMarker", b =>
                 {
                     b.HasOne("WarehouseManagement.Infrastructure.Data.Models.Marker", "Marker")
@@ -966,6 +1017,11 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("Zone");
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.ApplicationRole", b =>
+                {
+                    b.Navigation("RoleRoutePermissions");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("RefreshTokens");
@@ -992,6 +1048,11 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.Navigation("VendorsMarkers");
 
                     b.Navigation("ZonesMarkers");
+                });
+
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.RoutePermission", b =>
+                {
+                    b.Navigation("RoleRoutePermissions");
                 });
 
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Vendor", b =>

@@ -25,6 +25,7 @@ namespace WarehouseManagement.Api.Extensions
             services.AddScoped<IDifferenceService, DifferenceService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IRoleService, RoleService>();
             return services;
         }
 
@@ -62,7 +63,7 @@ namespace WarehouseManagement.Api.Extensions
                     options.Password.RequiredLength = 4;
                     options.User.RequireUniqueEmail = true;
                 })
-                .AddRoles<IdentityRole<Guid>>()
+                .AddRoles<ApplicationRole>()
                 .AddEntityFrameworkStores<WarehouseManagementDbContext>();
 
             return services;
