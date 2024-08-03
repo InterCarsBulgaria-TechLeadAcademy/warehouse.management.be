@@ -11,10 +11,12 @@ namespace WarehouseManagement.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService authService;
+    private readonly IJwtService jwtService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IJwtService jwtService)
     {
         this.authService = authService;
+        this.jwtService = jwtService;
     }
 
     [HttpPost("login")]
@@ -28,7 +30,7 @@ public class AuthController : ControllerBase
         }
 
         string jwtToken = await authService.LoginAsync(logindDto);
-        string refreshToken = await authService.GenerateRefreshToken(User.Id());
+        string refreshToken = await jwtService.GenerateRefreshToken(User.Id());
 
         return Ok(new TokenResponse() { AccessToken = jwtToken, RefreshToken = refreshToken });
     }
@@ -54,7 +56,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> Refresh([FromBody] string refreshToken)
     {
-        var newAccessToken = await authService.GenerateAccessTokenFromRefreshToken(refreshToken);
+        var newAccessToken = await jwtService.GenerateAccessTokenFromRefreshToken(refreshToken);
 
         var response = new TokenResponse
         {
