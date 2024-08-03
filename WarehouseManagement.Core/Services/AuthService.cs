@@ -86,8 +86,8 @@ public class AuthService : IAuthService
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Email, email)
             }),
-            Issuer = "https://localhost:7226",
-            Audience = "https://localhost:7226",
+            Issuer = configuration["Jwt:Issuer"],
+            Audience = configuration["Jwt:Audience"],
             Expires = DateTime.UtcNow.AddMinutes(10),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
@@ -117,14 +117,14 @@ public class AuthService : IAuthService
         var user = await repository
             .All<ApplicationUser>()
             .Include(u => u.RefreshTokens)
-            .FirstAsync(u => u.UserName == loginDto.Username);
+            .FirstOrDefaultAsync(u => u.UserName == loginDto.Username);
 
         if (user == null)
         {
             throw new ArgumentException("Email or password is incorrect.");
         }
 
-        var result = await signInManager.PasswordSignInAsync(user.UserName!, loginDto.Password, false, false);
+        var result = await signInManager.PasswordSignInAsync(user.UserName!, loginDto.Password, true, false);
 
         if (!result.Succeeded)
         {
@@ -139,7 +139,7 @@ public class AuthService : IAuthService
     {
         foreach (var refreshToken in user.RefreshTokens)
         {
-            // Maybe directly to delete them from the DB
+            // Maybe directly delete them from the DB
             if (!refreshToken.IsRevoked)
             {
                 refreshToken.IsRevoked = true;
