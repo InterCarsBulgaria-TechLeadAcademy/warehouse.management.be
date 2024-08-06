@@ -15,4 +15,5 @@ public interface IDeliveryService
     Task ChangeDeliveryStatusIfNeeded(int id);
     Task<DeliveryHistoryDto> GetHistoryAsync(int id);
     Task ApproveAsync(int id);
+    Task<DeliveryPDFModelDto> GetPDFModel(int id);
 }
