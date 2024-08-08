@@ -6,6 +6,7 @@ using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.Services;
 using WarehouseManagement.Infrastructure.Data;
 using WarehouseManagement.Infrastructure.Data.Common;
+using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Api.Extensions
 {
@@ -22,6 +23,8 @@ namespace WarehouseManagement.Api.Extensions
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IDifferenceTypeService, DifferenceTypeService>();
             services.AddScoped<IDifferenceService, DifferenceService>();
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IPDFService, PDFService>();
             return services;
         }
@@ -50,7 +53,7 @@ namespace WarehouseManagement.Api.Extensions
             //Here is Identity Configuration
 
             services
-                .AddDefaultIdentity<IdentityUser>(options =>
+                .AddDefaultIdentity<ApplicationUser>(options =>
                 {
                     options.SignIn.RequireConfirmedAccount = false;
                     options.Password.RequireNonAlphanumeric = false;
@@ -60,7 +63,7 @@ namespace WarehouseManagement.Api.Extensions
                     options.Password.RequiredLength = 4;
                     options.User.RequireUniqueEmail = true;
                 })
-                .AddRoles<IdentityRole>()
+                .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<WarehouseManagementDbContext>();
 
             return services;
