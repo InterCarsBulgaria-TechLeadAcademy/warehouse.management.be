@@ -1,13 +1,13 @@
 ﻿namespace WarehouseManagement.Infrastructure.Data.Models;
 
-public class RoutePermission
+public class RoutePermission : BaseClass
 {
     public RoutePermission()
     {
         this.Id = Guid.NewGuid();
     }
 
-    public Guid Id { get; set; }
+    public new Guid Id { get; set; }
 
     public string Name { get; set; } = string.Empty;
 
