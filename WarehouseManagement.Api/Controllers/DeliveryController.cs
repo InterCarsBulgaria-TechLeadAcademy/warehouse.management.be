@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WarehouseManagement.Api.Middlewares;
 using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;

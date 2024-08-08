@@ -2,26 +2,30 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
-using WarehouseManagement.Core.Services;
+using WarehouseManagement.Core.Contracts;
 
 namespace WarehouseManagement.Api.Middlewares
 {
     public class CustomAuthorizeAttribute : AuthorizeAttribute, IAsyncAuthorizationFilter
     {
-        private readonly string action;
-        private readonly string controller;
-
-        public CustomAuthorizeAttribute(string action, string controller)
-        {
-            this.action = action;
-            this.controller = controller;
-        }
-
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+            var allowAnonymous = context.ActionDescriptor.EndpointMetadata
+                .OfType<IAllowAnonymous>()
+                .Any();
+
+            if (allowAnonymous)
+            {
+                // Skip authorization if AllowAnonymous is present
+                return;
+            }
+
             // In the future maybe replace with context.RouteData to access controller and action
             var serviceProvider = context.HttpContext.RequestServices;
-            var roleService = serviceProvider.GetRequiredService<RoleService>();
+            var roleService = serviceProvider.GetRequiredService<IRoleService>();
+
+            string action = context.RouteData.Values["action"]!.ToString()!;
+            string controller = context.RouteData.Values["controller"]!.ToString()!;
 
             var user = context.HttpContext.User;
 

@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WarehouseManagement.Api.Middlewares;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.DifferenceType;
 using static WarehouseManagement.Common.MessageConstants.Keys.DifferenceTypeMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class DifferenceTypeController : ControllerBase
