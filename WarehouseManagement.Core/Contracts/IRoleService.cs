@@ -1,14 +1,20 @@
-﻿namespace WarehouseManagement.Core.Contracts;
+﻿using WarehouseManagement.Core.DTOs.Role;
+
+namespace WarehouseManagement.Core.Contracts;
 
 public interface IRoleService
 {
     Task<bool> CheckRoleAccessAsync(string roleName, string action, string controller);
 
-    Task CreateAsync(string roleName, ICollection<string> rolePermissionsIds);
+    Task CreateAsync(RoleFormDto model);
 
     Task AssignRoleToUserAsync(string roleName, string userId);
 
-    Task EditPermissionsAsync(string roleName, ICollection<string> newPermissionsIds);
+    Task EditAsync(string oldName, RoleFormDto model);
 
     Task DeleteAsync(string roleName);
+
+    Task<IEnumerable<RoleDto>> AllAsync();
+
+    Task<RoleDto> GetByNameAsync(string name);
 }

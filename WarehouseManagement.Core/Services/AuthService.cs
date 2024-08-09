@@ -23,6 +23,8 @@ public class AuthService : IAuthService
 
     public async Task RegisterAsync(RegisterDto registerDto)
     {
+        //TODO handle role
+
         var user = new ApplicationUser
         {
             UserName = registerDto.Username,

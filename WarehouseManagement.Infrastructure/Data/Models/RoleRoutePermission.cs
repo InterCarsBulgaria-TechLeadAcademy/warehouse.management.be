@@ -9,7 +9,6 @@ public class RoleRoutePermission
 
     public RoutePermission RoutePermission { get; set; } = null!;
 
-
     [ForeignKey(nameof(Role))]
     public Guid RoleId { get; set; }
 
