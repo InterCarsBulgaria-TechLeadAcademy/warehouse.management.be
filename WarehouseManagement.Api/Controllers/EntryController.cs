@@ -107,7 +107,7 @@ namespace WarehouseManagement.Api.Controllers
             return Ok(EntryRestored);
         }
 
-        [HttpGet("start/{id}")]
+        [HttpPut("start/{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -118,7 +118,7 @@ namespace WarehouseManagement.Api.Controllers
             return Ok(EntryStartedProcessing);
         }
 
-        [HttpGet("finish/{id}")]
+        [HttpPut("finish/{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]

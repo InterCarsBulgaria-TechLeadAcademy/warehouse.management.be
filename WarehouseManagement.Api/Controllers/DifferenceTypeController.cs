@@ -7,7 +7,6 @@ using static WarehouseManagement.Common.MessageConstants.Keys.DifferenceTypeMess
 
 namespace WarehouseManagement.Api.Controllers;
 
-[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class DifferenceTypeController : ControllerBase
