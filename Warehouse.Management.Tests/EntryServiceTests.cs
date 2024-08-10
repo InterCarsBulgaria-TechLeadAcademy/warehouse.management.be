@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
 using WarehouseManagement.Api.Services.Contracts;
+using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.Services;
 using WarehouseManagement.Infrastructure.Data;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
-using WarehouseManagement.Common.Statuses;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
-using Castle.Components.DictionaryAdapter.Xml;
-using WarehouseManagement.Core.DTOs;
 
 namespace Warehouse.Management.Tests;
 
@@ -22,7 +21,6 @@ public class EntryServiceTests
 
     private WarehouseManagementDbContext dbContext;
     private IEntryService entryService;
-    private IDeliveryService deliveryService;
     private Mock<IUserService> mockUserService;
 
     private Entry waitingEntry;
@@ -32,6 +30,8 @@ public class EntryServiceTests
 
     private Zone zone1;
     private Zone zone2;
+
+    private Delivery delivery;
 
     [SetUp]
     public async Task Setup()
@@ -59,6 +59,32 @@ public class EntryServiceTests
             Id = 2,
             Name = "Zone2",
             CreatedByUserId = "User1"
+        };
+
+        var vendor = new Vendor
+        {
+            Id = 1,
+            Name = "Vendor1",
+            SystemNumber = "V12345"
+        };
+
+        delivery = new Delivery
+        {
+            Id = 1,
+            SystemNumber = "D567892",
+            ReceptionNumber = "R987652",
+            TruckNumber = "TR12342",
+            Cmr = "CMR0012",
+            DeliveryTime = DateTime.Now,
+            Pallets = 10,
+            Packages = 100,
+            Pieces = 1000,
+            IsApproved = false,
+            Status = DeliveryStatus.Processing,
+            StartedProcessing = null,
+            FinishedProcessing = null,
+            VendorId = vendor.Id,
+            Vendor = vendor
         };
 
         waitingEntry = new Entry
@@ -113,13 +139,15 @@ public class EntryServiceTests
         var entries = new List<Entry> { waitingEntry, processingEntry, finishedEntry, deletedEntry };
         var zones = new List<Zone> { zone1, zone2 };
 
+        await dbContext.Vendors.AddAsync(vendor);
+        await dbContext.Deliveries.AddAsync(delivery);
+
         await dbContext.Entries.AddRangeAsync(entries);
         await dbContext.Zones.AddRangeAsync(zones);
 
         await dbContext.SaveChangesAsync();
 
-        deliveryService = new DeliveryService(new Repository(dbContext, mockUserService.Object));
-        entryService = new EntryService(new Repository(dbContext, mockUserService.Object), deliveryService);
+        entryService = new EntryService(new Repository(dbContext, mockUserService.Object));
     }
 
     [TearDown]
