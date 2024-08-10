@@ -460,7 +460,7 @@ public class DeliveryService : IDeliveryService
         return entries.All(e => e.FinishedProcessing != null);
     }
 
-    private void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
+    private async void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
     {
         if (status == DeliveryStatus.Waiting)
         {
@@ -501,6 +501,8 @@ public class DeliveryService : IDeliveryService
                 "Operation for delivery with status 'Approved' currently not supported."
             );
         }
+
+        await repository.SaveChangesWithLogAsync();
     }
 
     public async Task<DeliveryPDFModelDto> GetPDFModel(int id)

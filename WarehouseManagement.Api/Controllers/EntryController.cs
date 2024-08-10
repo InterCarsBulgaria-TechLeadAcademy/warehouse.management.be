@@ -115,6 +115,9 @@ namespace WarehouseManagement.Api.Controllers
         {
             await entryService.StartProcessingAsync(id);
 
+            var entry = await entryService.GetByIdAsync(id);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
+
             return Ok(EntryStartedProcessing);
         }
 
@@ -125,6 +128,9 @@ namespace WarehouseManagement.Api.Controllers
         public async Task<IActionResult> FinishProcessing(int id)
         {
             await entryService.FinishProcessingAsync(id);
+
+            var entry = await entryService.GetByIdAsync(id);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
 
             return Ok(EntryFinishedProcessing);
         }
