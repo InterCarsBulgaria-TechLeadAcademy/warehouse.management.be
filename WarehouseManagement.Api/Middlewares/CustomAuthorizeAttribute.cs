@@ -41,7 +41,9 @@ namespace WarehouseManagement.Api.Middlewares
 
             foreach (var role in roles)
             {
-                if (await roleService.CheckRoleAccessAsync(role, action, controller))
+                var hasAccess = await roleService.CheckRoleAccessAsync(role, action, controller);
+
+                if (hasAccess)
                 {
                     return;
                 }

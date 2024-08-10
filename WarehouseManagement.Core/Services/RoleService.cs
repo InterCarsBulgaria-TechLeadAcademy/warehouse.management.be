@@ -71,8 +71,11 @@ public class RoleService : IRoleService
             throw new ArgumentException(RoleWithThisNameDoesNotExist);
         }
 
-        return role.RoleRoutePermissions
-            .Any(rp => rp.RoutePermission.ActionName == action && rp.RoutePermission.ControllerName == controller);
+        return repository
+            .All<RoleRoutePermission>()
+            .Any(rrp => rrp.RoleId == role.Id 
+                && rrp.RoutePermission.ActionName == action 
+                && rrp.RoutePermission.ControllerName == controller);
     }
 
     public async Task CreateAsync(RoleFormDto model)
@@ -135,7 +138,8 @@ public class RoleService : IRoleService
             throw new ArgumentException(RoleWithThisNameDoesNotExist);
         }
 
-        if (await roleManager.FindByNameAsync(model.Name) != null)
+        if (await roleManager.FindByNameAsync(model.Name) != null
+            && model.Name != oldName)
         {
             throw new ArgumentException(RoleWithThisNameAlreadyExists);
         }
@@ -145,6 +149,13 @@ public class RoleService : IRoleService
         var permissions = repository
             .All<RoutePermission>()
             .Where(rp => model.PermissionIds.Contains(rp.Id.ToString()));
+
+        var oldRolePermissions = await repository
+            .All<RoleRoutePermission>()
+            .Where(rrp => rrp.RoleId == role.Id)
+            .ToListAsync();
+
+        repository.DeleteRange(oldRolePermissions);
 
         foreach (var permission in permissions)
         {

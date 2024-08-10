@@ -4,7 +4,7 @@ namespace WarehouseManagement.Core.Contracts;
 
 public interface IJwtService
 {
-    string ComposeAccessToken(string userId, string username, string email);
+    Task<string> ComposeAccessToken(string userId, string username, string email);
 
     Task<string> GenerateRefreshToken(string userId);
 

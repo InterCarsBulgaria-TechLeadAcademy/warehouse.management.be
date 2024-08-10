@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,26 +16,38 @@ public class JwtService : IJwtService
 {
     private readonly IRepository repository;
     private readonly IConfiguration configuration;
+    private readonly UserManager<ApplicationUser> userManager;
 
-    public JwtService(IRepository repository, IConfiguration configuration)
+    public JwtService(IRepository repository, IConfiguration configuration, UserManager<ApplicationUser> userManager)
     {
         this.repository = repository;
         this.configuration = configuration;
+        this.userManager = userManager;
     }
 
-    public string ComposeAccessToken(string userId, string username, string email)
+    public async Task<string> ComposeAccessToken(string userId, string username, string email)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
 
+        var claims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId),
+            new Claim(ClaimTypes.Name, username),
+            new Claim(ClaimTypes.Email, email)
+        };
+
+        var user = await repository.GetByIdAsync<ApplicationUser>(Guid.Parse(userId));
+        var roles = await this.userManager.GetRolesAsync(user);
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Email, email)
-            }),
+            Subject = new ClaimsIdentity(claims),
             Issuer = configuration["Jwt:Issuer"],
             Audience = configuration["Jwt:Audience"],
             Expires = DateTime.UtcNow.AddMinutes(10),
@@ -62,7 +75,7 @@ public class JwtService : IJwtService
             throw new InvalidOperationException(RefreshTokenHasExpired);
         }
 
-        var token = ComposeAccessToken(refreshTokenEntity.UserId.ToString(), refreshTokenEntity.User.UserName!, refreshTokenEntity.User.Email!);
+        var token = await ComposeAccessToken(refreshTokenEntity.UserId.ToString(), refreshTokenEntity.User.UserName!, refreshTokenEntity.User.Email!);
 
         return token;
     }

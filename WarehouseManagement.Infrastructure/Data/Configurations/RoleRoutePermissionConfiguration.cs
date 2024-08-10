@@ -19,7 +19,7 @@ namespace WarehouseManagement.Infrastructure.Data.Configurations
             builder
                 .HasOne(rp => rp.RoutePermission)
                 .WithMany(r => r.RoleRoutePermissions)
-                .HasForeignKey(rp => rp.RoleId)
+                .HasForeignKey(rp => rp.RoutePermissionId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

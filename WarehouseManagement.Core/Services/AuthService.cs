@@ -59,7 +59,7 @@ public class AuthService : IAuthService
         }
 
         await jwtService.RevokeOldRefreshTokens(user);
-        return jwtService.ComposeAccessToken(user!.Id.ToString(), user.UserName!, user.Email!);
+        return await jwtService.ComposeAccessToken(user!.Id.ToString(), user.UserName!, user.Email!);
     }
 
     public async Task LogoutAsync(string userId)
