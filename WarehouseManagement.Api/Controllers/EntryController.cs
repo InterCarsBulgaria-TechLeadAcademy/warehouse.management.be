@@ -107,7 +107,7 @@ namespace WarehouseManagement.Api.Controllers
             return Ok(EntryRestored);
         }
 
-        [HttpGet("start/{id}")]
+        [HttpPut("start/{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -115,16 +115,22 @@ namespace WarehouseManagement.Api.Controllers
         {
             await entryService.StartProcessingAsync(id);
 
+            var entry = await entryService.GetByIdAsync(id);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
+
             return Ok(EntryStartedProcessing);
         }
 
-        [HttpGet("finish/{id}")]
+        [HttpPut("finish/{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> FinishProcessing(int id)
         {
             await entryService.FinishProcessingAsync(id);
+
+            var entry = await entryService.GetByIdAsync(id);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
 
             return Ok(EntryFinishedProcessing);
         }
