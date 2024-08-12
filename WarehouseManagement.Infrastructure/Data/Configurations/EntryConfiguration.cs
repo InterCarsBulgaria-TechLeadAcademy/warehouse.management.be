@@ -4,7 +4,7 @@ using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data.Configurations
 {
-    public class EntryConfiguration : BaseConfiguration<Entry>
+    public class EntryConfiguration : BaseConfiguration<Entry>, IEntityTypeConfiguration<Entry>
     {
         public void Configure(EntityTypeBuilder<Entry> builder)
         {

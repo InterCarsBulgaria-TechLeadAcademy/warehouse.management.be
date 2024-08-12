@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using WarehouseManagement.Api.Services.Contracts;
+using WarehouseManagement.Infrastructure.Data.Configurations;
 using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data

@@ -4,7 +4,7 @@ using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data.Configurations;
 
-internal class VendorConfiguration : BaseConfiguration<Vendor>
+internal class VendorConfiguration : BaseConfiguration<Vendor>, IEntityTypeConfiguration<Vendor>
 {
     public void Configure(EntityTypeBuilder<Vendor> builder)
     {

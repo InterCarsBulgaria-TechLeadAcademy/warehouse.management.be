@@ -43,6 +43,7 @@ namespace WarehouseManagement.Api.Extensions
             );
 
             services.AddScoped<IRepository, Repository>();
+
             return services;
         }
 

@@ -17,21 +17,21 @@ public class RoutePermissionController : ControllerBase
     }
 
     [HttpGet("all")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<RoutePermissionDto>))]
+    [ProducesResponseType(200, Type = typeof(Dictionary<string, ICollection<RoutePermissionDto>>))]
     public async Task<IActionResult> GetAll()
     {
-        var permissions = await routePermissionService.AllAsync();
+        var permissionsByControllerName = await routePermissionService.AllAsync();
 
-        return Ok(permissions);
+        return Ok(permissionsByControllerName);
     }
 
     [HttpGet("all-with-deleted")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<RoutePermissionDto>))]
+    [ProducesResponseType(200, Type = typeof(Dictionary<string, ICollection<RoutePermissionDto>>))]
     public async Task<IActionResult> GetAllWithDeleted()
     {
-        var permissions = await routePermissionService.AllWithDeletedAsync();
+        var permissionsByControllerName = await routePermissionService.AllWithDeletedAsync();
 
-        return Ok(permissions);
+        return Ok(permissionsByControllerName);
     }
 
     [HttpGet("{id}")]
@@ -44,27 +44,6 @@ public class RoutePermissionController : ControllerBase
         return Ok(permission);
     }
 
-    [HttpPost("add")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
-    public async Task<IActionResult> Add([FromBody] RoutePermissionFormDto model)
-    {
-        await routePermissionService.AddAsync(model);
-
-        return Ok(RoutePermissionAddedSuccessfully);
-    }
-
-    [HttpPut("edit/{id}")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> Edit(string id, [FromBody] RoutePermissionFormDto model)
-    {
-        await routePermissionService.EditAsync(id, model);
-
-        return Ok(RoutePermissionAddedSuccessfully);
-    }
-
     [HttpDelete("delete/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
@@ -72,6 +51,6 @@ public class RoutePermissionController : ControllerBase
     {
         await routePermissionService.DeleteAsync(id);
 
-        return Ok(RoutePermissionAddedSuccessfully);
+        return Ok(RoutePermissionDeletedSuccessfully);
     }
 }

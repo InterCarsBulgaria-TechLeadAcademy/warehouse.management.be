@@ -5,7 +5,7 @@ using static WarehouseManagement.Common.ValidationConstants.DifferenceConstants;
 
 namespace WarehouseManagement.Infrastructure.Data.Configurations;
 
-public class DifferenceConfiguration : BaseConfiguration<Difference>
+public class DifferenceConfiguration : BaseConfiguration<Difference>, IEntityTypeConfiguration<Difference>
 {
     public void Configure(EntityTypeBuilder<Difference> builder)
     {

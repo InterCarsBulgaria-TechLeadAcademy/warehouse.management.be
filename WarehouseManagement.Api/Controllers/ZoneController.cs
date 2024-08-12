@@ -45,7 +45,7 @@ namespace WarehouseManagement.Api.Controllers
 
         [HttpGet("all-with-params")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
-        public async Task<IActionResult> GetAllWithParams([FromQuery] PaginationParameters paginationParams)
+        public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParams)
         {
             var zones = await zoneService.GetAllAsync(paginationParams);
 
@@ -111,7 +111,7 @@ namespace WarehouseManagement.Api.Controllers
 
         [HttpGet("all-with-deleted-with-params")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
-        public async Task<IActionResult> AllWithDeletedWithParams([FromBody] PaginationParameters paginationParams)
+        public async Task<IActionResult> AllWithDeleted([FromBody] PaginationParameters paginationParams)
         {
             var model = await zoneService.GetAllWithDeletedAsync(paginationParams);
 

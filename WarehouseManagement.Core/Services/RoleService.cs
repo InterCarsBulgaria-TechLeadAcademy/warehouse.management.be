@@ -35,9 +35,7 @@ public class RoleService : IRoleService
                 .Select(rrp => new RoutePermissionDto
                 {
                     Id = rrp.RoutePermission.Id.ToString(),
-                    Name = rrp.RoutePermission.Name,
-                    ActionName = rrp.RoutePermission.ActionName,
-                    ControllerName = rrp.RoutePermission.ControllerName
+                    Name = $"{rrp.RoutePermission.ControllerName}.{rrp.RoutePermission.ActionName}"
                 })
             })
             .ToListAsync();
@@ -186,9 +184,7 @@ public class RoleService : IRoleService
                 .Select(rrp => new RoutePermissionDto
                 {
                     Id = rrp.RoutePermission.Id.ToString(),
-                    Name = rrp.RoutePermission.Name,
-                    ActionName = rrp.RoutePermission.ActionName,
-                    ControllerName = rrp.RoutePermission.ControllerName
+                    Name = $"{rrp.RoutePermission.ControllerName}.{rrp.RoutePermission.ActionName}"
                 })
         };
     }

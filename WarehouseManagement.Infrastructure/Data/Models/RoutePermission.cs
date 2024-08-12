@@ -9,8 +9,6 @@ public class RoutePermission : BaseClass
 
     public new Guid Id { get; set; }
 
-    public string Name { get; set; } = string.Empty;
-
     public string ActionName { get; set; } = string.Empty;
 
     public string ControllerName { get; set; } = string.Empty;

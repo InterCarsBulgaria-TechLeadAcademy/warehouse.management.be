@@ -16,49 +16,54 @@ public class RoutePermissionService : IRoutePermissionService
         this.repository = repository;
     }
 
-    public async Task AddAsync(RoutePermissionFormDto model)
+    public async Task<Dictionary<string, ICollection<RoutePermissionDto>>> AllAsync()
     {
-        if (await ExistsByNameAsync(model.Name))
-        {
-            throw new ArgumentException(RoutePermissionWithThisNameAlreadyExists);
-        }
+        var dictionary = new Dictionary<string, ICollection<RoutePermissionDto>>();
 
-        if (await ExistsByRouteAsync(model.ControllerName, model.ActionName))
-        {
-            throw new ArgumentException(RoutePermissionWithThisRouteAlreadyExists);
-        }
+        var routePermissions = await repository
+            .AllReadOnly<RoutePermission>()
+            .ToListAsync();
 
-        await repository.AddAsync(new RoutePermission
+        foreach (var rp in routePermissions)
         {
-            Name = model.Name,
-            ActionName = model.ActionName,
-            ControllerName = model.ControllerName
-        });
-        await repository.SaveChangesAsync();
-    }
+            if (!dictionary.ContainsKey(rp.ControllerName))
+            {
+                dictionary[rp.ControllerName] = new List<RoutePermissionDto>();
+            }
 
-    public async Task<IEnumerable<RoutePermissionDto>> AllAsync()
-    {
-        return await repository.AllReadOnly<RoutePermission>()
-            .Select(rp => new RoutePermissionDto
+            dictionary[rp.ControllerName].Add(new RoutePermissionDto
             {
                 Id = rp.Id.ToString(),
-                Name = rp.Name,
-                ActionName = rp.ActionName,
-                ControllerName = rp.ControllerName
-            }).ToListAsync();
+                Name = $"{rp.ControllerName}.{rp.ActionName}"
+            });
+        }
+
+        return dictionary;
     }
 
-    public async Task<IEnumerable<RoutePermissionDto>> AllWithDeletedAsync()
+    public async Task<Dictionary<string, ICollection<RoutePermissionDto>>> AllWithDeletedAsync()
     {
-        return await repository.AllWithDeletedReadOnly<RoutePermission>()
-            .Select(rp => new RoutePermissionDto
+        var dictionary = new Dictionary<string, ICollection<RoutePermissionDto>>();
+
+        var routePermissions = await repository
+            .AllWithDeleted<RoutePermission>()
+            .ToListAsync();
+
+        foreach (var rp in routePermissions)
+        {
+            if (!dictionary.ContainsKey(rp.ControllerName))
+            {
+                dictionary[rp.ControllerName] = new List<RoutePermissionDto>();
+            }
+
+            dictionary[rp.ControllerName].Add(new RoutePermissionDto
             {
                 Id = rp.Id.ToString(),
-                Name = rp.Name,
-                ActionName = rp.ActionName,
-                ControllerName = rp.ControllerName
-            }).ToListAsync();
+                Name = $"{rp.ControllerName}.{rp.ActionName}"
+            });
+        }
+
+        return dictionary;
     }
 
     public async Task DeleteAsync(string id)
@@ -72,42 +77,9 @@ public class RoutePermissionService : IRoutePermissionService
         await repository.SaveChangesAsync();
     }
 
-    public async Task EditAsync(string id, RoutePermissionFormDto model)
-    {
-        if (!await ExistsByIdAsync(id))
-        {
-            throw new KeyNotFoundException(RoutePermissionWithIdNotFound);
-        }
-
-        if (await ExistsByNameAsync(model.Name))
-        {
-            throw new ArgumentException(RoutePermissionWithThisNameAlreadyExists);
-        }
-
-        if (await ExistsByRouteAsync(model.ControllerName, model.ActionName))
-        {
-            throw new ArgumentException(RoutePermissionWithThisRouteAlreadyExists);
-        }
-
-        var permission = await repository.GetByIdAsync<RoutePermission>(id);
-
-        permission!.Name = model.Name;
-        permission.ActionName = model.ActionName;
-        permission.ControllerName = model.ControllerName;
-
-        await repository.SaveChangesWithLogAsync();
-    }
-
     public async Task<bool> ExistsByIdAsync(string id)
     {
         return await repository.GetByIdAsync<RoutePermission>(id) != null;
-    }
-
-    public async Task<bool> ExistsByNameAsync(string name)
-    {
-        return await repository
-            .AllReadOnly<RoutePermission>()
-            .AnyAsync(rp => rp.Name == name);
     }
 
     public async Task<bool> ExistsByRouteAsync(string controller, string action)
@@ -130,9 +102,7 @@ public class RoutePermissionService : IRoutePermissionService
         return new RoutePermissionDto
         {
             Id = permission.Id.ToString(),
-            Name = permission.Name,
-            ActionName = permission.ActionName,
-            ControllerName = permission.ControllerName
+            Name = $"{permission.ControllerName}.{permission.ActionName}"
         };
     }
 }
