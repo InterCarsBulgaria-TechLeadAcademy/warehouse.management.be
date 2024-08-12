@@ -16,12 +16,10 @@ namespace WarehouseManagement.Core.Services;
 public class EntryService : IEntryService
 {
     private readonly IRepository repository;
-    private readonly IDeliveryService deliveryService;
 
-    public EntryService(IRepository repository, IDeliveryService deliveryService)
+    public EntryService(IRepository repository)
     {
         this.repository = repository;
-        this.deliveryService = deliveryService;
     }
 
     public async Task CreateAsync(ICollection<EntryFormDto> model, string userId)
@@ -200,7 +198,10 @@ public class EntryService : IEntryService
 
     public async Task<EntryDto> GetByIdAsync(int id)
     {
-        var entry = await repository.AllReadOnly<Entry>().FirstOrDefaultAsync(e => e.Id == id);
+        var entry = await repository
+            .AllReadOnly<Entry>()
+            .Include(e => e.Zone)
+            .FirstOrDefaultAsync(e => e.Id == id);
 
         if (entry == null)
         {
@@ -256,7 +257,6 @@ public class EntryService : IEntryService
         ValidateStartProcessingOfEntry(entry);
 
         entry.StartedProcessing = DateTime.UtcNow;
-        await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
 
         await repository.SaveChangesWithLogAsync();
     }
@@ -285,7 +285,6 @@ public class EntryService : IEntryService
         ValidateFinishProcessingOfEntry(entry);
 
         entry.FinishedProcessing = DateTime.UtcNow;
-        await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
 
         await repository.SaveChangesWithLogAsync();
     }

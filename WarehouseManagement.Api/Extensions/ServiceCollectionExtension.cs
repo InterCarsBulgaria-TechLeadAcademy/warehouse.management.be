@@ -27,6 +27,7 @@ namespace WarehouseManagement.Api.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IRoutePermissionService, RoutePermissionService>();
+            services.AddScoped<IPDFService, PDFService>();
             return services;
         }
 

@@ -200,10 +200,7 @@ public class DeliveryServiceTests
         await dbContext.SaveChangesAsync();
 
         deliveryService = new DeliveryService(new Repository(dbContext, mockUserService.Object));
-        entryService = new EntryService(
-            new Repository(dbContext, mockUserService.Object),
-            deliveryService
-        );
+        entryService = new EntryService(new Repository(dbContext, mockUserService.Object));
     }
 
     [TearDown]
@@ -310,6 +307,8 @@ public class DeliveryServiceTests
         await entryService.StartProcessingAsync(waitingEntry.Id);
         await entryService.FinishProcessingAsync(waitingEntry.Id);
 
+        await deliveryService.ChangeDeliveryStatusIfNeeded(delivery.Id);
+
         var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var deliveryStatusChange = history.Changes.First(c =>
@@ -329,6 +328,8 @@ public class DeliveryServiceTests
 
         await entryService.StartProcessingAsync(waitingEntry.Id);
         await entryService.FinishProcessingAsync(waitingEntry.Id);
+
+        await deliveryService.ChangeDeliveryStatusIfNeeded(delivery.Id);
 
         var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
@@ -386,6 +387,8 @@ public class DeliveryServiceTests
         await dbContext.SaveChangesAsync();
 
         await entryService.StartProcessingAsync(newEntry.Id);
+
+        await deliveryService.ChangeDeliveryStatusIfNeeded(newDelivery.Id);
 
         var history = await deliveryService.GetHistoryAsync(newDelivery.Id);
 

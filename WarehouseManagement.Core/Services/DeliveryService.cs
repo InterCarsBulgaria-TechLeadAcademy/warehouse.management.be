@@ -355,13 +355,13 @@ public class DeliveryService : IDeliveryService
             .Select(e => e.Id)
             .ToListAsync();
 
-        var changes = await repository
-            .AllReadOnly<EntityChange>()
-            .ToListAsync();
+        var changes = await repository.AllReadOnly<EntityChange>().ToListAsync();
 
         changes = changes
-            .Where(change => int.Parse(change.EntityId) == delivery.Id ||
-                relatedEntriesIds.Any(id => id == int.Parse(change.EntityId)))
+            .Where(change =>
+                int.Parse(change.EntityId) == delivery.Id
+                || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId))
+            )
             .ToList();
 
         var deliveryHistory = new DeliveryHistoryDto
@@ -460,7 +460,7 @@ public class DeliveryService : IDeliveryService
         return entries.All(e => e.FinishedProcessing != null);
     }
 
-    private void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
+    private async void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
     {
         if (status == DeliveryStatus.Waiting)
         {
@@ -501,5 +501,35 @@ public class DeliveryService : IDeliveryService
                 "Operation for delivery with status 'Approved' currently not supported."
             );
         }
+
+        await repository.SaveChangesWithLogAsync();
+    }
+
+    public async Task<DeliveryPDFModelDto> GetPDFModel(int id)
+    {
+        var delivery = await repository
+            .All<Delivery>()
+            .Where(d => d.Id == id)
+            .Select(d => new DeliveryPDFModelDto
+            {
+                Id = d.Id,
+                DeliveredOn = d.DeliveryTime,
+                Packages = d.Packages,
+                Pallets = d.Pallets,
+                Pieces = d.Pieces,
+                ReceptionNumber = d.ReceptionNumber,
+                SystemNumber = d.SystemNumber,
+                VendorName = d.Vendor.Name,
+                VendorSystemNumber = d.Vendor.SystemNumber,
+                Zones = d.Vendor.VendorsZones.Select(vz => vz.Zone.Name).ToList()
+            })
+            .FirstOrDefaultAsync();
+
+        if (delivery == null)
+        {
+            throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
+        }
+
+        return delivery;
     }
 }

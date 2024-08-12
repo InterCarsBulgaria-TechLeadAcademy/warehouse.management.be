@@ -17,16 +17,19 @@ public class DeliveryController : ControllerBase
     private readonly IDeliveryService deliveryService;
     private readonly IVendorService vendorService;
     private readonly IMarkerService markerService;
+    private readonly IPDFService pDFService;
 
     public DeliveryController(
         IDeliveryService deliveryService,
         IVendorService vendorService,
-        IMarkerService markerService
+        IMarkerService markerService,
+        IPDFService pDFService
     )
     {
         this.deliveryService = deliveryService;
         this.vendorService = vendorService;
         this.markerService = markerService;
+        this.pDFService = pDFService;
     }
 
     [HttpGet("{id}")]
@@ -152,5 +155,15 @@ public class DeliveryController : ControllerBase
         await deliveryService.ApproveAsync(id);
 
         return Ok($"{DeliverySuccessfullyApproved} {id}");
+    }
+
+    [HttpPost("GenerateBarcodePdf")]
+    public async Task<IActionResult> GenerateBarcodePdf(int id)
+    {
+        var model = await deliveryService.GetPDFModel(id);
+
+        var pdfBytes = pDFService.GenerateBarcodePdfReport(model);
+
+        return File(pdfBytes, "application/pdf", "BarcodePDF.pdf");
     }
 }
