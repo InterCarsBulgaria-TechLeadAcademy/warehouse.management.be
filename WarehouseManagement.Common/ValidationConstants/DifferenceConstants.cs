@@ -13,7 +13,7 @@ public static class DifferenceConstants
     public const int ActiveNumberMinLength = 1;
 
     public const int CommentMaxLength = 2000;
-    public const int CommentMinLength = 1;
+    public const int CommentMinLength = 0;
 
     public const int AdminCommentMaxLength = 2000;
     public const int AdminCommentMinLength = 1;
