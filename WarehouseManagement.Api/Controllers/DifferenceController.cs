@@ -96,35 +96,35 @@ public class DifferenceController : ControllerBase
         return Ok(DifferenceRestored);
     }
 
-    [HttpPost("start")]
+    [HttpPost("start/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> StartProcessing([FromBody] int id)
+    public async Task<IActionResult> StartProcessing(int id)
     {
         await differenceService.StartProcessing(id);
 
         return Ok(DifferenceSuccessfullyStartedProcessing);
     }
 
-    [HttpPost("finish")]
+    [HttpPost("finish/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> FinishProcessing([FromBody] DifferenceAdminCommentDto adminCommentDto)
+    public async Task<IActionResult> FinishProcessing(int id, [FromBody] DifferenceAdminCommentDto adminCommentDto)
     {
-        await differenceService.FinishProcessing(adminCommentDto);
+        await differenceService.FinishProcessing(id, adminCommentDto);
 
         return Ok(DifferenceSuccessfullyFinishedProcessing);
     }
 
-    [HttpPost("noDifferences")]
+    [HttpPost("noDifferences/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> NoDifferences([FromBody] DifferenceAdminCommentDto adminCommentDto)
+    public async Task<IActionResult> NoDifferences(int id, [FromBody] DifferenceAdminCommentDto adminCommentDto)
     {
-        await differenceService.NoDifferences(adminCommentDto);
+        await differenceService.NoDifferences(id, adminCommentDto);
 
         return Ok(DifferenceSuccessfullySetToNoDifferences);
     }
