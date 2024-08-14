@@ -5,6 +5,6 @@ using static WarehouseManagement.Common.ValidationConstants.DifferenceConstants;
 
 public class DifferenceAdminCommentDto
 {
-    [Range(AdminCommentMinLength, AdminCommentMaxLength)]
+    [StringLength(AdminCommentMaxLength, MinimumLength = AdminCommentMinLength)]
     public string AdminComment { get; set; } = string.Empty;
 }

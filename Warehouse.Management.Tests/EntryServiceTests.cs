@@ -96,7 +96,9 @@ public class EntryServiceTests
             Zone = zone1,
             StartedProcessing = null,
             FinishedProcessing = null,
-            CreatedByUserId = "User1"
+            CreatedByUserId = "User1",
+            Delivery = delivery,
+            DeliveryId = delivery.Id
         };
 
         processingEntry = new Entry
@@ -108,7 +110,9 @@ public class EntryServiceTests
             Zone = zone1,
             StartedProcessing = DateTime.UtcNow,
             FinishedProcessing = null,
-            CreatedByUserId = "User1"
+            CreatedByUserId = "User1",
+            Delivery = delivery,
+            DeliveryId = delivery.Id
         };
 
         finishedEntry = new Entry
@@ -120,7 +124,9 @@ public class EntryServiceTests
             Zone = zone2,
             StartedProcessing = DateTime.UtcNow.AddDays(-7),
             FinishedProcessing = DateTime.UtcNow,
-            CreatedByUserId = "User1"
+            CreatedByUserId = "User1",
+            Delivery = delivery,
+            DeliveryId = delivery.Id
         };
 
         deletedEntry = new Entry
@@ -133,7 +139,9 @@ public class EntryServiceTests
             StartedProcessing = null,
             FinishedProcessing = null,
             CreatedByUserId = "User1",
-            IsDeleted = true
+            IsDeleted = true,
+            Delivery = delivery,
+            DeliveryId = delivery.Id
         };
 
         var entries = new List<Entry> { waitingEntry, processingEntry, finishedEntry, deletedEntry };
