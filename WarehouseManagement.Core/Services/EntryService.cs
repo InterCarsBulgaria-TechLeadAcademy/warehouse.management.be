@@ -89,7 +89,11 @@ public class EntryService : IEntryService
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
                 CreatedAt = e.CreatedAt,
-                ZoneName = e.Zone.Name,
+                Zone = new EntryZoneDto()
+                {
+                    ZoneName = e.Zone.Name,
+                    IsFinal = e.Zone.IsFinal
+                },
                 DeliveryDetails = new EntryDeliveryDetailsDto()
                 {
                     Id = e.DeliveryId,
@@ -132,7 +136,11 @@ public class EntryService : IEntryService
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
                 CreatedAt = e.CreatedAt,
-                ZoneName = e.Zone.Name,
+                Zone = new EntryZoneDto()
+                {
+                    ZoneName = e.Zone.Name,
+                    IsFinal = e.Zone.IsFinal
+                },
                 DeliveryDetails = new EntryDeliveryDetailsDto()
                 {
                     Id = e.DeliveryId,
@@ -178,7 +186,11 @@ public class EntryService : IEntryService
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
                 CreatedAt = e.CreatedAt,
-                ZoneName = e.Zone.Name,
+                Zone = new EntryZoneDto()
+                {
+                    ZoneName = e.Zone.Name,
+                    IsFinal = e.Zone.IsFinal
+                },
                 DeliveryDetails = new EntryDeliveryDetailsDto()
                 {
                     Id = e.DeliveryId,
@@ -223,7 +235,11 @@ public class EntryService : IEntryService
             StartedProccessing = entry.StartedProcessing,
             FinishedProccessing = entry.FinishedProcessing,
             CreatedAt = entry.CreatedAt,
-            ZoneName = entry.Zone.Name,
+            Zone = new EntryZoneDto()
+            {
+                ZoneName = entry.Zone.Name,
+                IsFinal = entry.Zone.IsFinal
+            },
             DeliveryDetails = new EntryDeliveryDetailsDto()
             {
                 Id = entry.DeliveryId,
