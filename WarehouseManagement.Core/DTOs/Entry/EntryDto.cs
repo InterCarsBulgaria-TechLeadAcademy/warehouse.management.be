@@ -11,6 +11,6 @@ public class EntryDto
     public DateTime? StartedProccessing { get; set; }
     public DateTime? FinishedProccessing { get; set; }
     public DateTime CreatedAt { get; set; }
-    public string ZoneName { get; set; } = null!;
+    public EntryZoneDto Zone { get; set; } = null!;
     public EntryDeliveryDetailsDto DeliveryDetails { get; set; } = null!;
 }
