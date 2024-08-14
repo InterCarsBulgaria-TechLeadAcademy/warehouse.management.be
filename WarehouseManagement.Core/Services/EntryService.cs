@@ -89,13 +89,15 @@ public class EntryService : IEntryService
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
                 CreatedAt = e.CreatedAt,
-                Zone = new ZoneDto()
+                ZoneName = e.Zone.Name,
+                DeliveryDetails = new EntryDeliveryDetailsDto()
                 {
-                    Id = e.ZoneId,
-                    Name = e.Zone.Name,
-                    IsFinal = e.Zone.IsFinal
-                },
-                DeliveryId = e.DeliveryId
+                    Id = e.DeliveryId,
+                    ReceptionNumber = e.Delivery.ReceptionNumber,
+                    SystemNumber = e.Delivery.SystemNumber,
+                    VendorName = e.Delivery.Vendor.Name,
+                }
+                
             })
             .ToListAsync();
 
@@ -130,13 +132,14 @@ public class EntryService : IEntryService
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
                 CreatedAt = e.CreatedAt,
-                Zone = new ZoneDto()
+                ZoneName = e.Zone.Name,
+                DeliveryDetails = new EntryDeliveryDetailsDto()
                 {
-                    Id = e.ZoneId,
-                    Name = e.Zone.Name,
-                    IsFinal = e.Zone.IsFinal
-                },
-                DeliveryId = e.DeliveryId
+                    Id = e.DeliveryId,
+                    ReceptionNumber = e.Delivery.ReceptionNumber,
+                    SystemNumber = e.Delivery.SystemNumber,
+                    VendorName = e.Delivery.Vendor.Name,
+                }
             })
             .ToListAsync();
 
@@ -175,13 +178,14 @@ public class EntryService : IEntryService
                 StartedProccessing = e.StartedProcessing,
                 FinishedProccessing = e.FinishedProcessing,
                 CreatedAt = e.CreatedAt,
-                Zone = new ZoneDto()
+                ZoneName = e.Zone.Name,
+                DeliveryDetails = new EntryDeliveryDetailsDto()
                 {
-                    Id = e.ZoneId,
-                    Name = e.Zone.Name,
-                    IsFinal = e.Zone.IsFinal
-                },
-                DeliveryId = e.DeliveryId
+                    Id = e.DeliveryId,
+                    ReceptionNumber = e.Delivery.ReceptionNumber,
+                    SystemNumber = e.Delivery.SystemNumber,
+                    VendorName = e.Delivery.Vendor.Name,
+                }
             })
             .ToListAsync();
 
@@ -201,6 +205,8 @@ public class EntryService : IEntryService
         var entry = await repository
             .AllReadOnly<Entry>()
             .Include(e => e.Zone)
+            .Include(e => e.Delivery)
+            .ThenInclude(d => d.Vendor)
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (entry == null)
@@ -217,13 +223,14 @@ public class EntryService : IEntryService
             StartedProccessing = entry.StartedProcessing,
             FinishedProccessing = entry.FinishedProcessing,
             CreatedAt = entry.CreatedAt,
-            Zone = new ZoneDto()
+            ZoneName = entry.Zone.Name,
+            DeliveryDetails = new EntryDeliveryDetailsDto()
             {
-                Id = entry.ZoneId,
-                Name = entry.Zone.Name,
-                IsFinal = entry.Zone.IsFinal
-            },
-            DeliveryId = entry.DeliveryId
+                Id = entry.DeliveryId,
+                ReceptionNumber = entry.Delivery.ReceptionNumber,
+                SystemNumber = entry.Delivery.SystemNumber,
+                VendorName = entry.Delivery.Vendor.Name,
+            }
         };
     }
 

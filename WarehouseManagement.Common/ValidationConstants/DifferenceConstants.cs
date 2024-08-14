@@ -16,7 +16,7 @@ public static class DifferenceConstants
     public const int CommentMinLength = 0;
 
     public const int AdminCommentMaxLength = 2000;
-    public const int AdminCommentMinLength = 1;
+    public const int AdminCommentMinLength = 0;
 
     public const int MinCount = int.MinValue;
     public const int MaxCount = int.MaxValue;

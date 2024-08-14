@@ -116,7 +116,7 @@ namespace WarehouseManagement.Api.Controllers
             await entryService.StartProcessingAsync(id);
 
             var entry = await entryService.GetByIdAsync(id);
-            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryDetails.Id);
 
             return Ok(EntryStartedProcessing);
         }
@@ -130,7 +130,7 @@ namespace WarehouseManagement.Api.Controllers
             await entryService.FinishProcessingAsync(id);
 
             var entry = await entryService.GetByIdAsync(id);
-            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryId);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryDetails.Id);
 
             return Ok(EntryFinishedProcessing);
         }
