@@ -52,6 +52,11 @@ public class DeliveryService : IDeliveryService
                         Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
+                        Zone = new EntryZoneDto()
+                        {
+                            ZoneName = e.Zone.Name,
+                            IsFinal = e.Zone.IsFinal
+                        },
                         DeliveryDetails = new EntryDeliveryDetailsDto()
                         {
                             Id = e.DeliveryId,
@@ -120,6 +125,11 @@ public class DeliveryService : IDeliveryService
                         Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
+                        Zone = new EntryZoneDto()
+                        {
+                            ZoneName = e.Zone.Name,
+                            IsFinal = e.Zone.IsFinal
+                        },
                         DeliveryDetails = new EntryDeliveryDetailsDto()
                         {
                             Id = e.DeliveryId,
@@ -294,6 +304,11 @@ public class DeliveryService : IDeliveryService
                         Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
+                        Zone = new EntryZoneDto()
+                        {
+                            ZoneName = e.Zone.Name,
+                            IsFinal = e.Zone.IsFinal
+                        },
                         DeliveryDetails = new EntryDeliveryDetailsDto()
                         {
                             Id = e.DeliveryId,
