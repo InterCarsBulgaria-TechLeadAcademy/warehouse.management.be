@@ -29,7 +29,7 @@ public class DifferenceService : IDifferenceService
             ActiveNumber = model.ActiveNumber,
             Comment = model.Comment,
             Count = model.Count,
-            Status = model.Status ?? DifferenceStatus.Waiting,
+            Status = DifferenceStatus.Waiting,
             TypeId = model.DifferenceTypeId,
             ZoneId = model.ZoneId,
             DeliveryId = model.DeliveryId,
@@ -65,7 +65,6 @@ public class DifferenceService : IDifferenceService
         difference.ActiveNumber = model.ActiveNumber;
         difference.Comment = model.Comment;
         difference.Count = model.Count;
-        difference.Status = model.Status ?? DifferenceStatus.Waiting;
         difference.TypeId = model.DifferenceTypeId;
         difference.ZoneId = model.ZoneId;
         difference.DeliveryId = model.DeliveryId;
@@ -217,9 +216,9 @@ public class DifferenceService : IDifferenceService
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task FinishProcessing(DifferenceAdminCommentDto adminCommentDto)
+    public async Task FinishProcessing(int id, DifferenceAdminCommentDto adminCommentDto)
     {
-        var difference = await repository.GetByIdAsync<Difference>(adminCommentDto.DifferenceId);
+        var difference = await repository.GetByIdAsync<Difference>(id);
 
         if (difference == null)
         {
@@ -237,9 +236,9 @@ public class DifferenceService : IDifferenceService
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task NoDifferences(DifferenceAdminCommentDto adminCommentDto)
+    public async Task NoDifferences(int id, DifferenceAdminCommentDto adminCommentDto)
     {
-        var difference = await repository.GetByIdAsync<Difference>(adminCommentDto.DifferenceId);
+        var difference = await repository.GetByIdAsync<Difference>(id);
 
         if (difference == null)
         {

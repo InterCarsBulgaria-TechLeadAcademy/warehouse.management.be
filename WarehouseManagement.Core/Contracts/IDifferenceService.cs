@@ -23,7 +23,7 @@ public interface IDifferenceService
 
     Task StartProcessing(int id);
 
-    Task FinishProcessing(DifferenceAdminCommentDto adminCommentDto);
+    Task FinishProcessing(int id, DifferenceAdminCommentDto adminCommentDto);
 
-    Task NoDifferences(DifferenceAdminCommentDto adminCommentDto);
+    Task NoDifferences(int id, DifferenceAdminCommentDto adminCommentDto);
 }

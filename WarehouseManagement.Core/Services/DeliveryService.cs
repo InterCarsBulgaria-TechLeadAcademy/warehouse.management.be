@@ -52,13 +52,18 @@ public class DeliveryService : IDeliveryService
                         Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
-                        Zone = new ZoneDto()
+                        Zone = new EntryZoneDto()
                         {
-                            Id = e.ZoneId,
-                            Name = e.Zone.Name,
+                            ZoneName = e.Zone.Name,
                             IsFinal = e.Zone.IsFinal
                         },
-                        DeliveryId = e.DeliveryId,
+                        DeliveryDetails = new EntryDeliveryDetailsDto()
+                        {
+                            Id = e.DeliveryId,
+                            ReceptionNumber = e.Delivery.ReceptionNumber,
+                            SystemNumber = e.Delivery.SystemNumber,
+                            VendorName = e.Delivery.Vendor.Name,
+                        }
                     })
                     .ToList(),
                 Markers = d
@@ -70,11 +75,11 @@ public class DeliveryService : IDeliveryService
                     })
                     .ToList(),
                 EntriesFinishedProcessing = d
-                    .Entries.Where(e => e.FinishedProcessing.HasValue)
-                    .Count(),
+                    .Entries
+                    .Count(e => e.FinishedProcessing.HasValue),
                 EntriesWaitingProcessing = d
-                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
-                    .Count()
+                    .Entries
+                    .Count(e => !e.FinishedProcessing.HasValue)
             })
             .FirstOrDefaultAsync();
 
@@ -120,13 +125,18 @@ public class DeliveryService : IDeliveryService
                         Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
-                        Zone = new ZoneDto()
+                        Zone = new EntryZoneDto()
                         {
-                            Id = e.ZoneId,
-                            Name = e.Zone.Name,
+                            ZoneName = e.Zone.Name,
                             IsFinal = e.Zone.IsFinal
                         },
-                        DeliveryId = e.DeliveryId,
+                        DeliveryDetails = new EntryDeliveryDetailsDto()
+                        {
+                            Id = e.DeliveryId,
+                            ReceptionNumber = e.Delivery.ReceptionNumber,
+                            SystemNumber = e.Delivery.SystemNumber,
+                            VendorName = e.Delivery.Vendor.Name,
+                        }
                     })
                     .ToList(),
                 Markers = d
@@ -137,11 +147,11 @@ public class DeliveryService : IDeliveryService
                     })
                     .ToList(),
                 EntriesFinishedProcessing = d
-                    .Entries.Where(e => e.FinishedProcessing.HasValue)
-                    .Count(),
+                    .Entries
+                    .Count(e => e.FinishedProcessing.HasValue),
                 EntriesWaitingProcessing = d
-                    .Entries.Where(e => !e.FinishedProcessing.HasValue)
-                    .Count()
+                    .Entries
+                    .Count(e => !e.FinishedProcessing.HasValue)
             })
             .ToListAsync();
 
@@ -294,13 +304,18 @@ public class DeliveryService : IDeliveryService
                         Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing,
                         StartedProccessing = e.StartedProcessing,
-                        Zone = new ZoneDto()
+                        Zone = new EntryZoneDto()
                         {
-                            Id = e.ZoneId,
-                            Name = e.Zone.Name,
+                            ZoneName = e.Zone.Name,
                             IsFinal = e.Zone.IsFinal
                         },
-                        DeliveryId = e.DeliveryId,
+                        DeliveryDetails = new EntryDeliveryDetailsDto()
+                        {
+                            Id = e.DeliveryId,
+                            ReceptionNumber = e.Delivery.ReceptionNumber,
+                            SystemNumber = e.Delivery.SystemNumber,
+                            VendorName = e.Delivery.Vendor.Name,
+                        }
                     })
                     .ToList(),
                 Markers = d
