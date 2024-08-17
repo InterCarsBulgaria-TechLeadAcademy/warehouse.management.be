@@ -24,26 +24,23 @@ public class RoleService : IRoleService
         this.repository = repository;
     }
 
-    public async Task<IEnumerable<RoleDto>> AllAsync()
+    public async Task<IEnumerable<RoleDetails>> AllAsync()
     {
         return await roleManager.Roles
-            .Select(r => new RoleDto
+            .Select(r => new RoleDetails
             {
                 Id = r.Id.ToString(),
                 Name = r.Name!,
-                RoutePermissions = r.RoleRoutePermissions
-                .Select(rrp => new RoutePermissionDto
-                {
-                    Id = rrp.RoutePermission.Id.ToString(),
-                    Name = $"{rrp.RoutePermission.ControllerName}.{rrp.RoutePermission.ActionName}"
-                })
+                RolePermissions = r.RoleRoutePermissions
+                .Select(rrp => $"{rrp.RoutePermission.ControllerName}.{rrp.RoutePermission.ActionName}")
+                .ToList()
             })
             .ToListAsync();
     }
 
-    public async Task AssignRoleToUserAsync(string roleName, string userId)
+    public async Task AssignRoleToUserAsync(string id, string userId)
     {
-        var role = await roleManager.FindByNameAsync(roleName);
+        var role = await roleManager.FindByIdAsync(id);
 
         if (role == null)
         {
@@ -57,7 +54,7 @@ public class RoleService : IRoleService
             throw new KeyNotFoundException(UserWithThisIdNotFound);
         }
 
-        await userManager.AddToRoleAsync(user, roleName);
+        await userManager.AddToRoleAsync(user, role.Name!);
     }
 
     public async Task<bool> CheckRoleAccessAsync(string roleName, string action, string controller)
@@ -115,9 +112,9 @@ public class RoleService : IRoleService
         await repository.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(string roleName)
+    public async Task DeleteAsync(string id)
     {
-        var role = await roleManager.FindByNameAsync(roleName);
+        var role = await roleManager.FindByNameAsync(id);
 
         if (role == null)
         {
@@ -127,9 +124,9 @@ public class RoleService : IRoleService
         await roleManager.DeleteAsync(role);
     }
 
-    public async Task EditAsync(string oldName, RoleFormDto model)
+    public async Task EditAsync(string id, RoleFormDto model)
     {
-        var role = await roleManager.FindByNameAsync(oldName);
+        var role = await roleManager.FindByIdAsync(id);
 
         if (role == null)
         {
@@ -137,12 +134,13 @@ public class RoleService : IRoleService
         }
 
         if (await roleManager.FindByNameAsync(model.Name) != null
-            && model.Name != oldName)
+            && model.Name != id)
         {
             throw new ArgumentException(RoleWithThisNameAlreadyExists);
         }
 
         role.Name = model.Name;
+        role.NormalizedName = model.Name.ToUpper();
 
         var permissions = repository
             .All<RoutePermission>()
@@ -163,14 +161,17 @@ public class RoleService : IRoleService
                 RoutePermission = permission
             });
         }
-
+        
         await repository.SaveChangesWithLogAsync();
     }
 
-    public async Task<RoleDto> GetByNameAsync(string name)
+    public async Task<RoleDto> GetByIdAsync(string id)
     {
-        var role = await roleManager.FindByNameAsync(name);
-
+        var role = await roleManager.Roles
+            .Include(r => r.RoleRoutePermissions)
+            .ThenInclude(rrp => rrp.RoutePermission)
+            .FirstOrDefaultAsync(r => r.Id == Guid.Parse(id));
+        
         if (role == null)
         {
             throw new ArgumentException(RoleWithThisNameDoesNotExist);

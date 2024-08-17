@@ -22,7 +22,7 @@ public class RoleController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<IActionResult> AddUserToRole([FromBody] RoleUserAssignDto model)
     {
-        await roleService.AssignRoleToUserAsync(model.RoleName, model.UserId);
+        await roleService.AssignRoleToUserAsync(model.Id, model.UserId);
 
         return Ok(RoleAssignedToUserSuccessfully);
     }
@@ -38,22 +38,22 @@ public class RoleController : ControllerBase
         return Ok(RoleCreatedSuccessfully);
     }
 
-    [HttpPut("edit/{roleName}")]
+    [HttpPut("edit/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> Edit(string roleName, [FromBody] RoleFormDto model)
+    public async Task<IActionResult> Edit(string id, [FromBody] RoleFormDto model)
     {
-        await roleService.EditAsync(roleName, model);
+        await roleService.EditAsync(id, model);
 
         return Ok(RoleEditedSuccessfully);
     }
 
-    [HttpDelete("delete/{roleName}")]
+    [HttpDelete("delete/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> Delete(string roleName)
+    public async Task<IActionResult> Delete(string id)
     {
-        await roleService.DeleteAsync(roleName);
+        await roleService.DeleteAsync(id);
 
         return Ok(RoleDeletedSuccessfully);
     }
@@ -67,11 +67,11 @@ public class RoleController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("{roleName}")]
+    [HttpGet("{roleId}")]
     [ProducesResponseType(200, Type = typeof(RoleDto))]
-    public async Task<IActionResult> GetByName(string roleName)
+    public async Task<IActionResult> GetByName(string roleId)
     {
-        var model = await roleService.GetByNameAsync(roleName);
+        var model = await roleService.GetByIdAsync(roleId);
 
         return Ok(model);
     }

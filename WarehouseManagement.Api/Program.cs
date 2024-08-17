@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using WarehouseManagement.Api.Extensions;
 using WarehouseManagement.Api.Middlewares;
 using WarehouseManagement.Infrastructure.Data;
-using WarehouseManagement.Infrastructure.Data.Models;
+using WarehouseManagement.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,11 +57,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var warehouseManagementDbContext = scope.ServiceProvider.GetRequiredService<WarehouseManagementDbContext>();
-    warehouseManagementDbContext.Database.Migrate();
-}
+await app.MigrateDbAsync();
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -76,22 +72,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-
-    var roles = new string[] { "Admin" };
-
-    foreach (var role in roles)
-    {
-        var exists = await roleManager.RoleExistsAsync(role);
-
-        if (!exists)
-        {
-            await roleManager.CreateAsync(new ApplicationRole() { Name = role });
-        }
-    }
-}
+await app.SeedRolesAsync();
 
 // TODO: Seed user as admin
 
