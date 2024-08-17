@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using WarehouseManagement.Api.Middlewares;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
@@ -9,6 +10,7 @@ using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers
 {
+    [CustomAuthorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ZoneController : ControllerBase
@@ -43,7 +45,7 @@ namespace WarehouseManagement.Api.Controllers
 
         [HttpGet("all-with-params")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
-        public async Task<IActionResult> GetAllWithParams([FromQuery] PaginationParameters paginationParams)
+        public async Task<IActionResult> GetAll([FromQuery] PaginationParameters paginationParams)
         {
             var zones = await zoneService.GetAllAsync(paginationParams);
 
@@ -109,7 +111,7 @@ namespace WarehouseManagement.Api.Controllers
 
         [HttpGet("all-with-deleted-with-params")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ZoneDto>))]
-        public async Task<IActionResult> AllWithDeletedWithParams([FromBody] PaginationParameters paginationParams)
+        public async Task<IActionResult> AllWithDeleted([FromBody] PaginationParameters paginationParams)
         {
             var model = await zoneService.GetAllWithDeletedAsync(paginationParams);
 

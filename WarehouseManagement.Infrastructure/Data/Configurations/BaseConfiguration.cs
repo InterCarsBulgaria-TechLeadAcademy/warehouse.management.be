@@ -13,6 +13,5 @@ public class BaseConfiguration<T> : IEntityTypeConfiguration<T>
         builder.Property(p => p.CreatedByUserId).HasMaxLength(255);
         builder.Property(p => p.LastModifiedByUserId).HasMaxLength(255);
         builder.Property(p => p.DeletedByUserId).HasMaxLength(255);
-        builder.Property(p => p.CreatedAt).HasDefaultValue(DateTime.UtcNow);
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Text.Json.Serialization;
 using WarehouseManagement.Api.Extensions;
 using WarehouseManagement.Api.Middlewares;
 using WarehouseManagement.Infrastructure.Data;
+using WarehouseManagement.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,15 +57,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var warehouseManagementDbContext = scope.ServiceProvider.GetRequiredService<WarehouseManagementDbContext>();
-    warehouseManagementDbContext.Database.Migrate();
-}
+await app.MigrateDbAsync();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseHttpsRedirection();
@@ -74,5 +71,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+await app.SeedRolesAsync();
+
+// TODO: Seed user as admin
 
 await app.RunAsync();

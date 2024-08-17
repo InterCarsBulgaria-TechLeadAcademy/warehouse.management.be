@@ -12,4 +12,6 @@ public class RegisterDto
 
     [StringLength(250, MinimumLength = 5)]
     public string Password { get; set; } = null!;
+
+    public string RoleName { get; set; } = null!;
 }

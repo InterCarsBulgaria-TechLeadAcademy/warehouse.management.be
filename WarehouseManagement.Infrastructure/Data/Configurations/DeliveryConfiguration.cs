@@ -5,7 +5,7 @@ using WarehouseManagement.Infrastructure.Data.Models;
 
 namespace WarehouseManagement.Infrastructure.Data.Configurations;
 
-public class DeliveryConfiguration : BaseConfiguration<Delivery>
+public class DeliveryConfiguration : BaseConfiguration<Delivery>, IEntityTypeConfiguration<Delivery>
 {
     public void Configure(EntityTypeBuilder<Delivery> builder)
     {

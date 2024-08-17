@@ -23,6 +23,8 @@ public class AuthService : IAuthService
 
     public async Task RegisterAsync(RegisterDto registerDto)
     {
+        //TODO handle role
+
         var user = new ApplicationUser
         {
             UserName = registerDto.Username,
@@ -57,7 +59,7 @@ public class AuthService : IAuthService
         }
 
         await jwtService.RevokeOldRefreshTokens(user);
-        return jwtService.ComposeAccessToken(user!.Id.ToString(), user.UserName!, user.Email!);
+        return await jwtService.ComposeAccessToken(user!.Id.ToString(), user.UserName!, user.Email!);
     }
 
     public async Task LogoutAsync(string userId)
