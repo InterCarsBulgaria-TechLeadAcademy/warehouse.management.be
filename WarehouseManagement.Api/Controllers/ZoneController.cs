@@ -10,7 +10,6 @@ using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers
 {
-    [CustomAuthorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ZoneController : ControllerBase
