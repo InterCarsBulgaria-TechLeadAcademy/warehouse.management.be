@@ -335,8 +335,8 @@ public class DeliveryService : IDeliveryService
     {
         var deliveryToApprove = await repository
             .All<Delivery>()
-            .Where(d => d.Id == id)
             .Include(d => d.Entries)
+            .Where(d => d.Id == id)
             .FirstOrDefaultAsync();
 
         if (deliveryToApprove == null)
@@ -344,7 +344,9 @@ public class DeliveryService : IDeliveryService
             throw new KeyNotFoundException($"{DeliveryWithIdNotFound} {id}");
         }
 
-        if (deliveryToApprove.Entries.Any(e => !e.FinishedProcessing.HasValue))
+        var entriesAreFinished = AreAllEntriesFinished(deliveryToApprove.Entries);
+        
+        if (entriesAreFinished == false)
         {
             throw new ArgumentException(DeliveryHasNotFinishedEntries);
         }
@@ -423,7 +425,7 @@ public class DeliveryService : IDeliveryService
         {
             delivery.Status = expectedStatus;
 
-            SetDatesForDeliveryAsync(delivery, expectedStatus);
+            await SetDatesForDeliveryAsync(delivery, expectedStatus);
         }
     }
 
@@ -472,10 +474,15 @@ public class DeliveryService : IDeliveryService
 
     private bool AreAllEntriesFinished(ICollection<Entry> entries)
     {
+        if(entries.Count == 0)
+        {
+            return false;
+        }
+        
         return entries.All(e => e.FinishedProcessing != null);
     }
 
-    private async void SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
+    private async Task SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
     {
         if (status == DeliveryStatus.Waiting)
         {

@@ -59,7 +59,7 @@ public class RoleController : ControllerBase
     }
 
     [HttpGet("all")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<RoleDto>))]
+    [ProducesResponseType(200, Type = typeof(IEnumerable<RoleDetailsDto>))]
     public async Task<IActionResult> GetAll()
     {
         var models = await roleService.AllAsync();
