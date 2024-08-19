@@ -14,7 +14,7 @@ public interface IRoleService
 
     Task DeleteAsync(string id);
 
-    Task<IEnumerable<RoleDetails>> AllAsync();
+    Task<IEnumerable<RoleDetailsDto>> AllAsync();
 
     Task<RoleDto> GetByIdAsync(string id);
 }

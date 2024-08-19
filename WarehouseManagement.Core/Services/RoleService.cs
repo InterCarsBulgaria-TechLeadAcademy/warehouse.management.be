@@ -24,10 +24,10 @@ public class RoleService : IRoleService
         this.repository = repository;
     }
 
-    public async Task<IEnumerable<RoleDetails>> AllAsync()
+    public async Task<IEnumerable<RoleDetailsDto>> AllAsync()
     {
         return await roleManager.Roles
-            .Select(r => new RoleDetails
+            .Select(r => new RoleDetailsDto
             {
                 Id = r.Id.ToString(),
                 Name = r.Name!,

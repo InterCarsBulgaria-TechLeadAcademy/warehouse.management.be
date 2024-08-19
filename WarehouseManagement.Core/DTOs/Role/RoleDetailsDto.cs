@@ -1,6 +1,6 @@
 namespace WarehouseManagement.Core.DTOs.Role;
 
-public class RoleDetails
+public class RoleDetailsDto
 {
     public string Id { get; set; } = string.Empty;
 
