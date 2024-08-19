@@ -431,7 +431,10 @@ public class DeliveryService : IDeliveryService
 
     private async Task<Delivery> RetrieveByIdAsync(int id)
     {
-        var delivery = await repository.GetByIdAsync<Delivery>(id);
+        var delivery = await repository
+            .All<Delivery>()
+            .Include(d => d.Entries)
+            .FirstOrDefaultAsync(d => d.Id == id);
 
         if (delivery == null)
         {
