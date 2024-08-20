@@ -9,8 +9,8 @@ public class DeliveryDto
     public string ReceptionNumber { get; set; } = string.Empty;
     public string TruckNumber { get; set; } = string.Empty;
     public string Cmr { get; set; } = string.Empty;
-    public DateTime DeliveryTime { get; set; }
-    public DateTime? ApprovedOn { get; set; }
+    public string DeliveryTime { get; set; } = string.Empty;
+    public string? ApprovedOn { get; set; }
     public DateTime CreatedAt { get; set; }
     public int Pallets { get; set; }
     public int Packages { get; set; }

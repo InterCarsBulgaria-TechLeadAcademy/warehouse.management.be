@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Common.Enums;
 using WarehouseManagement.Common.Statuses;
@@ -32,7 +33,7 @@ public class DeliveryService : IDeliveryService
             {
                 Id = d.Id,
                 Cmr = d.Cmr,
-                DeliveryTime = d.DeliveryTime,
+                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -43,6 +44,7 @@ public class DeliveryService : IDeliveryService
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
                 CreatedAt = d.CreatedAt,
+                ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
                     {
@@ -105,7 +107,7 @@ public class DeliveryService : IDeliveryService
             {
                 Id = d.Id,
                 Cmr = d.Cmr,
-                DeliveryTime = d.DeliveryTime,
+                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -116,6 +118,7 @@ public class DeliveryService : IDeliveryService
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
                 CreatedAt = d.CreatedAt,
+                ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
                     {
@@ -284,7 +287,7 @@ public class DeliveryService : IDeliveryService
             {
                 Id = d.Id,
                 Cmr = d.Cmr,
-                DeliveryTime = d.DeliveryTime,
+                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -295,6 +298,7 @@ public class DeliveryService : IDeliveryService
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
                 CreatedAt = d.CreatedAt,
+                ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
                     {
@@ -358,6 +362,7 @@ public class DeliveryService : IDeliveryService
 
         deliveryToApprove.IsApproved = true;
         deliveryToApprove.ApprovedOn = DateTime.UtcNow;
+        deliveryToApprove.Status = DeliveryStatus.Approved;
 
         await repository.SaveChangesWithLogAsync();
     }
