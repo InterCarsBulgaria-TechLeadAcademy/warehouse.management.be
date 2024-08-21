@@ -10,5 +10,5 @@ public class UserDto
 
     public IEnumerable<string> Roles { get; set; } = new HashSet<string>();
 
-    public IEnumerable<string> RoutePermissionIds { get; set; } = new HashSet<string>();
+    public IEnumerable<string> RoutePermissionNames { get; set; } = new HashSet<string>();
 }

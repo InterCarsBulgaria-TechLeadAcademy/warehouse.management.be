@@ -30,7 +30,7 @@ public class AuthService : IAuthService
         this.jwtService = jwtService;
     }
 
-    public async Task RegisterAsync(RegisterDto registerDto)
+    public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
         var roleExists = await roleManager.RoleExistsAsync(registerDto.RoleName);
 
@@ -51,6 +51,8 @@ public class AuthService : IAuthService
         {
             throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
         }
+
+        return user.Id.ToString();
     }
 
     public async Task<string> LoginAsync(LoginDto loginDto)

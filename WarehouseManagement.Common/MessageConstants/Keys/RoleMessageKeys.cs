@@ -9,4 +9,5 @@ public static class RoleMessageKeys
     public const string RoleDeletedSuccessfully = "RoleDeletedSuccessfully";
     public const string RoleAssignedToUserSuccessfully = "RoleAssignedToUserSuccessfully";
     public const string RoleCannotBeCreatedWithoutPermissions = "RoleCannotBeCreatedWithoutPermissions";
+    public const string RoleCannotBeAssignedTwiceOnTheSameUser = "RoleCannotBeAssignedTwiceOnTheSameUser";
 }

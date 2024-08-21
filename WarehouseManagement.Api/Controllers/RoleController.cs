@@ -22,7 +22,7 @@ public class RoleController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<IActionResult> AddUserToRole([FromBody] RoleUserAssignDto model)
     {
-        await roleService.AssignRoleToUserAsync(model.Id, model.UserId);
+        await roleService.AssignRoleByIdToUserAsync(model.Id, model.UserId);
 
         return Ok(RoleAssignedToUserSuccessfully);
     }

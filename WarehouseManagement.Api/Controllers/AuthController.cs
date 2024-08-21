@@ -12,11 +12,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService authService;
     private readonly IJwtService jwtService;
+    private readonly IRoleService roleService;
 
-    public AuthController(IAuthService authService, IJwtService jwtService)
+    public AuthController(IAuthService authService, IJwtService jwtService, IRoleService roleService)
     {
         this.authService = authService;
         this.jwtService = jwtService;
+        this.roleService = roleService;
     }
 
     [HttpPost("login")]
@@ -45,7 +47,8 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await authService.RegisterAsync(registerDto);
+        var userId = await authService.RegisterAsync(registerDto);
+        await roleService.AssignRoleByNameToUserAsync(registerDto.RoleName, userId);
 
         return Ok(UserRegisteredSuccessfully);
     }

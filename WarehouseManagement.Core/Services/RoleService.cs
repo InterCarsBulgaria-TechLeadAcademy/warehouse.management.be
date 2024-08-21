@@ -39,7 +39,7 @@ public class RoleService : IRoleService
             .ToListAsync();
     }
 
-    public async Task AssignRoleToUserAsync(string id, string userId)
+    public async Task AssignRoleByIdToUserAsync(string id, string userId)
     {
         var role = await roleManager.FindByIdAsync(id);
 
@@ -53,6 +53,35 @@ public class RoleService : IRoleService
         if (user == null)
         {
             throw new KeyNotFoundException(UserWithThisIdNotFound);
+        }
+
+        if (await userManager.IsInRoleAsync(user, role.Name))
+        {
+            throw new InvalidOperationException(RoleCannotBeAssignedTwiceOnTheSameUser);
+        }
+
+        await userManager.AddToRoleAsync(user, role.Name!);
+    }
+
+    public async Task AssignRoleByNameToUserAsync(string roleName, string userId)
+    {
+        var role = await roleManager.FindByNameAsync(roleName);
+
+        if (role == null)
+        {
+            throw new ArgumentException(RoleWithThisNameDoesNotExist);
+        }
+
+        var user = await repository.GetByIdAsync<ApplicationUser>(Guid.Parse(userId));
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException(UserWithThisIdNotFound);
+        }
+
+        if (await userManager.IsInRoleAsync(user, role.Name))
+        {
+            throw new InvalidOperationException(RoleCannotBeAssignedTwiceOnTheSameUser);
         }
 
         await userManager.AddToRoleAsync(user, role.Name!);
@@ -135,7 +164,7 @@ public class RoleService : IRoleService
         }
 
         if (await roleManager.FindByNameAsync(model.Name) != null
-            && model.Name != id)
+            && model.Name != role.Name)
         {
             throw new ArgumentException(RoleWithThisNameAlreadyExists);
         }
