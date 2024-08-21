@@ -10,9 +10,6 @@ public class ZoneDto
 
     public DateTime CreatedAt { get; set; }
 
+    // TODO: Turn into List<string> when FE implements usage of ZoneDetailsDto
     public IEnumerable<ZoneMarkerDto> Markers { get; set; } = new HashSet<ZoneMarkerDto>();
-
-    public IEnumerable<ZoneVendorDto> Vendors { get; set; } = new HashSet<ZoneVendorDto>();
-
-    public IEnumerable<ZoneEntryDto> Entries { get; set; } = new HashSet<ZoneEntryDto>();
 }

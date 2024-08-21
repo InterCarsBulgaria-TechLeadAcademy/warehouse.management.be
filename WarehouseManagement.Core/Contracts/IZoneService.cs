@@ -5,7 +5,7 @@ namespace WarehouseManagement.Core.Contracts
 {
     public interface IZoneService
     {
-        Task<ZoneDto> GetByIdAsync(int id);
+        Task<ZoneDetailsDto> GetByIdAsync(int id);
         Task<IEnumerable<ZoneDto>> GetAllAsync();
         Task<IEnumerable<ZoneDto>> GetAllAsync(PaginationParameters paginationParams);
         Task<IEnumerable<ZoneDto>> GetAllWithDeletedAsync();

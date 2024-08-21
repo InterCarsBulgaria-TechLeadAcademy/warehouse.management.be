@@ -24,7 +24,7 @@ namespace WarehouseManagement.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(ZoneDto))]
+        [ProducesResponseType(200, Type = typeof(ZoneDetailsDto))]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
         {

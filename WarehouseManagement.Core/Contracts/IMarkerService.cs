@@ -17,6 +17,6 @@ public interface IMarkerService
     Task<IEnumerable<string>> GetDeletedMarkersAsync();
     Task<Dictionary<string, List<string>>> GetMarkerUsagesAsync(int id);
     Task<string?> GetDeletedMarkerNameByIdAsync(int id);
-    Task<bool> ExistById(int id);
+    Task<bool> ExistByIdAsync(int id);
     Task<ICollection<int>> GetNonExistingMarkerIdsAsync(ICollection<int> makrkerIds);
 }
