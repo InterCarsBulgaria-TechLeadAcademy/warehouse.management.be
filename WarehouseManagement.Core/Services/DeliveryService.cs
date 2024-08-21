@@ -149,6 +149,8 @@ public class DeliveryService : IDeliveryService
                         MarkerName = dm.Marker.Name
                     })
                     .ToList(),
+                EntriesFinishedProcessingDetails = GetEntriesProcessingDetails(d.Entries, true),
+                EntriesWaitingProcessingDetails = GetEntriesProcessingDetails(d.Entries, false),
                 EntriesFinishedProcessing = d
                     .Entries
                     .Count(e => e.FinishedProcessing.HasValue),
@@ -166,6 +168,23 @@ public class DeliveryService : IDeliveryService
             Results = deliveries,
             HasPrevious = paginationParams.PageNumber > 1,
             HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
+        };
+    }
+
+    private static EntriesProcessingDetails GetEntriesProcessingDetails(ICollection<Entry> entries, bool isFinished)
+    {
+        var entriesToProcess = entries
+            .Where(e => isFinished ? e.FinishedProcessing.HasValue : e.FinishedProcessing == null)
+            .ToList();
+        
+        return new EntriesProcessingDetails()
+        {
+            Pallets = entriesToProcess
+                .Sum(e => e.Pallets),
+            Packages = entriesToProcess
+                .Sum(e => e.Packages),
+            Pieces = entriesToProcess
+                .Sum(e => e.Pieces)
         };
     }
 
