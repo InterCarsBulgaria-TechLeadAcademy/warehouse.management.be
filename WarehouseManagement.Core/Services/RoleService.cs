@@ -8,6 +8,7 @@ using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.RoleMessageKeys;
 using static WarehouseManagement.Common.MessageConstants.Keys.ApplicationUserMessageKeys;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -172,6 +173,31 @@ public class RoleService : IRoleService
             .ThenInclude(rrp => rrp.RoutePermission)
             .FirstOrDefaultAsync(r => r.Id == Guid.Parse(id));
         
+        if (role == null)
+        {
+            throw new ArgumentException(RoleWithThisNameDoesNotExist);
+        }
+
+        return new RoleDto
+        {
+            Id = role.Id.ToString(),
+            Name = role.Name!,
+            RoutePermissions = role.RoleRoutePermissions
+                .Select(rrp => new RoutePermissionDto
+                {
+                    Id = rrp.RoutePermission.Id.ToString(),
+                    Name = $"{rrp.RoutePermission.ControllerName}.{rrp.RoutePermission.ActionName}"
+                })
+        };
+    }
+
+    public async Task<RoleDto> GetByNameAsync(string roleName)
+    {
+        var role = await roleManager.Roles
+            .Include(r => r.RoleRoutePermissions)
+            .ThenInclude(rrp => rrp.RoutePermission)
+            .FirstOrDefaultAsync(r => r.Name == roleName);
+
         if (role == null)
         {
             throw new ArgumentException(RoleWithThisNameDoesNotExist);

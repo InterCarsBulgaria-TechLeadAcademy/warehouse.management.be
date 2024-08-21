@@ -18,7 +18,7 @@ public class VendorServiceTests
     private WarehouseManagementDbContext dbContext;
     private IRepository repository;
     private IVendorService vendorService;
-    private Mock<IUserService> mockUserService;
+    private Mock<WarehouseManagement.Api.Services.Contracts.IUserService> mockUserService;
 
     private Vendor vendor1;
     private Vendor vendor2;
@@ -200,7 +200,7 @@ public class VendorServiceTests
             IsDeleted = false
         };
 
-        mockUserService = new Mock<IUserService>();
+        mockUserService = new Mock<WarehouseManagement.Api.Services.Contracts.IUserService>();
         mockUserService.Setup(x => x.UserId).Returns("TestUser");
         var options = new DbContextOptionsBuilder<WarehouseManagementDbContext>()
             .UseInMemoryDatabase(
