@@ -1,4 +1,5 @@
-﻿using WarehouseManagement.Core.Contracts;
+﻿using Microsoft.AspNetCore.Identity;
+using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.User;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
@@ -8,10 +9,12 @@ namespace WarehouseManagement.Core.Services;
 
 public class UserService : IUserService
 {
+    private readonly UserManager<ApplicationUser> userManager;
     private readonly IRepository repository;
 
-    public UserService(IRepository repository)
+    public UserService(UserManager<ApplicationUser> roleManager, IRepository repository)
     {
+        this.userManager = roleManager;
         this.repository = repository;
     }
 
@@ -24,11 +27,19 @@ public class UserService : IUserService
             throw new KeyNotFoundException(UserWithThisIdNotFound);
         }
 
+        var roles = await userManager.GetRolesAsync(user);
+
+        //var routePermissionIds = repository
+        //    .All<RoleRoutePermission>()
+        //    .Where(rrp => rrp.RoleId == )
+
+
         return new UserDto()
         {
             Id = userId,
             UserName = user.UserName!,
-            Email = user.Email!
+            Email = user.Email!,
+            Roles = roles
         };
     }
 }
