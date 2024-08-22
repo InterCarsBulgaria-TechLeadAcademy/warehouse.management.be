@@ -67,18 +67,18 @@ public class RoleController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("id/{roleId}")]
+    [HttpGet("get-by-id")]
     [ProducesResponseType(200, Type = typeof(RoleDto))]
-    public async Task<IActionResult> GetById(string roleId)
+    public async Task<IActionResult> GetById([FromQuery] string roleId)
     {
         var model = await roleService.GetByIdAsync(roleId);
 
         return Ok(model);
     }
 
-    [HttpGet("name/{roleName}")]
+    [HttpGet("get-by-name")]
     [ProducesResponseType(200, Type = typeof(RoleDto))]
-    public async Task<IActionResult> GetByName(string roleName)
+    public async Task<IActionResult> GetByName([FromQuery] string roleName)
     {
         var model = await roleService.GetByNameAsync(roleName);
 
