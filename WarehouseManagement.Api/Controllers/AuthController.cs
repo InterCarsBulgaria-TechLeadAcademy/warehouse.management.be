@@ -22,7 +22,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(200, Type = typeof(TokenResponse))]
+    [ProducesResponseType(200)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> SignIn([FromBody] LoginDto logindDto)
     {
@@ -34,7 +34,22 @@ public class AuthController : ControllerBase
         string jwtToken = await authService.LoginAsync(logindDto);
         string refreshToken = await jwtService.GenerateRefreshToken(User.Id());
 
-        return Ok(new TokenResponse() { AccessToken = jwtToken, RefreshToken = refreshToken });
+        Response.Cookies.Append("X-Access-Token", jwtToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+        Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+
+        return Ok();
     }
 
     [HttpPost("register")]
@@ -54,20 +69,30 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    [ProducesResponseType(200, Type = typeof(TokenResponse))]
+    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> Refresh([FromBody] string refreshToken)
+    public async Task<IActionResult> Refresh()
     {
+        var refreshToken = Request.Cookies["X-Refresh-Token"];
         var newAccessToken = await jwtService.GenerateAccessTokenFromRefreshToken(refreshToken);
 
-        var response = new TokenResponse
+        Response.Cookies.Append("X-Access-Token", newAccessToken, new CookieOptions
         {
-            AccessToken = newAccessToken,
-            RefreshToken = refreshToken
-        };
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+        Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
 
-        return Ok(response);
+        return Ok();
     }
 
     [HttpPost("logout")]
