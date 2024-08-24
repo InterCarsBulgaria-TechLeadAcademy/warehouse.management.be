@@ -29,6 +29,7 @@ namespace WarehouseManagement.Core.Services
             var vendor = await repository
                 .AllReadOnly<Vendor>()
                 .Include(v => v.VendorsMarkers)
+                .ThenInclude(m => m.Marker)
                 .FirstAsync(v => v.Id == id);
 
             return new VendorDetailsDto()

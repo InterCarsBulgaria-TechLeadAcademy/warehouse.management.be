@@ -160,7 +160,12 @@ public class DifferenceService : IDifferenceService
             throw new KeyNotFoundException(DifferenceWithIdNotFound);
         }
 
-        var model = await repository.GetByIdAsync<Difference>(id);
+        var model = await repository
+            .AllReadOnly<Difference>()
+            .Include(d => d.Type)
+            .Include(d => d.Zone)
+            .Include(d => d.Delivery)
+            .FirstOrDefaultAsync(d => d.Id == id);
 
         return new DifferenceDto()
         {

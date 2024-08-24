@@ -245,6 +245,7 @@ public class ZoneService : IZoneService
         var zone = await repository
             .AllReadOnly<Zone>()
             .Include(z => z.ZonesMarkers)
+            .ThenInclude(m => m.Marker)
             .FirstAsync(z => z.Id == id)!;
 
         return new ZoneDetailsDto()
