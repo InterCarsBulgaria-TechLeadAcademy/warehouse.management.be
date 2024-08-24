@@ -5,5 +5,8 @@ public enum LogType
     EntryStatusChange,
     DeliveryStatusChange,
     ZoneChange,
-    Split
+    Split,
+    DifferenceStatusChange,
+    DifferenceAdminComment,
+    Empty
 }
