@@ -290,8 +290,6 @@ public class MarkerServiceTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual("Marker1", result.Name);
-        Assert.IsNotEmpty(result.Vendors); //Check if there are vendors assosiated with the Marker
-        Assert.IsNotEmpty(result.Zones); // Check if there are zones assosiated with the Marker
     }
 
     [Test]

@@ -101,29 +101,7 @@ public class MarkerService : IMarkerService
             {
                 Id = m.Id,
                 Name = m.Name,
-                CreatedAt = m.CreatedAt,
-                Deliveries = m
-                    .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
-                    {
-                        DeliveryId = dm.DeliveryId,
-                        DeliverySystemNumber = dm.Delivery.SystemNumber
-                    })
-                    .ToList(),
-                Vendors = m
-                    .VendorsMarkers.Select(vm => new MarkerVendorDto
-                    {
-                        VendorId = vm.VendorId,
-                        VendorName = vm.Vendor.Name,
-                        VendorSystemNumber = vm.Vendor.SystemNumber
-                    })
-                    .ToList(),
-                Zones = m
-                    .ZonesMarkers.Select(zm => new MarkerZoneDto
-                    {
-                        ZoneId = zm.ZoneId,
-                        ZoneName = zm.Zone.Name
-                    })
-                    .ToList()
+                CreatedAt = m.CreatedAt
             })
             .ToListAsync();
 
@@ -143,29 +121,7 @@ public class MarkerService : IMarkerService
             {
                 Id = m.Id,
                 Name = m.Name,
-                CreatedAt = m.CreatedAt,
-                Deliveries = m
-                    .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
-                    {
-                        DeliveryId = dm.DeliveryId,
-                        DeliverySystemNumber = dm.Delivery.SystemNumber
-                    })
-                    .ToList(),
-                Vendors = m
-                    .VendorsMarkers.Select(vm => new MarkerVendorDto
-                    {
-                        VendorId = vm.VendorId,
-                        VendorName = vm.Vendor.Name,
-                        VendorSystemNumber = vm.Vendor.SystemNumber
-                    })
-                    .ToList(),
-                Zones = m
-                    .ZonesMarkers.Select(zm => new MarkerZoneDto
-                    {
-                        ZoneId = zm.ZoneId,
-                        ZoneName = zm.Zone.Name
-                    })
-                    .ToList()
+                CreatedAt = m.CreatedAt
             })
             .ToListAsync();
 
@@ -174,45 +130,21 @@ public class MarkerService : IMarkerService
 
     public async Task<MarkerDto> GetByIdAsync(int id)
     {
-        var marker = await repository
-            .AllReadOnly<Marker>()
-            .Where(m => m.Id == id)
-            .Select(m => new MarkerDto
-            {
-                Id = m.Id,
-                Name = m.Name,
-                CreatedAt = m.CreatedAt,
-                Deliveries = m
-                    .DeliveriesMarkers.Select(dm => new MarkerDeliveryDto
-                    {
-                        DeliveryId = dm.DeliveryId,
-                        DeliverySystemNumber = dm.Delivery.SystemNumber
-                    })
-                    .ToList(),
-                Vendors = m
-                    .VendorsMarkers.Select(vm => new MarkerVendorDto
-                    {
-                        VendorId = vm.VendorId,
-                        VendorName = vm.Vendor.Name,
-                        VendorSystemNumber = vm.Vendor.SystemNumber
-                    })
-                    .ToList(),
-                Zones = m
-                    .ZonesMarkers.Select(zm => new MarkerZoneDto
-                    {
-                        ZoneId = zm.ZoneId,
-                        ZoneName = zm.Zone.Name
-                    })
-                    .ToList()
-            })
-            .FirstOrDefaultAsync();
-
-        if (marker == null)
+        if (!await ExistByIdAsync(id))
         {
             throw new KeyNotFoundException($"{MarkerWithIdNotFound} {id}");
         }
+        
+        var marker = await repository
+            .AllReadOnly<Marker>()
+            .FirstAsync(m => m.Id == id);
 
-        return marker;
+        return new MarkerDto
+        {
+            Id = marker.Id,
+            Name = marker.Name,
+            CreatedAt = marker.CreatedAt,
+        };
     }
 
     public async Task RestoreAsync(int id, string userId)
@@ -309,7 +241,7 @@ public class MarkerService : IMarkerService
         return null;
     }
 
-    public async Task<bool> ExistById(int id)
+    public async Task<bool> ExistByIdAsync(int id)
     {
         return await repository.AllReadOnly<Marker>().AnyAsync(m => m.Id == id);
     }
@@ -319,7 +251,7 @@ public class MarkerService : IMarkerService
         List<int> notExistingMarkerIds = new List<int>();
         foreach (var id in makrkerIds)
         {
-            if (await ExistById(id) == false)
+            if (await ExistByIdAsync(id) == false)
             {
                 notExistingMarkerIds.Add(id);
             }

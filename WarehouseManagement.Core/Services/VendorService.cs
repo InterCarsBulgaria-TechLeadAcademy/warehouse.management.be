@@ -19,41 +19,32 @@ namespace WarehouseManagement.Core.Services
             this.repository = repository;
         }
 
-        public async Task<VendorDto> GetByIdAsync(int id)
+        public async Task<VendorDetailsDto> GetByIdAsync(int id)
         {
-            var vendor = await repository
-                .AllReadOnly<Vendor>()
-                .Where(v => v.Id == id)
-                .Select(v => new VendorDto()
-                {
-                    Id = v.Id,
-                    Name = v.Name,
-                    SystemNumber = v.SystemNumber,
-                    CreatedAt = v.CreatedAt,
-                    Markers = v
-                        .VendorsMarkers.Select(vm => new VendorMarkerDto()
-                        {
-                            MarkerId = vm.MarkerId,
-                            MarkerName = vm.Marker.Name,
-                        })
-                        .ToList(),
-                    Zones = v
-                        .VendorsZones.Select(vz => new VendorZoneDto()
-                        {
-                            ZoneId = vz.ZoneId,
-                            ZoneName = vz.Zone.Name,
-                            IsFinal = vz.Zone.IsFinal,
-                        })
-                        .ToList(),
-                })
-                .FirstOrDefaultAsync();
-
-            if (vendor == null)
+            if (!await ExistByIdAsync(id))
             {
                 throw new KeyNotFoundException($"{VendorWithIdNotFound} {id}");
             }
+            
+            var vendor = await repository
+                .AllReadOnly<Vendor>()
+                .Include(v => v.VendorsMarkers)
+                .FirstAsync(v => v.Id == id);
 
-            return vendor;
+            return new VendorDetailsDto()
+            {
+                Id = vendor.Id,
+                Name = vendor.Name,
+                SystemNumber = vendor.SystemNumber,
+                CreatedAt = vendor.CreatedAt,
+                Markers = vendor
+                    .VendorsMarkers.Select(vm => new VendorMarkerDto()
+                    {
+                        MarkerId = vm.MarkerId,
+                        MarkerName = vm.Marker.Name,
+                    })
+                    .ToList(),
+            };
         }
 
         public async Task<IEnumerable<VendorDto>> GetAllAsync(PaginationParameters paginationParams)
@@ -77,15 +68,7 @@ namespace WarehouseManagement.Core.Services
                             MarkerId = vm.MarkerId,
                             MarkerName = vm.Marker.Name,
                         })
-                        .ToList(),
-                    Zones = v
-                        .VendorsZones.Select(vz => new VendorZoneDto()
-                        {
-                            ZoneId = vz.ZoneId,
-                            ZoneName = vz.Zone.Name,
-                            IsFinal = vz.Zone.IsFinal,
-                        })
-                        .ToList(),
+                        .ToList()
                 })
                 .ToListAsync();
         }
@@ -106,14 +89,6 @@ namespace WarehouseManagement.Core.Services
                         {
                             MarkerId = vm.MarkerId,
                             MarkerName = vm.Marker.Name,
-                        })
-                        .ToList(),
-                    Zones = v
-                        .VendorsZones.Select(vz => new VendorZoneDto()
-                        {
-                            ZoneId = vz.ZoneId,
-                            ZoneName = vz.Zone.Name,
-                            IsFinal = vz.Zone.IsFinal,
                         })
                         .ToList(),
                 })

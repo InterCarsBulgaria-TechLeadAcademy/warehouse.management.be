@@ -22,7 +22,7 @@ namespace WarehouseManagement.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(VendorDto))]
+        [ProducesResponseType(200, Type = typeof(VendorDetailsDto))]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetVendor(int id)
         {

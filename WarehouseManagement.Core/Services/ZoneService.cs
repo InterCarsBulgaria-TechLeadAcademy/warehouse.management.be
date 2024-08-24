@@ -165,22 +165,6 @@ public class ZoneService : IZoneService
                 {
                     MarkerId = zm.MarkerId,
                     MarkerName = zm.Marker.Name,
-                }),
-                Vendors = z.VendorsZones.Select(vz => new ZoneVendorDto()
-                {
-                    VendorId = vz.VendorId,
-                    VendorName = vz.Vendor.Name,
-                    VendorSystemNumber = vz.Vendor.SystemNumber
-                }),
-                Entries = z.Entries.Select(e => new ZoneEntryDto()
-                {
-                    EntryId = e.Id,
-                    Pallets = e.Pallets,
-                    Packages = e.Packages,
-                    Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProcessing,
-                    FinishedProccessing = e.FinishedProcessing,
-                    DeliveryId = e.DeliveryId
                 })
             })
             .ToListAsync();
@@ -204,22 +188,6 @@ public class ZoneService : IZoneService
                 {
                     MarkerId = zm.MarkerId,
                     MarkerName = zm.Marker.Name,
-                }),
-                Vendors = z.VendorsZones.Select(vz => new ZoneVendorDto()
-                {
-                    VendorId = vz.VendorId,
-                    VendorName = vz.Vendor.Name,
-                    VendorSystemNumber = vz.Vendor.SystemNumber
-                }),
-                Entries = z.Entries.Select(e => new ZoneEntryDto()
-                {
-                    EntryId = e.Id,
-                    Pallets = e.Pallets,
-                    Packages = e.Packages,
-                    Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProcessing,
-                    FinishedProccessing = e.FinishedProcessing,
-                    DeliveryId = e.DeliveryId
                 })
             })
             .ToListAsync();
@@ -239,22 +207,6 @@ public class ZoneService : IZoneService
                 {
                     MarkerId = zm.MarkerId,
                     MarkerName = zm.Marker.Name,
-                }),
-                Vendors = z.VendorsZones.Select(vz => new ZoneVendorDto()
-                {
-                    VendorId = vz.VendorId,
-                    VendorName = vz.Vendor.Name,
-                    VendorSystemNumber = vz.Vendor.SystemNumber
-                }),
-                Entries = z.Entries.Select(e => new ZoneEntryDto()
-                {
-                    EntryId = e.Id,
-                    Pallets = e.Pallets,
-                    Packages = e.Packages,
-                    Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProcessing,
-                    FinishedProccessing = e.FinishedProcessing,
-                    DeliveryId = e.DeliveryId
                 })
             })
             .ToListAsync();
@@ -278,37 +230,24 @@ public class ZoneService : IZoneService
                 {
                     MarkerId = zm.MarkerId,
                     MarkerName = zm.Marker.Name,
-                }),
-                Vendors = z.VendorsZones.Select(vz => new ZoneVendorDto()
-                {
-                    VendorId = vz.VendorId,
-                    VendorName = vz.Vendor.Name,
-                    VendorSystemNumber = vz.Vendor.SystemNumber
-                }),
-                Entries = z.Entries.Select(e => new ZoneEntryDto()
-                {
-                    EntryId = e.Id,
-                    Pallets = e.Pallets,
-                    Packages = e.Packages,
-                    Pieces = e.Pieces,
-                    StartedProccessing = e.StartedProcessing,
-                    FinishedProccessing = e.FinishedProcessing,
-                    DeliveryId = e.DeliveryId
                 })
             })
             .ToListAsync();
     }
 
-    public async Task<ZoneDto> GetByIdAsync(int id)
+    public async Task<ZoneDetailsDto> GetByIdAsync(int id)
     {
         if (!await ExistsByIdAsync(id))
         {
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        var zone = (await repository.AllReadOnly<Zone>().FirstAsync(z => z.Id == id))!;
+        var zone = await repository
+            .AllReadOnly<Zone>()
+            .Include(z => z.ZonesMarkers)
+            .FirstAsync(z => z.Id == id)!;
 
-        return new ZoneDto()
+        return new ZoneDetailsDto()
         {
             Id = zone.Id,
             Name = zone.Name,
@@ -318,22 +257,6 @@ public class ZoneService : IZoneService
             {
                 MarkerId = zm.MarkerId,
                 MarkerName = zm.Marker.Name,
-            }),
-            Vendors = zone.VendorsZones.Select(vz => new ZoneVendorDto()
-            {
-                VendorId = vz.VendorId,
-                VendorName = vz.Vendor.Name,
-                VendorSystemNumber = vz.Vendor.SystemNumber
-            }),
-            Entries = zone.Entries.Select(e => new ZoneEntryDto()
-            {
-                EntryId = e.Id,
-                Pallets = e.Pallets,
-                Packages = e.Packages,
-                Pieces = e.Pieces,
-                StartedProccessing = e.StartedProcessing,
-                FinishedProccessing = e.FinishedProcessing,
-                DeliveryId = e.DeliveryId
             })
         };
     }
