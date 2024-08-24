@@ -3,6 +3,5 @@
 public enum DeliveryHistoryChangeType
 {
     Delivery,
-    Entry,
-    Difference
+    Entry
 }
