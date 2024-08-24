@@ -17,6 +17,8 @@ public class DeliveryDto
     public int Pieces { get; set; }
     public int EntriesWaitingProcessing { get; set; }
     public int EntriesFinishedProcessing { get; set; }
+    public EntriesProcessingDetails EntriesWaitingProcessingDetails { get; set; } = null!;
+    public EntriesProcessingDetails EntriesFinishedProcessingDetails { get; set; } = null!;
     public int VendorId { get; set; }
     public string VendorName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
