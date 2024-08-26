@@ -8,7 +8,6 @@ using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.RoleMessageKeys;
 using static WarehouseManagement.Common.MessageConstants.Keys.ApplicationUserMessageKeys;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace WarehouseManagement.Core.Services;
 
