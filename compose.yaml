@@ -8,19 +8,19 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
-  server:
-    build:
-      context: .
-      target: development
-    ports:
-      - 8080:8080
-      - 8081:8081
-    environment:
-      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-      - ASPNETCORE_ENVIRONMENT=Development
-    depends_on:
-      db:
-        condition: service_healthy
+  # server:
+  #   build:
+  #     context: .
+  #     target: development
+  #   ports:
+  #     - 8080:8080
+  #     - 8081:8081
+  #   environment:
+  #     - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
   db:
     container_name: mssql_db
     image: mcr.microsoft.com/mssql/server:2022-latest

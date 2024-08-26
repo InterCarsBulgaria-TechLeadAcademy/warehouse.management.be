@@ -37,7 +37,7 @@ public class DifferenceService : IDifferenceService
         };
 
         await repository.AddAsync(difference);
-        await repository.SaveChangesAsync();
+        await repository.SaveChangesWithLogAsync();
     }
 
     public async Task DeleteAsync(int id)
