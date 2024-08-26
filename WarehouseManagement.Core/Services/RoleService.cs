@@ -139,8 +139,7 @@ public class RoleService : IRoleService
             throw new ArgumentException(RoleWithThisNameDoesNotExist);
         }
 
-        if (await roleManager.FindByNameAsync(model.Name) != null
-            && model.Name != role.Name)
+        if (model.Name != role.Name && await roleManager.FindByNameAsync(model.Name) != null)
         {
             throw new ArgumentException(RoleWithThisNameAlreadyExists);
         }
