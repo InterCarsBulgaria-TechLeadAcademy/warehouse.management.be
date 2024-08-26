@@ -18,7 +18,7 @@ public class MarkerServiceTests
     private WarehouseManagementDbContext dbContext;
     private IRepository repository;
     private IMarkerService markerService;
-    private Mock<IUserService> mockUserService;
+    private Mock<WarehouseManagement.Api.Services.Contracts.IUserService> mockUserService;
 
     private Marker marker1;
     private Marker marker2;
@@ -32,7 +32,7 @@ public class MarkerServiceTests
     [SetUp]
     public async Task Setup()
     {
-        mockUserService = new Mock<IUserService>();
+        mockUserService = new Mock<WarehouseManagement.Api.Services.Contracts.IUserService>();
         mockUserService.Setup(x => x.UserId).Returns("TestUser");
         var options = new DbContextOptionsBuilder<WarehouseManagementDbContext>()
             .UseInMemoryDatabase(
@@ -290,6 +290,8 @@ public class MarkerServiceTests
 
         Assert.IsNotNull(result);
         Assert.AreEqual("Marker1", result.Name);
+        Assert.IsNotEmpty(result.Vendors); //Check if there are vendors assosiated with the Marker
+        Assert.IsNotEmpty(result.Zones); // Check if there are zones assosiated with the Marker
     }
 
     [Test]

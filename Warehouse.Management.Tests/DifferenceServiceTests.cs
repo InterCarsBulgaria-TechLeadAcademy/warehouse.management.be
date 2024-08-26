@@ -19,7 +19,7 @@ public class DifferenceServiceTests
 
     private WarehouseManagementDbContext dbContext;
     private IDifferenceService differenceService;
-    private Mock<IUserService> mockUserService;
+    private Mock<WarehouseManagement.Api.Services.Contracts.IUserService> mockUserService;
 
     private Difference difference1;
     private Difference difference2;
@@ -37,7 +37,7 @@ public class DifferenceServiceTests
     [SetUp]
     public async Task SetUp()
     {
-        mockUserService = new Mock<IUserService>();
+        mockUserService = new Mock<WarehouseManagement.Api.Services.Contracts.IUserService>();
         mockUserService.Setup(x => x.UserId).Returns("TestUser");
 
         var options = new DbContextOptionsBuilder<WarehouseManagementDbContext>()
