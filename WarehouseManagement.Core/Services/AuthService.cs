@@ -32,7 +32,7 @@ public class AuthService : IAuthService
 
     public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
-        var roleExists = await roleManager.RoleExistsAsync(registerDto.RoleName);
+        var roleExists = await roleManager.RoleExistsAsync(registerDto.RoleId);
 
         if (!roleExists)
         {
