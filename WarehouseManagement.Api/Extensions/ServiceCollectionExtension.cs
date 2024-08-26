@@ -16,7 +16,7 @@ namespace WarehouseManagement.Api.Extensions
         {
             //Here we add services
             services.AddScoped<IMarkerService, MarkerService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<WarehouseManagement.Api.Services.Contracts.IUserService, WarehouseManagement.Api.Services.UserService>();
             services.AddScoped<IZoneService, ZoneService>();
             services.AddScoped<IVendorService, VendorService>();
             services.AddScoped<IEntryService, EntryService>();
@@ -28,6 +28,7 @@ namespace WarehouseManagement.Api.Extensions
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IRoutePermissionService, RoutePermissionService>();
             services.AddScoped<IPDFService, PDFService>();
+            services.AddScoped<WarehouseManagement.Core.Contracts.IUserService, WarehouseManagement.Core.Services.UserService>();
             return services;
         }
 

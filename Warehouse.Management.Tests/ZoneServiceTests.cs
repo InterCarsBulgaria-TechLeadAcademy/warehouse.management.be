@@ -17,7 +17,7 @@ public class ZoneServiceTests
 
     private WarehouseManagementDbContext dbContext;
     private IZoneService zoneService;
-    private Mock<IUserService> mockUserService;
+    private Mock<WarehouseManagement.Api.Services.Contracts.IUserService> mockUserService;
 
     private Zone zone1;
     private Zone zone2;
@@ -34,7 +34,7 @@ public class ZoneServiceTests
     [SetUp]
     public async Task Setup()
     {
-        mockUserService = new Mock<IUserService>();
+        mockUserService = new Mock<WarehouseManagement.Api.Services.Contracts.IUserService>();
         mockUserService.Setup(x => x.UserId).Returns("TestUser");
 
         var options = new DbContextOptionsBuilder<WarehouseManagementDbContext>()

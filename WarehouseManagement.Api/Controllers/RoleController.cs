@@ -22,7 +22,7 @@ public class RoleController : ControllerBase
     [ProducesResponseType(500)]
     public async Task<IActionResult> AddUserToRole([FromBody] RoleUserAssignDto model)
     {
-        await roleService.AssignRoleToUserAsync(model.Id, model.UserId);
+        await roleService.AssignRoleByIdToUserAsync(model.Id, model.UserId);
 
         return Ok(RoleAssignedToUserSuccessfully);
     }
@@ -67,11 +67,11 @@ public class RoleController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("{roleId}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(200, Type = typeof(RoleDto))]
-    public async Task<IActionResult> GetByName(string roleId)
+    public async Task<IActionResult> GetById(string id)
     {
-        var model = await roleService.GetByIdAsync(roleId);
+        var model = await roleService.GetByIdAsync(id);
 
         return Ok(model);
     }

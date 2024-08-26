@@ -18,7 +18,7 @@ public class DeliveryServiceTests
     private WarehouseManagementDbContext dbContext;
     private IDeliveryService deliveryService;
     private IEntryService entryService;
-    private Mock<IUserService> mockUserService;
+    private Mock<WarehouseManagement.Api.Services.Contracts.IUserService> mockUserService;
 
     private Delivery delivery;
     private Delivery deliveryApproved;
@@ -37,7 +37,7 @@ public class DeliveryServiceTests
     [SetUp]
     public async Task Setup()
     {
-        mockUserService = new Mock<IUserService>();
+        mockUserService = new Mock<WarehouseManagement.Api.Services.Contracts.IUserService>();
         mockUserService.Setup(x => x.UserId).Returns("TestUser");
 
         var options = new DbContextOptionsBuilder<WarehouseManagementDbContext>()

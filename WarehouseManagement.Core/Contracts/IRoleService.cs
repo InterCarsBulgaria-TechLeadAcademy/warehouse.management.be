@@ -8,7 +8,7 @@ public interface IRoleService
 
     Task CreateAsync(RoleFormDto model);
 
-    Task AssignRoleToUserAsync(string id, string userId);
+    Task AssignRoleToUserAsync(string roleId, string userId);
 
     Task EditAsync(string id, RoleFormDto model);
 
