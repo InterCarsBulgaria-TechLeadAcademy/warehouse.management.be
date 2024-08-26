@@ -4,26 +4,40 @@ using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Auth;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using static WarehouseManagement.Common.MessageConstants.Keys.RoleMessageKeys;
 
 public class AuthService : IAuthService
 {
     private readonly SignInManager<ApplicationUser> signInManager;
     private readonly UserManager<ApplicationUser> userManager;
+    private readonly RoleManager<ApplicationRole> roleManager;
 
     private readonly IRepository repository;
     private readonly IJwtService jwtService;
 
-    public AuthService(IRepository repository, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IJwtService jwtService)
+    public AuthService(
+        IRepository repository, 
+        SignInManager<ApplicationUser> signInManager, 
+        UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager,
+        IJwtService jwtService)
     {
-        this.repository = repository;
         this.signInManager = signInManager;
         this.userManager = userManager;
+        this.roleManager = roleManager;
+
+        this.repository = repository;
         this.jwtService = jwtService;
     }
 
-    public async Task RegisterAsync(RegisterDto registerDto)
+    public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
-        //TODO handle role
+        var roleExists = await roleManager.RoleExistsAsync(registerDto.RoleName);
+
+        if (!roleExists)
+        {
+            throw new ArgumentException(RoleWithThisNameDoesNotExist);
+        }
 
         var user = new ApplicationUser
         {
@@ -37,6 +51,8 @@ public class AuthService : IAuthService
         {
             throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
         }
+
+        return user.Id.ToString();
     }
 
     public async Task<string> LoginAsync(LoginDto loginDto)

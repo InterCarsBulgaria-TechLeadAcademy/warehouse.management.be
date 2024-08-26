@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Api.Middlewares;
 using WarehouseManagement.Common.Statuses;
@@ -10,6 +11,7 @@ using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ZoneController : ControllerBase
@@ -24,7 +26,7 @@ namespace WarehouseManagement.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(ZoneDetailsDto))]
+        [ProducesResponseType(200, Type = typeof(ZoneDto))]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
         {

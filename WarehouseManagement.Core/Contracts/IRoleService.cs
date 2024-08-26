@@ -8,7 +8,9 @@ public interface IRoleService
 
     Task CreateAsync(RoleFormDto model);
 
-    Task AssignRoleToUserAsync(string id, string userId);
+    Task AssignRoleByIdToUserAsync(string roleId, string userId);
+
+    Task AssignRoleByNameToUserAsync(string roleName, string userId);
 
     Task EditAsync(string id, RoleFormDto model);
 
@@ -17,4 +19,6 @@ public interface IRoleService
     Task<IEnumerable<RoleDetailsDto>> AllAsync();
 
     Task<RoleDto> GetByIdAsync(string id);
+
+    Task<RoleDto> GetByNameAsync(string roleName);
 }

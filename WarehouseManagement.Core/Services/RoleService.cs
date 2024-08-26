@@ -8,6 +8,7 @@ using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using static WarehouseManagement.Common.MessageConstants.Keys.RoleMessageKeys;
 using static WarehouseManagement.Common.MessageConstants.Keys.ApplicationUserMessageKeys;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -38,7 +39,7 @@ public class RoleService : IRoleService
             .ToListAsync();
     }
 
-    public async Task AssignRoleToUserAsync(string id, string userId)
+    public async Task AssignRoleByIdToUserAsync(string id, string userId)
     {
         var role = await roleManager.FindByIdAsync(id);
 
@@ -52,6 +53,35 @@ public class RoleService : IRoleService
         if (user == null)
         {
             throw new KeyNotFoundException(UserWithThisIdNotFound);
+        }
+
+        if (await userManager.IsInRoleAsync(user, role.Name))
+        {
+            throw new InvalidOperationException(RoleCannotBeAssignedTwiceOnTheSameUser);
+        }
+
+        await userManager.AddToRoleAsync(user, role.Name!);
+    }
+
+    public async Task AssignRoleByNameToUserAsync(string roleName, string userId)
+    {
+        var role = await roleManager.FindByNameAsync(roleName);
+
+        if (role == null)
+        {
+            throw new ArgumentException(RoleWithThisNameDoesNotExist);
+        }
+
+        var user = await repository.GetByIdAsync<ApplicationUser>(Guid.Parse(userId));
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException(UserWithThisIdNotFound);
+        }
+
+        if (await userManager.IsInRoleAsync(user, role.Name))
+        {
+            throw new InvalidOperationException(RoleCannotBeAssignedTwiceOnTheSameUser);
         }
 
         await userManager.AddToRoleAsync(user, role.Name!);
@@ -134,7 +164,7 @@ public class RoleService : IRoleService
         }
 
         if (await roleManager.FindByNameAsync(model.Name) != null
-            && model.Name != id)
+            && model.Name != role.Name)
         {
             throw new ArgumentException(RoleWithThisNameAlreadyExists);
         }
@@ -172,6 +202,31 @@ public class RoleService : IRoleService
             .ThenInclude(rrp => rrp.RoutePermission)
             .FirstOrDefaultAsync(r => r.Id == Guid.Parse(id));
         
+        if (role == null)
+        {
+            throw new ArgumentException(RoleWithThisNameDoesNotExist);
+        }
+
+        return new RoleDto
+        {
+            Id = role.Id.ToString(),
+            Name = role.Name!,
+            RoutePermissions = role.RoleRoutePermissions
+                .Select(rrp => new RoutePermissionDto
+                {
+                    Id = rrp.RoutePermission.Id.ToString(),
+                    Name = $"{rrp.RoutePermission.ControllerName}.{rrp.RoutePermission.ActionName}"
+                })
+        };
+    }
+
+    public async Task<RoleDto> GetByNameAsync(string roleName)
+    {
+        var role = await roleManager.Roles
+            .Include(r => r.RoleRoutePermissions)
+            .ThenInclude(rrp => rrp.RoutePermission)
+            .FirstOrDefaultAsync(r => r.Name == roleName);
+
         if (role == null)
         {
             throw new ArgumentException(RoleWithThisNameDoesNotExist);
