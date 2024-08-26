@@ -17,6 +17,4 @@ public interface IRoleService
     Task<IEnumerable<RoleDetailsDto>> AllAsync();
 
     Task<RoleDto> GetByIdAsync(string id);
-
-    Task<RoleDto> GetByNameAsync(string roleName);
 }
