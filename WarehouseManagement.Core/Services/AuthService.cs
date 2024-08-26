@@ -32,9 +32,9 @@ public class AuthService : IAuthService
 
     public async Task<string> RegisterAsync(RegisterDto registerDto)
     {
-        var roleExists = await roleManager.RoleExistsAsync(registerDto.RoleId);
+        var roleExists = await roleManager.FindByIdAsync(registerDto.RoleId);
 
-        if (!roleExists)
+        if (roleExists == null)
         {
             throw new ArgumentException(RoleWithThisNameDoesNotExist);
         }
