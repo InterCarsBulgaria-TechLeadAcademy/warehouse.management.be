@@ -63,7 +63,7 @@ public class AuthController : ControllerBase
         }
 
         var userId = await authService.RegisterAsync(registerDto);
-        await roleService.AssignRoleByNameToUserAsync(registerDto.RoleName, userId);
+        await roleService.AssignRoleToUserAsync(registerDto.RoleId, userId);
 
         return Ok(UserRegisteredSuccessfully);
     }
