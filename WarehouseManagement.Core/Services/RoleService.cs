@@ -119,7 +119,7 @@ public class RoleService : IRoleService
 
     public async Task DeleteAsync(string id)
     {
-        var role = await roleManager.FindByNameAsync(id);
+        var role = await roleManager.FindByIdAsync(id);
 
         if (role == null)
         {
