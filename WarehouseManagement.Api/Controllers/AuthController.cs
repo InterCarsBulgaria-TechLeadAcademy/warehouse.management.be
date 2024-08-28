@@ -34,18 +34,19 @@ public class AuthController : ControllerBase
         string jwtToken = await authService.LoginAsync(logindDto);
         string refreshToken = await jwtService.GenerateRefreshToken(User.Id());
 
+        // TODO Fix SameSiteMode to be Strict when UI is deployed
         Response.Cookies.Append("X-Access-Token", jwtToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
         Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
 
@@ -81,14 +82,14 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
         Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
 
