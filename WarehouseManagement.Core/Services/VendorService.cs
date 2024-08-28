@@ -64,11 +64,7 @@ namespace WarehouseManagement.Core.Services
                     SystemNumber = v.SystemNumber,
                     CreatedAt = v.CreatedAt,
                     Markers = v
-                        .VendorsMarkers.Select(vm => new VendorMarkerDto()
-                        {
-                            MarkerId = vm.MarkerId,
-                            MarkerName = vm.Marker.Name,
-                        })
+                        .VendorsMarkers.Select(vm => vm.Marker.Name)
                         .ToList()
                 })
                 .ToListAsync();
@@ -86,11 +82,7 @@ namespace WarehouseManagement.Core.Services
                     SystemNumber = v.SystemNumber,
                     CreatedAt = v.CreatedAt,
                     Markers = v
-                        .VendorsMarkers.Select(vm => new VendorMarkerDto()
-                        {
-                            MarkerId = vm.MarkerId,
-                            MarkerName = vm.Marker.Name,
-                        })
+                        .VendorsMarkers.Select(vm => vm.Marker.Name)
                         .ToList(),
                 })
                 .ToListAsync();
