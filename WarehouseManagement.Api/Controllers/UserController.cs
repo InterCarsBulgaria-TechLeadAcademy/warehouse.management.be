@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WarehouseManagement.Core.Contracts;
+using WarehouseManagement.Core.DTOs.User;
 
 namespace WarehouseManagement.Api.Controllers;
 
@@ -18,6 +19,8 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
+    [ProducesResponseType(200, Type = typeof(UserDto))]
+    [ProducesResponseType(401)]
     public async Task<IActionResult> GetUserInfo()
     {
         var userId = User

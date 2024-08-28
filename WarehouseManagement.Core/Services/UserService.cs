@@ -55,6 +55,7 @@ public class UserService : IUserService
             UserName = user.UserName!,
             Email = user.Email!,
             Roles = roleNames,
+            Role = roleNames.FirstOrDefault() ?? string.Empty,
             RoutePermissionNames = routePermissionNames
         };
     }
