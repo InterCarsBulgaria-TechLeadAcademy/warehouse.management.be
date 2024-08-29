@@ -12,15 +12,17 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService authService;
     private readonly IJwtService jwtService;
+    private readonly IRoleService roleService;
 
-    public AuthController(IAuthService authService, IJwtService jwtService)
+    public AuthController(IAuthService authService, IJwtService jwtService, IRoleService roleService)
     {
         this.authService = authService;
         this.jwtService = jwtService;
+        this.roleService = roleService;
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(200, Type = typeof(TokenResponse))]
+    [ProducesResponseType(200)]
     [ProducesResponseType(500)]
     public async Task<IActionResult> SignIn([FromBody] LoginDto logindDto)
     {
@@ -32,7 +34,23 @@ public class AuthController : ControllerBase
         string jwtToken = await authService.LoginAsync(logindDto);
         string refreshToken = await jwtService.GenerateRefreshToken(User.Id());
 
-        return Ok(new TokenResponse() { AccessToken = jwtToken, RefreshToken = refreshToken });
+        // TODO Fix SameSiteMode to be Strict when UI is deployed
+        Response.Cookies.Append("X-Access-Token", jwtToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+        Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+
+        return Ok();
     }
 
     [HttpPost("register")]
@@ -45,26 +63,37 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        await authService.RegisterAsync(registerDto);
+        var userId = await authService.RegisterAsync(registerDto);
+        await roleService.AssignRoleToUserAsync(registerDto.RoleId, userId);
 
         return Ok(UserRegisteredSuccessfully);
     }
 
     [HttpPost("refresh")]
-    [ProducesResponseType(200, Type = typeof(TokenResponse))]
+    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> Refresh([FromBody] string refreshToken)
+    public async Task<IActionResult> Refresh()
     {
+        var refreshToken = Request.Cookies["X-Refresh-Token"];
         var newAccessToken = await jwtService.GenerateAccessTokenFromRefreshToken(refreshToken);
 
-        var response = new TokenResponse
+        Response.Cookies.Append("X-Access-Token", newAccessToken, new CookieOptions
         {
-            AccessToken = newAccessToken,
-            RefreshToken = refreshToken
-        };
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+        Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
 
-        return Ok(response);
+        return Ok();
     }
 
     [HttpPost("logout")]

@@ -67,11 +67,11 @@ public class RoleController : ControllerBase
         return Ok(models);
     }
 
-    [HttpGet("{roleId}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(200, Type = typeof(RoleDto))]
-    public async Task<IActionResult> GetByName(string roleId)
+    public async Task<IActionResult> GetById(string id)
     {
-        var model = await roleService.GetByIdAsync(roleId);
+        var model = await roleService.GetByIdAsync(id);
 
         return Ok(model);
     }

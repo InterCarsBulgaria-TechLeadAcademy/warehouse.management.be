@@ -16,8 +16,9 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy
-            .WithOrigins("http://localhost:8000")
+            .WithOrigins(["https://localhost:8000", "http://localhost:8000"])
             .AllowAnyHeader()
+            .AllowCredentials()
             .AllowAnyMethod();
     });
 });
@@ -29,6 +30,16 @@ builder.Services.AddApplicationService();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>
  {
+     options.Events = new JwtBearerEvents
+     {
+         OnMessageReceived = context =>
+         {
+             context.Token = context.Request.Cookies["X-Access-Token"];
+
+             return Task.CompletedTask;
+         }
+     };
+
      options.TokenValidationParameters = new TokenValidationParameters
      {
          ValidIssuer = builder.Configuration["Jwt:Issuer"],
@@ -50,7 +61,7 @@ builder.Services
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-builder.Services.AddDbContext<WarehouseManagementDbContext>(options => 
+builder.Services.AddDbContext<WarehouseManagementDbContext>(options =>
         options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -67,6 +78,7 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
+app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 
