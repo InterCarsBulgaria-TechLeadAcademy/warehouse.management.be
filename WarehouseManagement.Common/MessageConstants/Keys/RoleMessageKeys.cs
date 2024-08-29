@@ -3,6 +3,7 @@
 public static class RoleMessageKeys
 {
     public const string RoleWithThisNameDoesNotExist = "RoleWithThisNameDoesNotExist";
+    public const string RoleWithThisIdDoesNotExist = "RoleWithThisIdDoesNotExist";
     public const string RoleWithThisNameAlreadyExists = "RoleWithThisNameExists";
     public const string RoleCreatedSuccessfully = "RoleAddedSuccessfully";
     public const string RoleEditedSuccessfully = "RoleEditedSuccessfully";

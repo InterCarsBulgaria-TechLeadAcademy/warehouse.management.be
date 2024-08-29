@@ -101,6 +101,9 @@ public class AuthController : ControllerBase
     {
         await authService.LogoutAsync(User.Id());
 
+        Response.Cookies.Delete("X-Access-Token");
+        Response.Cookies.Delete("X-Refresh-Token");
+
         return Ok(UserSignedOutSuccessfully);
     }
 }
