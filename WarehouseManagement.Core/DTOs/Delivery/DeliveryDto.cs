@@ -11,7 +11,7 @@ public class DeliveryDto
     public string Cmr { get; set; } = string.Empty;
     public string DeliveryTime { get; set; } = string.Empty;
     public string? ApprovedOn { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public string CreatedAt { get; set; } = string.Empty;
     public int Pallets { get; set; }
     public int Packages { get; set; }
     public int Pieces { get; set; }

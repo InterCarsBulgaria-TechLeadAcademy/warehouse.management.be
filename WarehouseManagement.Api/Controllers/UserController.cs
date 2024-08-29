@@ -16,6 +16,14 @@ public class UserController : ControllerBase
         this.userService = userService;
     }
 
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAll()
+    {
+        var users = await userService.GetAllAsync();
+
+        return Ok(users);
+    }
+
     [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> GetUserInfo()
@@ -25,7 +33,7 @@ public class UserController : ControllerBase
             .First(c => c.Type == ClaimTypes.NameIdentifier)
             .Value;
 
-        var userInfo = await userService.GetUserInfo(userId);
+        var userInfo = await userService.GetUserInfoAsync(userId);
 
         return Ok(userInfo);
     }

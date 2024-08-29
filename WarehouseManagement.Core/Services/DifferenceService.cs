@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using WarehouseManagement.Common.Statuses;
+using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Difference;
@@ -100,7 +101,7 @@ public class DifferenceService : IDifferenceService
                 Count = d.Count,
                 Status = d.Status,
                 Type = d.Type.Name,
-                CreatedAt = d.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 Zone = d.Zone.Name,
                 DeliverySystemNumber = d.Delivery.SystemNumber
             }).ToListAsync();
@@ -137,7 +138,7 @@ public class DifferenceService : IDifferenceService
                 Count = d.Count,
                 Status = d.Status,
                 Type = d.Type.Name,
-                CreatedAt = d.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 Zone = d.Zone.Name,
                 DeliverySystemNumber = d.Delivery.SystemNumber
             }).ToListAsync();
@@ -178,7 +179,7 @@ public class DifferenceService : IDifferenceService
             Count = model.Count,
             Status = model.Status,
             Type = model.Type.Name,
-            CreatedAt = model.CreatedAt,
+            CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(model.CreatedAt),
             Zone = model.Zone.Name,
             DeliverySystemNumber = model.Delivery.SystemNumber
         };

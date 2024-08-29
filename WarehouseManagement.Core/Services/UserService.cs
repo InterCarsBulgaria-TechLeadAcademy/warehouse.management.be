@@ -21,7 +21,20 @@ public class UserService : IUserService
         this.repository = repository;
     }
 
-    public async Task<UserDto> GetUserInfo(string userId)
+    public async Task<IEnumerable<UserDto>> GetAllAsync()
+    {
+        var usersDtos = new List<UserDto>();
+        var users = await repository.AllReadOnly<ApplicationUser>().ToListAsync();
+
+        foreach (var user in users)
+        {
+            usersDtos.Add(await GetUserInfoAsync(user.Id.ToString()));
+        }
+
+        return usersDtos;
+    }
+
+    public async Task<UserDto> GetUserInfoAsync(string userId)
     {
         var user = await repository.GetByIdAsync<ApplicationUser>(Guid.Parse(userId));
 

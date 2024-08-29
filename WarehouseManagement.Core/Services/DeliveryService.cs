@@ -1,16 +1,15 @@
-﻿using System.Globalization;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Common.Enums;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
 using WarehouseManagement.Core.DTOs.Entry;
-using WarehouseManagement.Core.DTOs.Zone;
 using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
+using WarehouseManagement.Common.Utilities;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
@@ -33,7 +32,7 @@ public class DeliveryService : IDeliveryService
             {
                 Id = d.Id,
                 Cmr = d.Cmr,
-                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
+                DeliveryTime = UtcNowDateTimeStringFormatted.GetUtcNow(d.DeliveryTime),
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -43,7 +42,7 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
-                CreatedAt = d.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
@@ -52,8 +51,8 @@ public class DeliveryService : IDeliveryService
                         Packages = e.Packages,
                         Pallets = e.Pallets,
                         Pieces = e.Pieces,
-                        FinishedProccessing = e.FinishedProcessing,
-                        StartedProccessing = e.StartedProcessing,
+                        FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
+                        StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
                         Zone = new EntryZoneDto()
                         {
                             ZoneName = e.Zone.Name,
@@ -107,7 +106,7 @@ public class DeliveryService : IDeliveryService
             {
                 Id = d.Id,
                 Cmr = d.Cmr,
-                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
+                DeliveryTime = UtcNowDateTimeStringFormatted.GetUtcNow(d.DeliveryTime),
                 Packages = d.Packages,
                 Pallets = d.Pallets,
                 Pieces = d.Pieces,
@@ -117,8 +116,8 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
-                CreatedAt = d.CreatedAt,
-                ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
+                ApprovedOn = d.ApprovedOn.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(d.ApprovedOn.Value) : null,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
                     {
@@ -126,8 +125,8 @@ public class DeliveryService : IDeliveryService
                         Packages = e.Packages,
                         Pallets = e.Pallets,
                         Pieces = e.Pieces,
-                        FinishedProccessing = e.FinishedProcessing,
-                        StartedProccessing = e.StartedProcessing,
+                        FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
+                        StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
                         Zone = new EntryZoneDto()
                         {
                             ZoneName = e.Zone.Name,
@@ -316,7 +315,7 @@ public class DeliveryService : IDeliveryService
                 VendorId = d.VendorId,
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
-                CreatedAt = d.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
                 Entries = d
                     .Entries.Select(e => new EntryDto()
@@ -325,8 +324,8 @@ public class DeliveryService : IDeliveryService
                         Packages = e.Packages,
                         Pallets = e.Pallets,
                         Pieces = e.Pieces,
-                        FinishedProccessing = e.FinishedProcessing,
-                        StartedProccessing = e.StartedProcessing,
+                        FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
+                        StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
                         Zone = new EntryZoneDto()
                         {
                             ZoneName = e.Zone.Name,

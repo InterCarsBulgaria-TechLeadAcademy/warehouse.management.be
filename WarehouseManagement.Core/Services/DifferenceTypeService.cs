@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.DifferenceType;
 using WarehouseManagement.Infrastructure.Data.Common;
@@ -87,7 +88,7 @@ public class DifferenceTypeService : IDifferenceTypeService
             {
                 Id = dt.Id,
                 Name = dt.Name,
-                CreatedAt = dt.CreatedAt
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(dt.CreatedAt)
             }).ToListAsync();
     }
 
@@ -99,7 +100,7 @@ public class DifferenceTypeService : IDifferenceTypeService
             {
                 Id = dt.Id,
                 Name = dt.Name,
-                CreatedAt = dt.CreatedAt
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(dt.CreatedAt)
             }).ToListAsync();
     }
 
@@ -116,7 +117,7 @@ public class DifferenceTypeService : IDifferenceTypeService
         {
             Id = differenceType!.Id,
             Name = differenceType.Name,
-            CreatedAt = differenceType.CreatedAt
+            CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(differenceType.CreatedAt)
         };
     }
 
