@@ -38,6 +38,17 @@ public class RoleController : ControllerBase
         return Ok(RoleCreatedSuccessfully);
     }
 
+    [HttpPost("create-with-all-permissions")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(500)]
+    public async Task<IActionResult> CreateWithAllPermissions([FromBody] string roleName)
+    {
+        await roleService.CreateRoleWithAllPermissionsAsync(roleName);
+
+        return Ok(RoleCreatedSuccessfully);
+    }
+
     [HttpPut("edit/{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]

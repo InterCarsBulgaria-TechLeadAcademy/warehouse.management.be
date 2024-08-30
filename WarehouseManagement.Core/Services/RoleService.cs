@@ -80,9 +80,7 @@ public class RoleService : IRoleService
 
     public async Task CreateAsync(RoleFormDto model)
     {
-        var role = await roleManager.FindByNameAsync(model.Name);
-
-        if (role != null)
+        if (await roleManager.RoleExistsAsync(model.Name))
         {
             throw new InvalidOperationException(RoleWithThisNameAlreadyExists);
         }
@@ -110,6 +108,37 @@ public class RoleService : IRoleService
             await repository.AddAsync(new RoleRoutePermission()
             {
                 Role = newRole,
+                RoutePermission = permission
+            });
+        }
+
+        await repository.SaveChangesAsync();
+    }
+
+    public async Task CreateRoleWithAllPermissionsAsync(string roleName)
+    {
+        if (await roleManager.RoleExistsAsync(roleName))
+        {
+            throw new InvalidOperationException(RoleWithThisNameAlreadyExists);
+        }
+
+        var result = await roleManager.CreateAsync(new ApplicationRole { Name = roleName });
+
+        if (!result.Succeeded)
+        {
+            throw new Exception("Something went wrong while trying to save the role.");
+        }
+
+        var newRole = await roleManager.FindByNameAsync(roleName);
+        var routePermissions = await repository
+            .All<RoutePermission>()
+            .ToListAsync();
+
+        foreach (var permission in routePermissions)
+        {
+            await repository.AddAsync(new RoleRoutePermission()
+            {
+                Role = newRole!,
                 RoutePermission = permission
             });
         }
