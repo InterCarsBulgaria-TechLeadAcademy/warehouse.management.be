@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using WarehouseManagement.Api.Services.Contracts;
 using WarehouseManagement.Common.Enums;
 using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
-using WarehouseManagement.Core.DTOs.Delivery;
 using WarehouseManagement.Core.Services;
 using WarehouseManagement.Infrastructure.Data;
 using WarehouseManagement.Infrastructure.Data.Common;
