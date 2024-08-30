@@ -44,7 +44,7 @@ public class RoleService : IRoleService
 
         if (role == null)
         {
-            throw new ArgumentException(RoleWithThisNameDoesNotExist);
+            throw new ArgumentException(RoleWithThisIdDoesNotExist);
         }
 
         var user = await repository.GetByIdAsync<ApplicationUser>(Guid.Parse(userId));
@@ -119,7 +119,7 @@ public class RoleService : IRoleService
 
     public async Task DeleteAsync(string id)
     {
-        var role = await roleManager.FindByNameAsync(id);
+        var role = await roleManager.FindByIdAsync(id);
 
         if (role == null)
         {

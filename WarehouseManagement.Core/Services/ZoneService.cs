@@ -162,11 +162,7 @@ public class ZoneService : IZoneService
                 Name = z.Name,
                 IsFinal = z.IsFinal,
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
-                Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
-                {
-                    MarkerId = zm.MarkerId,
-                    MarkerName = zm.Marker.Name,
-                })
+                Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
     }
@@ -185,11 +181,7 @@ public class ZoneService : IZoneService
                 Name = z.Name,
                 IsFinal = z.IsFinal,
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
-                Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
-                {
-                    MarkerId = zm.MarkerId,
-                    MarkerName = zm.Marker.Name,
-                })
+                Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
     }
@@ -204,11 +196,7 @@ public class ZoneService : IZoneService
                 Name = z.Name,
                 IsFinal = z.IsFinal,
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
-                Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
-                {
-                    MarkerId = zm.MarkerId,
-                    MarkerName = zm.Marker.Name,
-                })
+                Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
     }
@@ -227,11 +215,7 @@ public class ZoneService : IZoneService
                 Name = z.Name,
                 IsFinal = z.IsFinal,
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
-                Markers = z.ZonesMarkers.Select(zm => new ZoneMarkerDto()
-                {
-                    MarkerId = zm.MarkerId,
-                    MarkerName = zm.Marker.Name,
-                })
+                Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
     }

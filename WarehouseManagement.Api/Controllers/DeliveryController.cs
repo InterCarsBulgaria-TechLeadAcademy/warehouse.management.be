@@ -33,7 +33,7 @@ public class DeliveryController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [ProducesResponseType(200, Type = typeof(DeliveryDto))]
+    [ProducesResponseType(200, Type = typeof(DeliveryDetailsDto))]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetDelivery(int id)
     {
@@ -147,7 +147,7 @@ public class DeliveryController : ControllerBase
     }
 
     [HttpPut("Approve/{id}")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<VendorDto>))]
+    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> Approve(int id)

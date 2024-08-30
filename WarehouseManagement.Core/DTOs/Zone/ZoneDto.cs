@@ -10,6 +10,5 @@ public class ZoneDto
 
     public string CreatedAt { get; set; } = string.Empty;
 
-    // TODO: Turn into List<string> when FE implements usage of ZoneDetailsDto
-    public IEnumerable<ZoneMarkerDto> Markers { get; set; } = new HashSet<ZoneMarkerDto>();
+    public List<string> Markers { get; set; } = new();
 }

@@ -23,12 +23,12 @@ public class DeliveryService : IDeliveryService
         this.repository = repository;
     }
 
-    public async Task<DeliveryDto> GetByIdAsync(int id)
+    public async Task<DeliveryDetailsDto> GetByIdAsync(int id)
     {
         var delivery = await repository
             .AllReadOnly<Delivery>()
             .Where(d => d.Id == id)
-            .Select(d => new DeliveryDto()
+            .Select(d => new DeliveryDetailsDto()
             {
                 Id = d.Id,
                 Cmr = d.Cmr,
@@ -45,7 +45,7 @@ public class DeliveryService : IDeliveryService
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
                 Entries = d
-                    .Entries.Select(e => new EntryDto()
+                    .Entries.Select(e => new DeliveryEntryDetailsDto()
                     {
                         Id = e.Id,
                         Packages = e.Packages,
@@ -58,13 +58,6 @@ public class DeliveryService : IDeliveryService
                             ZoneName = e.Zone.Name,
                             IsFinal = e.Zone.IsFinal
                         },
-                        DeliveryDetails = new EntryDeliveryDetailsDto()
-                        {
-                            Id = e.DeliveryId,
-                            ReceptionNumber = e.Delivery.ReceptionNumber,
-                            SystemNumber = e.Delivery.SystemNumber,
-                            VendorName = e.Delivery.Vendor.Name,
-                        }
                     })
                     .ToList(),
                 Markers = d
@@ -107,40 +100,13 @@ public class DeliveryService : IDeliveryService
                 Id = d.Id,
                 Cmr = d.Cmr,
                 DeliveryTime = UtcNowDateTimeStringFormatted.GetUtcNow(d.DeliveryTime),
-                Packages = d.Packages,
-                Pallets = d.Pallets,
-                Pieces = d.Pieces,
                 ReceptionNumber = d.ReceptionNumber,
                 SystemNumber = d.SystemNumber,
-                TruckNumber = d.TruckNumber,
-                VendorId = d.VendorId,
+                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 ApprovedOn = d.ApprovedOn.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(d.ApprovedOn.Value) : null,
-                Entries = d
-                    .Entries.Select(e => new EntryDto()
-                    {
-                        Id = e.Id,
-                        Packages = e.Packages,
-                        Pallets = e.Pallets,
-                        Pieces = e.Pieces,
-                        FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
-                        StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
-                        Zone = new EntryZoneDto()
-                        {
-                            ZoneName = e.Zone.Name,
-                            IsFinal = e.Zone.IsFinal
-                        },
-                        DeliveryDetails = new EntryDeliveryDetailsDto()
-                        {
-                            Id = e.DeliveryId,
-                            ReceptionNumber = e.Delivery.ReceptionNumber,
-                            SystemNumber = e.Delivery.SystemNumber,
-                            VendorName = e.Delivery.Vendor.Name,
-                        }
-                    })
-                    .ToList(),
                 Markers = d
                     .DeliveriesMarkers.Select(dm => new DeliveryMarkerDto()
                     {
@@ -304,42 +270,13 @@ public class DeliveryService : IDeliveryService
             .Select(d => new DeliveryDto()
             {
                 Id = d.Id,
-                Cmr = d.Cmr,
-                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
-                Packages = d.Packages,
-                Pallets = d.Pallets,
-                Pieces = d.Pieces,
                 ReceptionNumber = d.ReceptionNumber,
                 SystemNumber = d.SystemNumber,
-                TruckNumber = d.TruckNumber,
-                VendorId = d.VendorId,
+                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
-                Entries = d
-                    .Entries.Select(e => new EntryDto()
-                    {
-                        Id = e.Id,
-                        Packages = e.Packages,
-                        Pallets = e.Pallets,
-                        Pieces = e.Pieces,
-                        FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
-                        StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
-                        Zone = new EntryZoneDto()
-                        {
-                            ZoneName = e.Zone.Name,
-                            IsFinal = e.Zone.IsFinal
-                        },
-                        DeliveryDetails = new EntryDeliveryDetailsDto()
-                        {
-                            Id = e.DeliveryId,
-                            ReceptionNumber = e.Delivery.ReceptionNumber,
-                            SystemNumber = e.Delivery.SystemNumber,
-                            VendorName = e.Delivery.Vendor.Name,
-                        }
-                    })
-                    .ToList(),
                 Markers = d
                     .DeliveriesMarkers.Select(dm => new DeliveryMarkerDto()
                     {
