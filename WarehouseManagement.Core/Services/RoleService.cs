@@ -44,7 +44,7 @@ public class RoleService : IRoleService
 
         if (role == null)
         {
-            throw new ArgumentException(RoleWithThisNameDoesNotExist);
+            throw new ArgumentException(RoleWithThisIdDoesNotExist);
         }
 
         var user = await repository.GetByIdAsync<ApplicationUser>(Guid.Parse(userId));
