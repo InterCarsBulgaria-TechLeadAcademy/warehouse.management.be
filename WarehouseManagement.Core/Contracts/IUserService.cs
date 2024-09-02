@@ -6,6 +6,6 @@ namespace WarehouseManagement.Core.Contracts
     {
         Task<UserDto> GetUserInfoAsync(string userId);
 
-        Task<IEnumerable<UserDto>> GetAllAsync();
+        Task<IEnumerable<UserAllDto>> GetAllAsync();
     }
 }

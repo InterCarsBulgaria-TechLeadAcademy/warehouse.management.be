@@ -30,7 +30,7 @@ public class AuthService : IAuthService
         this.jwtService = jwtService;
     }
 
-    public async Task<string> RegisterAsync(RegisterDto registerDto)
+    public async Task<string> RegisterAsync(RegisterDto registerDto, string creatorId)
     {
         var roleExists = await roleManager.FindByIdAsync(registerDto.RoleId);
 
@@ -43,6 +43,8 @@ public class AuthService : IAuthService
         {
             UserName = registerDto.Username,
             Email = registerDto.Email,
+            CreatedAt = DateTime.UtcNow,
+            CreatorId = !creatorId.StartsWith("user") ? Guid.Parse(creatorId) : null // For test scenarios, later leave only Guid.Parse(creatorId)
         };
 
         var result = await userManager.CreateAsync(user, registerDto.Password);

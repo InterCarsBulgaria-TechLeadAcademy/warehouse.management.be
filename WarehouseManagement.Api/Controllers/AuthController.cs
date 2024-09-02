@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Auth;
@@ -63,7 +64,8 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var userId = await authService.RegisterAsync(registerDto);
+        var creatorId = User.Id(); // Get the currently logged-in user ID to be representd as the creator of the new user
+        var userId = await authService.RegisterAsync(registerDto, creatorId); 
         await roleService.AssignRoleToUserAsync(registerDto.RoleId, userId);
 
         return Ok(UserRegisteredSuccessfully);

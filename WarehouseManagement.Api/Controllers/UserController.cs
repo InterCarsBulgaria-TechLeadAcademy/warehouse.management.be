@@ -18,6 +18,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("all")]
+    [ProducesResponseType(200, Type = typeof(UserAllDto))]
     public async Task<IActionResult> GetAll()
     {
         var users = await userService.GetAllAsync();

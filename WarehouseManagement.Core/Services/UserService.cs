@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.User;
 using WarehouseManagement.Infrastructure.Data.Common;
@@ -21,17 +22,29 @@ public class UserService : IUserService
         this.repository = repository;
     }
 
-    public async Task<IEnumerable<UserDto>> GetAllAsync()
+    public async Task<IEnumerable<UserAllDto>> GetAllAsync()
     {
-        var usersDtos = new List<UserDto>();
-        var users = await repository.AllReadOnly<ApplicationUser>().ToListAsync();
+        var users = await repository
+            .AllReadOnly<ApplicationUser>()
+            .Include(u => u.Creator)
+            .ToListAsync();
+
+        var userDtos = new List<UserAllDto>();
 
         foreach (var user in users)
         {
-            usersDtos.Add(await GetUserInfoAsync(user.Id.ToString()));
+            userDtos.Add(new UserAllDto()
+            {
+                Id = user.Id.ToString(),
+                UserName = user.UserName!,
+                Email = user.Email!,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(user.CreatedAt),
+                CreatedBy = user.Creator != null ? user.Creator.UserName! : null,
+                Role = await GetFirstRoleForUserAsync(user)
+            });
         }
 
-        return usersDtos;
+        return userDtos;
     }
 
     public async Task<UserDto> GetUserInfoAsync(string userId)
@@ -71,5 +84,17 @@ public class UserService : IUserService
             Role = roleNames.FirstOrDefault() ?? string.Empty,
             RoutePermissionNames = routePermissionNames
         };
+    }
+
+    private async Task<string?> GetFirstRoleForUserAsync(ApplicationUser user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentException("No user provided.");
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+
+        return roles.FirstOrDefault();
     }
 }
