@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.User;
+using static WarehouseManagement.Common.MessageConstants.Keys.ApplicationUserMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers;
 
@@ -40,5 +41,13 @@ public class UserController : ControllerBase
         var userInfo = await userService.GetUserInfoAsync(userId);
 
         return Ok(userInfo);
+    }
+
+    [HttpPatch("delete/{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await userService.DeleteAsync(id);
+
+        return Ok(UserDeletedSuccessfully);
     }
 }

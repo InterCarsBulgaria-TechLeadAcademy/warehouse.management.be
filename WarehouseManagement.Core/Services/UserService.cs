@@ -22,6 +22,19 @@ public class UserService : IUserService
         this.repository = repository;
     }
 
+    public async Task DeleteAsync(string userId)
+    {
+        var user = await repository.GetByIdAsync<ApplicationUser>(Guid.Parse(userId));
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException(UserWithThisIdNotFound);
+        }
+
+        user.IsDeleted = true;
+        await repository.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<UserAllDto>> GetAllAsync()
     {
         var users = await repository
