@@ -10,9 +10,6 @@ public class DeliveryDto
     public string DeliveryTime { get; set; } = string.Empty;
     public string? ApprovedOn { get; set; }
     public string CreatedAt { get; set; } = string.Empty;
-    public int Pallets { get; set; }
-    public int Packages { get; set; }
-    public int Pieces { get; set; }
     public int EntriesWaitingProcessing { get; set; }
     public int EntriesFinishedProcessing { get; set; }
     public EntriesProcessingDetails EntriesWaitingProcessingDetails { get; set; } = null!;

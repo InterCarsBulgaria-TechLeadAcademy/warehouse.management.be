@@ -53,11 +53,7 @@ public class DeliveryService : IDeliveryService
                         Pieces = e.Pieces,
                         FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
                         StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
-                        Zone = new EntryZoneDto()
-                        {
-                            ZoneName = e.Zone.Name,
-                            IsFinal = e.Zone.IsFinal
-                        },
+                        ZoneName = e.Zone.Name,
                     })
                     .ToList(),
                 Markers = d
@@ -98,11 +94,9 @@ public class DeliveryService : IDeliveryService
             .Select(d => new DeliveryDto()
             {
                 Id = d.Id,
-                Cmr = d.Cmr,
                 DeliveryTime = UtcNowDateTimeStringFormatted.GetUtcNow(d.DeliveryTime),
                 ReceptionNumber = d.ReceptionNumber,
                 SystemNumber = d.SystemNumber,
-                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
