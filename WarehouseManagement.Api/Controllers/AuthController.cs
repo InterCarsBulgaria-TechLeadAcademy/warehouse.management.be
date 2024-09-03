@@ -100,16 +100,22 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Logout()
     {
         await authService.LogoutAsync(User.Id());
-
-        Response.Cookies.Delete("X-Access-Token", new CookieOptions
+        
+        Response.Cookies.Append("X-Access-Token", string.Empty, new CookieOptions
         {
-            SameSite = SameSiteMode.None
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
         });
-        Response.Cookies.Delete("X-Refresh-Token", new CookieOptions()
+        Response.Cookies.Append("X-Refresh-Token", string.Empty, new CookieOptions
         {
-            SameSite = SameSiteMode.None
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
         });
-
+        
         return Ok(UserSignedOutSuccessfully);
     }
 }
