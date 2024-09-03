@@ -40,14 +40,14 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddMinutes(15)
         });
         Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
 
         return Ok();
@@ -83,14 +83,14 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddMinutes(15)
         });
         Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
 
         return Ok();
@@ -101,8 +101,14 @@ public class AuthController : ControllerBase
     {
         await authService.LogoutAsync(User.Id());
 
-        Response.Cookies.Delete("X-Access-Token");
-        Response.Cookies.Delete("X-Refresh-Token");
+        Response.Cookies.Delete("X-Access-Token", new CookieOptions
+        {
+            SameSite = SameSiteMode.None
+        });
+        Response.Cookies.Delete("X-Refresh-Token", new CookieOptions()
+        {
+            SameSite = SameSiteMode.None
+        });
 
         return Ok(UserSignedOutSuccessfully);
     }
