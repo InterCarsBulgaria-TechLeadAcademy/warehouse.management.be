@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WarehouseManagement.Core.Contracts;
@@ -43,7 +43,7 @@ public class UserController : ControllerBase
         return Ok(userInfo);
     }
 
-    [HttpPatch("delete/{id}")]
+    [HttpDelete("delete/{id}")]
     public async Task<IActionResult> Delete(string id)
     {
         await userService.DeleteAsync(id);
