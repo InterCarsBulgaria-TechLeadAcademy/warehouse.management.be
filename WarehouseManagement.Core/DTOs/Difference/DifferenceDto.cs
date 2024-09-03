@@ -22,7 +22,7 @@ public class DifferenceDto
 
     public string Type { get; set; } = string.Empty;
 
-    public DateTime CreatedAt { get; set; }
+    public string CreatedAt { get; set; } = string.Empty;
 
     public string Zone { get; set; } = string.Empty;
 

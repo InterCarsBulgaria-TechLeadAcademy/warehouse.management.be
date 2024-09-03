@@ -8,7 +8,7 @@ public class ZoneDto
 
     public bool IsFinal { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public string CreatedAt { get; set; } = string.Empty;
 
     public List<string> Markers { get; set; } = new();
 }

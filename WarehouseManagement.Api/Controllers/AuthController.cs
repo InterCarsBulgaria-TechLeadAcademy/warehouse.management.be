@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Auth;
@@ -40,14 +41,14 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddMinutes(15)
         });
         Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
 
         return Ok();
@@ -63,7 +64,8 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var userId = await authService.RegisterAsync(registerDto);
+        var creatorId = User.Id(); // Get the currently logged-in user ID to be representd as the creator of the new user
+        var userId = await authService.RegisterAsync(registerDto, creatorId); 
         await roleService.AssignRoleToUserAsync(registerDto.RoleId, userId);
 
         return Ok(UserRegisteredSuccessfully);
@@ -83,14 +85,14 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddMinutes(15)
         });
         Response.Cookies.Append("X-Refresh-Token", refreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddDays(7)
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
 
         return Ok();
@@ -100,10 +102,22 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Logout()
     {
         await authService.LogoutAsync(User.Id());
-
-        Response.Cookies.Delete("X-Access-Token");
-        Response.Cookies.Delete("X-Refresh-Token");
-
+        
+        Response.Cookies.Append("X-Access-Token", string.Empty, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
+        });
+        Response.Cookies.Append("X-Refresh-Token", string.Empty, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(-1)
+        });
+        
         return Ok(UserSignedOutSuccessfully);
     }
 }

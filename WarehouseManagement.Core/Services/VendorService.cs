@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Vendor;
@@ -37,7 +38,7 @@ namespace WarehouseManagement.Core.Services
                 Id = vendor.Id,
                 Name = vendor.Name,
                 SystemNumber = vendor.SystemNumber,
-                CreatedAt = vendor.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(vendor.CreatedAt),
                 Markers = vendor
                     .VendorsMarkers.Select(vm => new VendorMarkerDto()
                     {
@@ -62,7 +63,7 @@ namespace WarehouseManagement.Core.Services
                     Id = v.Id,
                     Name = v.Name,
                     SystemNumber = v.SystemNumber,
-                    CreatedAt = v.CreatedAt,
+                    CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(v.CreatedAt),
                     Markers = v
                         .VendorsMarkers.Select(vm => vm.Marker.Name)
                         .ToList()
@@ -80,7 +81,7 @@ namespace WarehouseManagement.Core.Services
                     Id = v.Id,
                     Name = v.Name,
                     SystemNumber = v.SystemNumber,
-                    CreatedAt = v.CreatedAt,
+                    CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(v.CreatedAt),
                     Markers = v
                         .VendorsMarkers.Select(vm => vm.Marker.Name)
                         .ToList(),

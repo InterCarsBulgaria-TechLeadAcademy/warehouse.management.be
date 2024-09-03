@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Zone;
@@ -160,7 +161,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
-                CreatedAt = z.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
                 Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
@@ -179,7 +180,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
-                CreatedAt = z.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
                 Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
@@ -194,7 +195,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
-                CreatedAt = z.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
                 Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
@@ -213,7 +214,7 @@ public class ZoneService : IZoneService
                 Id = z.Id,
                 Name = z.Name,
                 IsFinal = z.IsFinal,
-                CreatedAt = z.CreatedAt,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(z.CreatedAt),
                 Markers = z.ZonesMarkers.Select(zm => zm.Marker.Name).ToList()
             })
             .ToListAsync();
@@ -237,7 +238,7 @@ public class ZoneService : IZoneService
             Id = zone.Id,
             Name = zone.Name,
             IsFinal = zone.IsFinal,
-            CreatedAt = zone.CreatedAt,
+            CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(zone.CreatedAt),
             Markers = zone.ZonesMarkers.Select(zm => new ZoneMarkerDto()
             {
                 MarkerId = zm.MarkerId,

@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Marker;
@@ -101,7 +102,7 @@ public class MarkerService : IMarkerService
             {
                 Id = m.Id,
                 Name = m.Name,
-                CreatedAt = m.CreatedAt
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(m.CreatedAt)
             })
             .ToListAsync();
 
@@ -121,7 +122,7 @@ public class MarkerService : IMarkerService
             {
                 Id = m.Id,
                 Name = m.Name,
-                CreatedAt = m.CreatedAt
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(m.CreatedAt)
             })
             .ToListAsync();
 
@@ -143,7 +144,7 @@ public class MarkerService : IMarkerService
         {
             Id = marker.Id,
             Name = marker.Name,
-            CreatedAt = marker.CreatedAt,
+            CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(marker.CreatedAt)
         };
     }
 

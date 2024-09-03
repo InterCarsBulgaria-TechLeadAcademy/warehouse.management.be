@@ -8,7 +8,7 @@ public class ZoneDetailsDto
 
     public bool IsFinal { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public string CreatedAt { get; set; } = string.Empty;
 
     public IEnumerable<ZoneMarkerDto> Markers { get; set; } = new HashSet<ZoneMarkerDto>();
 }

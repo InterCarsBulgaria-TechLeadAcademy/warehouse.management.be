@@ -10,6 +10,7 @@ using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 using WarehouseManagement.Core.DTOs.Zone;
+using WarehouseManagement.Common.Utilities;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -86,9 +87,9 @@ public class EntryService : IEntryService
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
-                StartedProccessing = e.StartedProcessing,
-                FinishedProccessing = e.FinishedProcessing,
-                CreatedAt = e.CreatedAt,
+                StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
+                FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(e.CreatedAt),
                 Zone = new EntryZoneDto()
                 {
                     ZoneName = e.Zone.Name,
@@ -133,9 +134,9 @@ public class EntryService : IEntryService
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
-                StartedProccessing = e.StartedProcessing,
-                FinishedProccessing = e.FinishedProcessing,
-                CreatedAt = e.CreatedAt,
+                StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
+                FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(e.CreatedAt),
                 Zone = new EntryZoneDto()
                 {
                     ZoneName = e.Zone.Name,
@@ -183,9 +184,9 @@ public class EntryService : IEntryService
                 Pallets = e.Pallets,
                 Packages = e.Packages,
                 Pieces = e.Pieces,
-                StartedProccessing = e.StartedProcessing,
-                FinishedProccessing = e.FinishedProcessing,
-                CreatedAt = e.CreatedAt,
+                StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
+                FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(e.CreatedAt),
                 Zone = new EntryZoneDto()
                 {
                     ZoneName = e.Zone.Name,
@@ -232,9 +233,9 @@ public class EntryService : IEntryService
             Pallets = entry.Pallets,
             Packages = entry.Packages,
             Pieces = entry.Pieces,
-            StartedProccessing = entry.StartedProcessing,
-            FinishedProccessing = entry.FinishedProcessing,
-            CreatedAt = entry.CreatedAt,
+            StartedProccessing = entry.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(entry.StartedProcessing.Value) : null,
+            FinishedProccessing = entry.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(entry.FinishedProcessing.Value) : null,
+            CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(entry.CreatedAt),
             Zone = new EntryZoneDto()
             {
                 ZoneName = entry.Zone.Name,
