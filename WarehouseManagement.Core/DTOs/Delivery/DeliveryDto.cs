@@ -9,7 +9,7 @@ public class DeliveryDto
     public string ReceptionNumber { get; set; } = string.Empty;
     public string DeliveryTime { get; set; } = string.Empty;
     public string? ApprovedOn { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public string CreatedAt { get; set; } = string.Empty;
     public int EntriesWaitingProcessing { get; set; }
     public int EntriesFinishedProcessing { get; set; }
     public EntriesProcessingDetails EntriesWaitingProcessingDetails { get; set; } = null!;

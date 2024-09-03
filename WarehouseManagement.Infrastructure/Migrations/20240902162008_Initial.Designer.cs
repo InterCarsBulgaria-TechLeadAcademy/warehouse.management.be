@@ -12,7 +12,7 @@ using WarehouseManagement.Infrastructure.Data;
 namespace WarehouseManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(WarehouseManagementDbContext))]
-    [Migration("20240812204332_Initial")]
+    [Migration("20240902162008_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -173,11 +173,20 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -214,6 +223,8 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -695,7 +706,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8abee68a-22e6-4795-af74-e9bae7df712d"),
+                            Id = new Guid("f3688312-0d05-4940-a88c-30c2ab562be9"),
                             ActionName = "SignIn",
                             ControllerName = "Auth",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -704,7 +715,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("99ffcfb0-7d10-481e-8530-d1bdf99a7f7c"),
+                            Id = new Guid("814a8084-265a-4cfa-9ece-167b17b3b4f1"),
                             ActionName = "SignUp",
                             ControllerName = "Auth",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -713,7 +724,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9f60c085-dcf9-4241-a1d2-2debc6b0ade3"),
+                            Id = new Guid("73e9bd2f-c14c-4630-8fe6-f9a2f1bf260c"),
                             ActionName = "Refresh",
                             ControllerName = "Auth",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -722,7 +733,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("39ab107e-4b06-41d8-b0d5-e4e11af17aef"),
+                            Id = new Guid("ff7b988b-f4c5-4fde-97cb-56afa5edeb34"),
                             ActionName = "Logout",
                             ControllerName = "Auth",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -731,7 +742,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("49e73ff6-04d3-4beb-a1e6-75f22b74e077"),
+                            Id = new Guid("bcc9e281-c73d-46b2-9bd3-3635f3d52458"),
                             ActionName = "GetDelivery",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -740,7 +751,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("1e113fe8-0b69-4be3-b783-082a291c1587"),
+                            Id = new Guid("86a55b61-7416-4721-b33d-295bb7e7526b"),
                             ActionName = "GetDeliveries",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -749,7 +760,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e5123e76-631b-4ea1-b6df-88002b8d5d59"),
+                            Id = new Guid("8047493a-b861-4c3f-bee5-f907a079188c"),
                             ActionName = "Add",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -758,7 +769,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("3b14fb3b-e21e-4b40-b2ce-42e4fba44d98"),
+                            Id = new Guid("b06c59a6-df21-4436-b24f-74c3a853a0fe"),
                             ActionName = "Edit",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -767,7 +778,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e5dda1f8-e431-4a86-879d-0abe4dfdcdc7"),
+                            Id = new Guid("e59c8365-9e3b-4142-b2b9-4591055d3c1b"),
                             ActionName = "Delete",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -776,7 +787,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("39e90d41-da2c-44e1-b8d7-ab59a8cbc66f"),
+                            Id = new Guid("22be0299-3e6a-4196-92b5-227f3d472119"),
                             ActionName = "Restore",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -785,7 +796,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("968d31bd-2d50-442d-be71-6dfc924af994"),
+                            Id = new Guid("3c11e187-437b-45bf-8caa-0e37285c3b6f"),
                             ActionName = "AllDeleted",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -794,7 +805,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0b49a008-c018-4acd-90b3-a08cfbf393c4"),
+                            Id = new Guid("8cb5cd6e-1240-470a-a299-033a69667431"),
                             ActionName = "GetHistory",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -803,7 +814,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d2e32e26-95cb-4f52-88ad-3ba92255e824"),
+                            Id = new Guid("fad5cdae-95b4-412b-9fa0-8484794f4e70"),
                             ActionName = "Approve",
                             ControllerName = "Delivery",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -812,7 +823,16 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("70bf9c60-a7cf-4d57-b1e7-b192fdaa55eb"),
+                            Id = new Guid("a5bc4dfd-85fe-4730-8c94-3b593ebef8c0"),
+                            ActionName = "GenerateBarcodePdf",
+                            ControllerName = "Delivery",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedByUserId = "",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = new Guid("bdcc7f49-78a6-40a4-9b02-85c1a1c11c8f"),
                             ActionName = "All",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -821,7 +841,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9e0e86ee-ff0c-49a7-881f-3cd72138218d"),
+                            Id = new Guid("fb9fc971-14b1-443a-8a58-032134675c7e"),
                             ActionName = "AllWithDeleted",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -830,7 +850,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("1bdbf393-1308-4054-9eaf-7cd7b65ada86"),
+                            Id = new Guid("e2032701-057a-416d-9b26-cb31cb423c20"),
                             ActionName = "GetById",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -839,7 +859,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fbda2c57-bf40-4a37-9123-d3eb94a8e5b7"),
+                            Id = new Guid("ccb74a66-1eb7-48a0-9e97-27332ea1337b"),
                             ActionName = "Add",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -848,7 +868,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("18252657-f04e-497f-b1e9-b3f945f563e3"),
+                            Id = new Guid("b15f05f3-7b03-4557-b015-fe2a33c45891"),
                             ActionName = "Edit",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -857,7 +877,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c46882bc-99f9-4d72-95c6-ab30f6eac857"),
+                            Id = new Guid("158804f9-c382-490e-9e44-46e275561519"),
                             ActionName = "Delete",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -866,7 +886,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("7a69c406-a2cd-4604-a7a3-6b2df08da3e7"),
+                            Id = new Guid("bcc23b4c-7859-4a9b-9b8c-ee6b011e2d23"),
                             ActionName = "Restore",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -875,7 +895,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("7598dda9-ab15-43c7-a215-a667ca4b4b1d"),
+                            Id = new Guid("2e5a213f-ab9c-4ee0-a636-c45b3bc99fef"),
                             ActionName = "StartProcessing",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -884,7 +904,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8a5c65a5-10dd-4b9a-969b-a286d4b0cd5e"),
+                            Id = new Guid("7761c8ca-65d5-4820-8e9c-c05e68a33395"),
                             ActionName = "FinishProcessing",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -893,7 +913,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5961248b-38b2-48ec-afde-468d15136b43"),
+                            Id = new Guid("56530054-5033-4b2f-8be5-d0f8882f4c5b"),
                             ActionName = "NoDifferences",
                             ControllerName = "Difference",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -902,7 +922,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("a37336f4-01f0-4bc3-b669-c04e258c998d"),
+                            Id = new Guid("7ae10f2b-683b-40a7-a6df-4648e5bce1cd"),
                             ActionName = "All",
                             ControllerName = "DifferenceType",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -911,7 +931,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("87d0104e-0cad-4d9e-a83b-c7180ea25a3c"),
+                            Id = new Guid("10b56ab4-9436-4e38-9e9f-bd63f6461a81"),
                             ActionName = "AllWithDeleted",
                             ControllerName = "DifferenceType",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -920,7 +940,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e4a9ffd6-82b3-4884-8fdf-8b1b42b3157e"),
+                            Id = new Guid("3f9f0f89-712d-41ab-ba21-85bc80e1b1f5"),
                             ActionName = "GetById",
                             ControllerName = "DifferenceType",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -929,7 +949,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("36935ca8-e05c-4c95-868a-a7a54b1f6c0f"),
+                            Id = new Guid("ec7c4587-b945-4e74-a29f-26ccc0a946c4"),
                             ActionName = "Add",
                             ControllerName = "DifferenceType",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -938,7 +958,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("88d91cf3-8cab-4ac8-b3cb-6a8071df7985"),
+                            Id = new Guid("68df5521-10cf-496a-b344-b874eba79682"),
                             ActionName = "Edit",
                             ControllerName = "DifferenceType",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -947,7 +967,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9398c93a-7614-4209-8f66-0b9294e77f04"),
+                            Id = new Guid("ff055215-7454-437a-b593-96471525b1ae"),
                             ActionName = "Delete",
                             ControllerName = "DifferenceType",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -956,7 +976,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("cd17679c-2479-4f62-bc4c-45d3985e7ce9"),
+                            Id = new Guid("08f39727-5aa6-4ec3-8836-9bae540b095a"),
                             ActionName = "Restore",
                             ControllerName = "DifferenceType",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -965,7 +985,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("7fa1ac80-b4af-4be2-966e-00dec1b366d6"),
+                            Id = new Guid("e38ab8e9-e548-46ab-be74-76e111f788df"),
                             ActionName = "All",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -974,7 +994,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("59f6c50d-bf95-4f6c-ad03-183a3c456be2"),
+                            Id = new Guid("c2d99ac1-39f5-43f0-b3c2-ddfb1c5827e5"),
                             ActionName = "GetById",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -983,7 +1003,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("f7771647-818d-4483-ad20-c08809835034"),
+                            Id = new Guid("00e3f5f5-97d0-493c-90a3-3a7cf8adf9bd"),
                             ActionName = "AllWithDeleted",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -992,7 +1012,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("58e984cd-6941-4a78-a5e5-dae400e48b7c"),
+                            Id = new Guid("9617f591-839e-4ce1-a4cb-6b5bab1c3061"),
                             ActionName = "Add",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1001,7 +1021,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("f38fe8bc-f73f-442e-8283-bb79d6aa94f7"),
+                            Id = new Guid("62f6c21e-ebb5-4048-973b-8da69cd05a4f"),
                             ActionName = "Edit",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1010,7 +1030,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c1ad7c4a-faf1-4baa-94fe-ea1de779d758"),
+                            Id = new Guid("9181982e-e34b-409d-8a01-c8de1716a37f"),
                             ActionName = "Delete",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1019,7 +1039,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0ee63829-f237-4204-a7af-c425e6b18b72"),
+                            Id = new Guid("06b4a9c3-52bb-45d5-ba00-503878310c98"),
                             ActionName = "Restore",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1028,7 +1048,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("db0be472-ae5d-441c-8363-d6d9afb382f4"),
+                            Id = new Guid("5cc63b02-72c9-42bf-8525-2a6d21174e1d"),
                             ActionName = "StartProcessing",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1037,7 +1057,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("645b7d2f-20af-41b2-98d4-708ba7d08a66"),
+                            Id = new Guid("ffc7afa0-53ff-4eff-ac9e-7c628242cade"),
                             ActionName = "FinishProcessing",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1046,7 +1066,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("aab5ca97-0de2-4cb7-86b3-0c5c32b91731"),
+                            Id = new Guid("1668837b-2dec-4964-94d9-9daa6456e8a8"),
                             ActionName = "Move",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1055,7 +1075,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fd52508a-25e5-4174-91d1-1535ca7d3549"),
+                            Id = new Guid("85bbbd64-49e8-4274-977d-3f7d11887672"),
                             ActionName = "Split",
                             ControllerName = "Entry",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1064,7 +1084,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fa661482-15a4-4e3d-858e-5db9811f4ed9"),
+                            Id = new Guid("ee305deb-4f71-434c-a0e4-300acbe2faea"),
                             ActionName = "GetMarker",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1073,7 +1093,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("39f63c45-a19e-4051-9cfe-c20d48c0a8f2"),
+                            Id = new Guid("3b1545a4-6fcc-4fd6-ba9e-0e34f94578af"),
                             ActionName = "GetAll",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1082,7 +1102,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("72a09570-26ba-4ade-96c7-e163a395f7f7"),
+                            Id = new Guid("74923801-25bc-4401-b4a7-d3cf1794eb61"),
                             ActionName = "GetAll",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1091,7 +1111,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("37b76e9b-4735-43ce-a476-995032cb7358"),
+                            Id = new Guid("459fdfc6-ee7a-4743-9313-1053ddc5336b"),
                             ActionName = "Add",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1100,7 +1120,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("87db784e-83a5-4ef8-aad9-602aabff4438"),
+                            Id = new Guid("e3944cab-e13e-4a02-bc10-a0440898837e"),
                             ActionName = "Edit",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1109,7 +1129,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("b5284213-d20a-43cc-804c-6bcc4999b8e4"),
+                            Id = new Guid("b6d91cec-79a5-40b1-97e8-cb2921c1c620"),
                             ActionName = "Delete",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1118,7 +1138,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("3f684d24-8b41-428d-9d16-f214390b5459"),
+                            Id = new Guid("8bd90da1-b9f2-4263-b93e-a887a13dd7f8"),
                             ActionName = "Restore",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1127,7 +1147,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("3166906a-e173-4278-9175-b2ef028c2a55"),
+                            Id = new Guid("f6da031b-6ee2-4551-b893-425035b7bb6b"),
                             ActionName = "GetDeletedMarkers",
                             ControllerName = "Marker",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1136,7 +1156,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e1c62105-4f16-4746-94fb-0f1b599ae760"),
+                            Id = new Guid("0876e417-f6be-4018-87b0-5263a9c02fa8"),
                             ActionName = "AddUserToRole",
                             ControllerName = "Role",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1145,7 +1165,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("237aa22e-8455-44e9-a7ea-8330c1e4c0f3"),
+                            Id = new Guid("e84ca46e-2aa9-4c8f-b683-184a55ee3845"),
                             ActionName = "Create",
                             ControllerName = "Role",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1154,7 +1174,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("4e3155e9-cb1b-4056-ac5f-a06eea066b5d"),
+                            Id = new Guid("5982d2d0-a13c-4677-bf57-3101f207fda9"),
                             ActionName = "Edit",
                             ControllerName = "Role",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1163,7 +1183,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e0e9774b-1244-4df7-aa45-3428ad2e58e1"),
+                            Id = new Guid("d3f64546-13d1-4d50-9f5f-f78941dd9364"),
                             ActionName = "Delete",
                             ControllerName = "Role",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1172,7 +1192,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5a77c1f2-3b8e-475d-b093-fb5aa0883e9f"),
+                            Id = new Guid("264e6a14-e7e2-4f9e-8e3d-017c84e1d9bb"),
                             ActionName = "GetAll",
                             ControllerName = "Role",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1181,8 +1201,8 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("b3ec2088-0826-47b9-9ec8-206feb8a9ee2"),
-                            ActionName = "GetByName",
+                            Id = new Guid("9e34ab9f-cfee-42d8-bd66-1e45210511f9"),
+                            ActionName = "GetById",
                             ControllerName = "Role",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CreatedByUserId = "",
@@ -1190,7 +1210,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fd296bbf-ac43-406c-b5d8-414535b2d686"),
+                            Id = new Guid("b62d9453-f28e-4553-a886-20a5a1271057"),
                             ActionName = "GetAll",
                             ControllerName = "RoutePermission",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1199,7 +1219,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("6946b8c2-4b9f-4785-bb1d-cae7fe149849"),
+                            Id = new Guid("1253074d-fd4d-4534-8c9b-06049c006a72"),
                             ActionName = "GetAllWithDeleted",
                             ControllerName = "RoutePermission",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1208,7 +1228,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("45f63579-0d4e-4113-aaaf-b3434deaea7a"),
+                            Id = new Guid("81b08fc1-d0a4-419e-9ea1-945bb8f61cde"),
                             ActionName = "GetById",
                             ControllerName = "RoutePermission",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1217,7 +1237,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("84938c3e-3020-400c-90ec-884d9d5c8c14"),
+                            Id = new Guid("74ccaec5-4f74-4b06-a104-822bd17aa111"),
                             ActionName = "Delete",
                             ControllerName = "RoutePermission",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1226,7 +1246,25 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("01d3db6f-14a5-452c-acd3-70d3769461fd"),
+                            Id = new Guid("d103d32a-ecae-4749-8e62-ffc80eeb67af"),
+                            ActionName = "GetAll",
+                            ControllerName = "User",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedByUserId = "",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = new Guid("b94b6d16-96da-46c4-b11e-3705780f1e36"),
+                            ActionName = "GetUserInfo",
+                            ControllerName = "User",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedByUserId = "",
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            Id = new Guid("8ddfa6d2-ee80-4e06-9c73-4ac03fa47b3d"),
                             ActionName = "GetVendor",
                             ControllerName = "Vendor",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1235,7 +1273,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8fe3e40a-8d76-460c-8e4f-93fedbc00d0f"),
+                            Id = new Guid("a685edd2-7710-4337-bac8-1e2ef3fb9e4a"),
                             ActionName = "All",
                             ControllerName = "Vendor",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1244,7 +1282,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("cdb4e120-65dd-466f-9400-3235ad59944e"),
+                            Id = new Guid("50fe8d2c-629c-4dcd-815f-99fd06065f69"),
                             ActionName = "Add",
                             ControllerName = "Vendor",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1253,7 +1291,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5255ef9a-8d43-41bf-9c37-96331fa953d9"),
+                            Id = new Guid("054a66a8-8fca-4b94-86cb-e5559fa7b027"),
                             ActionName = "Edit",
                             ControllerName = "Vendor",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1262,7 +1300,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("1971375a-6333-4395-be4e-ecbaea15bdc0"),
+                            Id = new Guid("e0548499-1dc7-400f-91e3-0e2ebe5eb15c"),
                             ActionName = "Delete",
                             ControllerName = "Vendor",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1271,7 +1309,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d30b81f8-328e-450a-b987-27e04e7f8048"),
+                            Id = new Guid("196a7170-8fc0-446c-a1fc-cc8da1f70f98"),
                             ActionName = "Restore",
                             ControllerName = "Vendor",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1280,7 +1318,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("21e9ad37-7460-4e86-826e-d1e991ded705"),
+                            Id = new Guid("212492ec-8b5f-4d6c-858d-fd9f819e83f4"),
                             ActionName = "AllDeleted",
                             ControllerName = "Vendor",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1289,7 +1327,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2b10ec34-80e8-4768-8c62-aaa3209763a2"),
+                            Id = new Guid("1226cde4-8c42-46b4-9880-297a0b5a8fc3"),
                             ActionName = "GetById",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1298,7 +1336,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0ef49517-dbcf-41ce-a2ac-2907faf0776f"),
+                            Id = new Guid("57960fd5-e0e4-4105-9080-58392715a056"),
                             ActionName = "GetAll",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1307,7 +1345,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ca750589-fdf1-4d86-b6f9-bdda25037d81"),
+                            Id = new Guid("410b385e-e757-4a0f-b078-acf5b2c0fd0b"),
                             ActionName = "GetAll",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1316,7 +1354,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8faae285-742a-4e87-8dad-9b0161149b4d"),
+                            Id = new Guid("67d22a57-4edd-4b98-bad0-613742c13192"),
                             ActionName = "Add",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1325,7 +1363,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("bf6e06b6-ad42-4071-90bb-02d216767d89"),
+                            Id = new Guid("ab8f1e49-4d2c-45ff-9ee4-f78d40cf0fb0"),
                             ActionName = "Edit",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1334,7 +1372,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("7f757a2f-23bf-493a-aaf0-a4daad2d2f9c"),
+                            Id = new Guid("2caf782c-01c9-4296-be66-824eefbdcaf4"),
                             ActionName = "Delete",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1343,7 +1381,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ae1aeba5-cb4f-4fdc-9ffd-51fbe117b6ad"),
+                            Id = new Guid("ab7a2262-723e-4ca9-bff2-ad330cf67ca1"),
                             ActionName = "Restore",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1352,7 +1390,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("99f9eddf-fdf3-458e-aaee-865c520eaa06"),
+                            Id = new Guid("12e14bd1-fe0a-4ca5-9b31-1aa3d1da5aab"),
                             ActionName = "AllWithDeleted",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1361,7 +1399,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e852de35-9c19-4fee-ac0d-1a481faaf5e5"),
+                            Id = new Guid("ce296956-feba-43d8-b8e0-0aca5285e174"),
                             ActionName = "AllWithDeleted",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1370,7 +1408,7 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2f125a94-e01f-4095-b8ce-e2a5ca5d2c35"),
+                            Id = new Guid("68812d08-339e-45e4-a7ad-973bb91f2db3"),
                             ActionName = "Entries",
                             ControllerName = "Zone",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1569,6 +1607,16 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("WarehouseManagement.Infrastructure.Data.Models.ApplicationUser", "Creator")
+                        .WithMany("SubUsers")
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Creator");
+                });
+
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Delivery", b =>
                 {
                     b.HasOne("WarehouseManagement.Infrastructure.Data.Models.Vendor", "Vendor")
@@ -1740,6 +1788,8 @@ namespace WarehouseManagement.Infrastructure.Migrations
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("SubUsers");
                 });
 
             modelBuilder.Entity("WarehouseManagement.Infrastructure.Data.Models.Delivery", b =>
