@@ -10,6 +10,7 @@ using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using WarehouseManagement.Common.Utilities;
+using WarehouseManagement.Core.Factories;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
@@ -329,47 +330,38 @@ public class DeliveryService : IDeliveryService
                 || delivery.Differences.Any(d => d.Id == int.Parse(change.EntityId))
             )
             .ToList();
+        
+        DeliveryChangeFactory deliveryChangeFactory = new();
 
         var deliveryHistory = new DeliveryHistoryDto
         {
             Id = delivery.Id,
             Changes = changes
-                .Where(c => 
-                    c.PropertyName is "Status" or "ZoneId" or "StartedProcessing" or "FinishedProcessing" or "AdminComment")
                 .Select(change =>
                 {
-                    var logType = GetHistoryLogType(change.PropertyName, change.EntityName);
-                    var changeType = GetHistoryChangeType(change.EntityName);
+                    var deliveryChange = deliveryChangeFactory.CreateDeliveryChangeDto(
+                        int.Parse(change.EntityId),
+                        change.PropertyName,
+                        change.EntityName,
+                        change.NewValue,
+                        change.OldValue,
+                        change.ChangedAt
+                    );
+
+                    if (deliveryChange.LogType != LogType.ZoneChange) return deliveryChange;
                     
-                    if (logType == LogType.ZoneChange)
-                    {
-                        change.OldValue = int.TryParse(change.OldValue, out _)
-                            ? repository
-                                .AllReadOnly<Zone>()
-                                .Where(z => z.Id == int.Parse(change.OldValue))
-                                .Select(z => z.Name)
-                                .FirstOrDefault()
-                            : null;
-                        
-                        change.NewValue = int.TryParse(change.NewValue, out _)
-                            ? repository
-                                .AllReadOnly<Zone>()
-                                .Where(z => z.Id == int.Parse(change.NewValue))
-                                .Select(z => z.Name)
-                                .FirstOrDefault()
-                            : null;
-                    }
-                    
-                    return new DeliveryChangeDto
-                    {
-                        EntityId = int.Parse(change.EntityId),
-                        PropertyName = change.PropertyName,
-                        From = change.OldValue!,
-                        To = change.NewValue!,
-                        Type = changeType,
-                        LogType = logType,
-                        ChangeDate = change.ChangedAt
-                    };
+                    // Use a method?
+                    deliveryChange.From = repository
+                        .AllReadOnly<Zone>()
+                        .FirstOrDefault(z => z.Id == int.Parse(change.OldValue!))
+                        ?.Name ?? string.Empty;
+
+                    deliveryChange.To = repository
+                        .AllReadOnly<Zone>()
+                        .FirstOrDefault(z => z.Id == int.Parse(change.NewValue!))
+                        ?.Name ?? string.Empty;
+
+                    return deliveryChange;
                 })
                 .Where(c => c.LogType != LogType.Empty)
                 .OrderByDescending(c => c.ChangeDate)
@@ -379,36 +371,6 @@ public class DeliveryService : IDeliveryService
         return deliveryHistory;
     }
     
-    private static LogType GetHistoryLogType(string propertyName, string entityName)
-    {
-        return propertyName switch
-        {
-            "StartedProcessing" => entityName == "Delivery" ? LogType.Empty : LogType.EntryStatusChange,
-            "FinishedProcessing" => entityName == "Delivery" ? LogType.Empty : LogType.EntryStatusChange,
-            "Status" => entityName switch
-            {
-                "Delivery" => LogType.DeliveryStatusChange,
-                "Entry" => LogType.EntryStatusChange,
-                "Difference" => LogType.DifferenceStatusChange,
-                _ => LogType.Empty
-            },
-            "ZoneId" => LogType.ZoneChange,
-            "AdminComment" => LogType.DifferenceAdminComment,
-            _ => LogType.Empty
-        };
-    }
-    
-    private static DeliveryHistoryChangeType GetHistoryChangeType(string entityName)
-    {
-        return entityName switch
-        {
-            "Delivery" => DeliveryHistoryChangeType.Delivery,
-            "Entry" => DeliveryHistoryChangeType.Entry,
-            "Difference" => DeliveryHistoryChangeType.Difference,
-            _ => throw new InvalidOperationException("Invalid entity name.")
-        };
-    }
-
     public async Task ChangeDeliveryStatusIfNeeded(int id)
     {
         var delivery = await RetrieveByIdAsync(id);

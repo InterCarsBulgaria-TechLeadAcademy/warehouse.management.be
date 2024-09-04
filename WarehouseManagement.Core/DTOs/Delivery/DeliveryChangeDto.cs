@@ -16,5 +16,5 @@ public class DeliveryChangeDto
 
     public LogType LogType { get; set; }
 
-    public DateTime ChangeDate { get; set; }
+    public string ChangeDate { get; set; } = string.Empty;
 }
