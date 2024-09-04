@@ -65,8 +65,7 @@ public class DifferenceController : ControllerBase
 
         await differenceService.CreateAsync(model, User.Id());
 
-        var deliveryId = await differenceService.GetDeliveryIdAsync(id);
-        await deliveryService.ChangeDeliveryStatusIfNeeded(deliveryId);
+        //TODO maybe update the difference of the delivery here?
 
         return Ok(DifferenceAddedSuccessfully);
     }
