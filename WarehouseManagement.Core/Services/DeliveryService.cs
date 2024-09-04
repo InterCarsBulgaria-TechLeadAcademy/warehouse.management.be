@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Common.Enums;
 using WarehouseManagement.Common.Statuses;
+using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
@@ -9,7 +10,6 @@ using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
-using WarehouseManagement.Common.Utilities;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
@@ -51,8 +51,12 @@ public class DeliveryService : IDeliveryService
                         Packages = e.Packages,
                         Pallets = e.Pallets,
                         Pieces = e.Pieces,
-                        FinishedProccessing = e.FinishedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value) : null,
-                        StartedProccessing = e.StartedProcessing.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value) : null,
+                        FinishedProccessing = e.FinishedProcessing.HasValue
+                            ? UtcNowDateTimeStringFormatted.GetUtcNow(e.FinishedProcessing.Value)
+                            : null,
+                        StartedProccessing = e.StartedProcessing.HasValue
+                            ? UtcNowDateTimeStringFormatted.GetUtcNow(e.StartedProcessing.Value)
+                            : null,
                         ZoneName = e.Zone.Name,
                     })
                     .ToList(),
@@ -64,12 +68,8 @@ public class DeliveryService : IDeliveryService
                         MarkerName = dm.Marker.Name
                     })
                     .ToList(),
-                EntriesFinishedProcessing = d
-                    .Entries
-                    .Count(e => e.FinishedProcessing.HasValue),
-                EntriesWaitingProcessing = d
-                    .Entries
-                    .Count(e => !e.FinishedProcessing.HasValue)
+                EntriesFinishedProcessing = d.Entries.Count(e => e.FinishedProcessing.HasValue),
+                EntriesWaitingProcessing = d.Entries.Count(e => !e.FinishedProcessing.HasValue)
             })
             .FirstOrDefaultAsync();
 
@@ -100,7 +100,9 @@ public class DeliveryService : IDeliveryService
                 VendorName = d.Vendor.Name,
                 Status = d.Status.ToString(),
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
-                ApprovedOn = d.ApprovedOn.HasValue ? UtcNowDateTimeStringFormatted.GetUtcNow(d.ApprovedOn.Value) : null,
+                ApprovedOn = d.ApprovedOn.HasValue
+                    ? UtcNowDateTimeStringFormatted.GetUtcNow(d.ApprovedOn.Value)
+                    : null,
                 Markers = d
                     .DeliveriesMarkers.Select(dm => new DeliveryMarkerDto()
                     {
@@ -110,12 +112,8 @@ public class DeliveryService : IDeliveryService
                     .ToList(),
                 EntriesFinishedProcessingDetails = GetEntriesProcessingDetails(d.Entries, true),
                 EntriesWaitingProcessingDetails = GetEntriesProcessingDetails(d.Entries, false),
-                EntriesFinishedProcessing = d
-                    .Entries
-                    .Count(e => e.FinishedProcessing.HasValue),
-                EntriesWaitingProcessing = d
-                    .Entries
-                    .Count(e => !e.FinishedProcessing.HasValue)
+                EntriesFinishedProcessing = d.Entries.Count(e => e.FinishedProcessing.HasValue),
+                EntriesWaitingProcessing = d.Entries.Count(e => !e.FinishedProcessing.HasValue)
             })
             .ToListAsync();
 
@@ -130,20 +128,20 @@ public class DeliveryService : IDeliveryService
         };
     }
 
-    private static EntriesProcessingDetails GetEntriesProcessingDetails(ICollection<Entry> entries, bool isFinished)
+    private static EntriesProcessingDetails GetEntriesProcessingDetails(
+        ICollection<Entry> entries,
+        bool isFinished
+    )
     {
         var entriesToProcess = entries
             .Where(e => isFinished ? e.FinishedProcessing.HasValue : e.FinishedProcessing == null)
             .ToList();
-        
+
         return new EntriesProcessingDetails()
         {
-            Pallets = entriesToProcess
-                .Sum(e => e.Pallets),
-            Packages = entriesToProcess
-                .Sum(e => e.Packages),
-            Pieces = entriesToProcess
-                .Sum(e => e.Pieces)
+            Pallets = entriesToProcess.Sum(e => e.Pallets),
+            Packages = entriesToProcess.Sum(e => e.Packages),
+            Pieces = entriesToProcess.Sum(e => e.Pieces)
         };
     }
 
@@ -298,7 +296,7 @@ public class DeliveryService : IDeliveryService
         }
 
         var entriesAreFinished = AreAllEntriesFinished(deliveryToApprove.Entries);
-        
+
         if (entriesAreFinished == false)
         {
             throw new ArgumentException(DeliveryHasNotFinishedEntries);
@@ -388,6 +386,7 @@ public class DeliveryService : IDeliveryService
         var delivery = await repository
             .All<Delivery>()
             .Include(d => d.Entries)
+            .Include(d => d.Differences)
             .FirstOrDefaultAsync(d => d.Id == id);
 
         if (delivery == null)
@@ -400,15 +399,23 @@ public class DeliveryService : IDeliveryService
 
     private DeliveryStatus GetExpectedStatus(Delivery delivery)
     {
-        if (AreAllEntriesWaiting(delivery.Entries))
+        if (
+            AreAllEntriesWaiting(delivery.Entries) && AreAllDifferencesWaiting(delivery.Differences)
+        )
         {
             return DeliveryStatus.Waiting;
         }
-        else if (IsProcessingInProgress(delivery.Entries))
+        else if (
+            IsProcessingInProgress(delivery.Entries)
+            && IsDifferenceProcessingInProgress(delivery.Differences)
+        )
         {
             return DeliveryStatus.Processing;
         }
-        else if (AreAllEntriesFinished(delivery.Entries))
+        else if (
+            AreAllEntriesFinished(delivery.Entries)
+            && AreAllDifferencesFinished(delivery.Differences)
+        )
         {
             return DeliveryStatus.Finished;
         }
@@ -431,12 +438,29 @@ public class DeliveryService : IDeliveryService
 
     private bool AreAllEntriesFinished(ICollection<Entry> entries)
     {
-        if(entries.Count == 0)
+        if (entries.Count == 0)
         {
             return false;
         }
-        
+
         return entries.All(e => e.FinishedProcessing != null);
+    }
+
+    private bool AreAllDifferencesWaiting(ICollection<Difference> differences)
+    {
+        return differences.All(d => d.Status == DifferenceStatus.Waiting);
+    }
+
+    private bool IsDifferenceProcessingInProgress(ICollection<Difference> differences)
+    {
+        return differences.Any(d => d.Status == DifferenceStatus.Processing);
+    }
+
+    private bool AreAllDifferencesFinished(ICollection<Difference> differences)
+    {
+        return differences.All(d =>
+            d.Status == DifferenceStatus.Finished || d.Status == DifferenceStatus.NoDifferences
+        );
     }
 
     private async Task SetDatesForDeliveryAsync(Delivery delivery, DeliveryStatus status)
