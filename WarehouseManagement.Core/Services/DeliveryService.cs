@@ -299,9 +299,9 @@ public class DeliveryService : IDeliveryService
 
         var entriesAreFinished = AreAllEntriesFinished(deliveryToApprove.Entries);
         
-        if (entriesAreFinished == false)
+        if (!entriesAreFinished)
         {
-            throw new ArgumentException(DeliveryHasNotFinishedEntries);
+            throw new InvalidOperationException(DeliveryHasNotFinishedEntries);
         }
 
         if (deliveryToApprove.IsApproved == true)
