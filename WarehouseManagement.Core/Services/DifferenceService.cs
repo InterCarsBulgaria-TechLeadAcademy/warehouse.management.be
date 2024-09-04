@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Common.Utilities;
 using WarehouseManagement.Core.Contracts;
@@ -60,7 +60,7 @@ public class DifferenceService : IDifferenceService
         }
 
         var difference = await repository.GetByIdAsync<Difference>(id);
-        
+
         difference!.ReceptionNumber = model.ReceptionNumber;
         difference.InternalNumber = model.InternalNumber;
         difference.ActiveNumber = model.ActiveNumber;
@@ -104,7 +104,8 @@ public class DifferenceService : IDifferenceService
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 Zone = d.Zone.Name,
                 DeliverySystemNumber = d.Delivery.SystemNumber
-            }).ToListAsync();
+            })
+            .ToListAsync();
 
         var totalItems = repository.AllReadOnly<Difference>().Count();
 
@@ -117,7 +118,9 @@ public class DifferenceService : IDifferenceService
         };
     }
 
-    public async Task<PageDto<DifferenceDto>> GetAllWithDeletedAsync(PaginationParameters paginationParams)
+    public async Task<PageDto<DifferenceDto>> GetAllWithDeletedAsync(
+        PaginationParameters paginationParams
+    )
     {
         Expression<Func<Difference, bool>> filter = v =>
             EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
@@ -141,7 +144,8 @@ public class DifferenceService : IDifferenceService
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
                 Zone = d.Zone.Name,
                 DeliverySystemNumber = d.Delivery.SystemNumber
-            }).ToListAsync();
+            })
+            .ToListAsync();
 
         var totalItems = repository.AllReadOnly<Difference>().Count();
 
@@ -260,5 +264,17 @@ public class DifferenceService : IDifferenceService
         difference.AdminComment = adminCommentDto.AdminComment;
 
         await repository.SaveChangesWithLogAsync();
+    }
+
+    public async Task<int> GetDeliveryIdAsync(int id)
+    {
+        var difference = await repository.GetByIdAsync<Difference>(id);
+
+        if (difference == null)
+        {
+            throw new KeyNotFoundException(DifferenceWithIdNotFound);
+        }
+
+        return difference.DeliveryId;
     }
 }

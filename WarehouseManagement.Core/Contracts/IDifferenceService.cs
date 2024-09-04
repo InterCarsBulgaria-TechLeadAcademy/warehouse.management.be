@@ -26,4 +26,5 @@ public interface IDifferenceService
     Task FinishProcessing(int id, DifferenceAdminCommentDto adminCommentDto);
 
     Task NoDifferences(int id, DifferenceAdminCommentDto adminCommentDto);
+    Task<int> GetDeliveryIdAsync(int id);
 }

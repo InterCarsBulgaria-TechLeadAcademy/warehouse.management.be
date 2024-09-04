@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Difference;
@@ -12,10 +12,15 @@ namespace WarehouseManagement.Api.Controllers;
 public class DifferenceController : ControllerBase
 {
     private readonly IDifferenceService differenceService;
+    private readonly IDeliveryService deliveryService;
 
-    public DifferenceController(IDifferenceService differenceService)
+    public DifferenceController(
+        IDifferenceService differenceService,
+        IDeliveryService deliveryService
+    )
     {
         this.differenceService = differenceService;
+        this.deliveryService = deliveryService;
     }
 
     [HttpGet("all")]
@@ -29,7 +34,9 @@ public class DifferenceController : ControllerBase
 
     [HttpGet("all-with-deleted")]
     [ProducesResponseType(200, Type = typeof(PageDto<DifferenceDto>))]
-    public async Task<IActionResult> AllWithDeleted([FromQuery] PaginationParameters paginationParams)
+    public async Task<IActionResult> AllWithDeleted(
+        [FromQuery] PaginationParameters paginationParams
+    )
     {
         var pageDto = await differenceService.GetAllWithDeletedAsync(paginationParams);
 
@@ -58,6 +65,8 @@ public class DifferenceController : ControllerBase
 
         await differenceService.CreateAsync(model, User.Id());
 
+        //TODO maybe update the difference of the delivery here?
+
         return Ok(DifferenceAddedSuccessfully);
     }
 
@@ -82,6 +91,9 @@ public class DifferenceController : ControllerBase
     {
         await differenceService.DeleteAsync(id);
 
+        var deliveryId = await differenceService.GetDeliveryIdAsync(id);
+        await deliveryService.ChangeDeliveryStatusIfNeeded(deliveryId);
+
         return Ok(DifferenceDeletedSuccessfully);
     }
 
@@ -92,6 +104,9 @@ public class DifferenceController : ControllerBase
     public async Task<IActionResult> Restore(int id)
     {
         await differenceService.RestoreAsync(id);
+
+        var deliveryId = await differenceService.GetDeliveryIdAsync(id);
+        await deliveryService.ChangeDeliveryStatusIfNeeded(deliveryId);
 
         return Ok(DifferenceRestored);
     }
@@ -104,6 +119,9 @@ public class DifferenceController : ControllerBase
     {
         await differenceService.StartProcessing(id);
 
+        var deliveryId = await differenceService.GetDeliveryIdAsync(id);
+        await deliveryService.ChangeDeliveryStatusIfNeeded(deliveryId);
+
         return Ok(DifferenceSuccessfullyStartedProcessing);
     }
 
@@ -111,9 +129,15 @@ public class DifferenceController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> FinishProcessing(int id, [FromBody] DifferenceAdminCommentDto adminCommentDto)
+    public async Task<IActionResult> FinishProcessing(
+        int id,
+        [FromBody] DifferenceAdminCommentDto adminCommentDto
+    )
     {
         await differenceService.FinishProcessing(id, adminCommentDto);
+
+        var deliveryId = await differenceService.GetDeliveryIdAsync(id);
+        await deliveryService.ChangeDeliveryStatusIfNeeded(deliveryId);
 
         return Ok(DifferenceSuccessfullyFinishedProcessing);
     }
@@ -122,9 +146,15 @@ public class DifferenceController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> NoDifferences(int id, [FromBody] DifferenceAdminCommentDto adminCommentDto)
+    public async Task<IActionResult> NoDifferences(
+        int id,
+        [FromBody] DifferenceAdminCommentDto adminCommentDto
+    )
     {
         await differenceService.NoDifferences(id, adminCommentDto);
+
+        var deliveryId = await differenceService.GetDeliveryIdAsync(id);
+        await deliveryService.ChangeDeliveryStatusIfNeeded(deliveryId);
 
         return Ok(DifferenceSuccessfullySetToNoDifferences);
     }
