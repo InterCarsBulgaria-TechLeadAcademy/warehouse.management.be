@@ -6,7 +6,7 @@ using WarehouseManagement.Core.Contracts;
 
 namespace WarehouseManagement.Api.Middlewares
 {
-    public class CustomAuthorizeAttribute : AuthorizeAttribute, IAsyncAuthorizationFilter
+    public class SecureRouteAttribute : AuthorizeAttribute, IAsyncAuthorizationFilter
     {
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {

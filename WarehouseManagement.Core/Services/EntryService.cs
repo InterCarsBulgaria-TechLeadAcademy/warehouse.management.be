@@ -450,15 +450,13 @@ public class EntryService : IEntryService
                     e.StartedProcessing == null && e.FinishedProcessing == null
                 );
             }
-
-            if (statuses.Contains(EntryStatuses.Processing))
+            else if (statuses.Contains(EntryStatuses.Processing))
             {
                 query = query.Where(e =>
                     e.StartedProcessing != null && e.FinishedProcessing == null
                 );
             }
-
-            if (statuses.Contains(EntryStatuses.Finished))
+            else if (statuses.Contains(EntryStatuses.Finished))
             {
                 query = query.Where(e => e.FinishedProcessing != null);
             }
