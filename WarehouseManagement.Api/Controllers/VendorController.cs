@@ -14,11 +14,16 @@ namespace WarehouseManagement.Api.Controllers
     {
         private readonly IVendorService vendorService;
         private readonly IMarkerService markerService;
+        private readonly IZoneService zoneService;
 
-        public VendorController(IVendorService vendorService, IMarkerService markerService)
+        public VendorController(
+            IVendorService vendorService,
+            IMarkerService markerService,
+            IZoneService zoneService)
         {
             this.vendorService = vendorService;
             this.markerService = markerService;
+            this.zoneService = zoneService;
         }
 
         [HttpGet("{id}")]
@@ -46,6 +51,11 @@ namespace WarehouseManagement.Api.Controllers
         [ProducesResponseType(400)]
         public async Task<IActionResult> Add([FromBody] VendorFormDto model)
         {
+            if (model.DefaultZoneId != null && !await zoneService.ExistsByIdAsync(model.DefaultZoneId.Value))
+            {
+                return BadRequest($"{ZoneMessageKeys.ZoneWithIdNotFound} {model.DefaultZoneId.Value}");
+            }
+
             var newVendorId = await vendorService.AddAsync(model, User.Id());
 
             return Ok(newVendorId);
@@ -66,6 +76,11 @@ namespace WarehouseManagement.Api.Controllers
                 return BadRequest(
                     $"{MarkerMessageKeys.MarkerWithIdNotFound} {string.Join(",", nonExistingMarkes)}"
                 );
+            }
+
+            if (model.DefaultZoneId != null && !await zoneService.ExistsByIdAsync(model.DefaultZoneId.Value))
+            {
+                return BadRequest($"{ZoneMessageKeys.ZoneWithIdNotFound} {model.DefaultZoneId.Value}");
             }
 
             await vendorService.EditAsync(id, model, User.Id());

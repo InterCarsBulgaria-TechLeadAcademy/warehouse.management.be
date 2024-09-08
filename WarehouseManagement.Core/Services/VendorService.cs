@@ -39,6 +39,7 @@ namespace WarehouseManagement.Core.Services
                 Name = vendor.Name,
                 SystemNumber = vendor.SystemNumber,
                 CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(vendor.CreatedAt),
+                DefaultZoneId = vendor.DefaultZoneId,
                 Markers = vendor
                     .VendorsMarkers.Select(vm => new VendorMarkerDto()
                     {
@@ -64,6 +65,7 @@ namespace WarehouseManagement.Core.Services
                     Name = v.Name,
                     SystemNumber = v.SystemNumber,
                     CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(v.CreatedAt),
+                    DefaultZoneName = v.DefaultZone != null ? v.DefaultZone.Name : null,
                     Markers = v
                         .VendorsMarkers.Select(vm => vm.Marker.Name)
                         .ToList()
@@ -106,6 +108,7 @@ namespace WarehouseManagement.Core.Services
                 Name = model.Name,
                 SystemNumber = model.SystemNumber,
                 CreatedByUserId = userId,
+                DefaultZoneId = model.DefaultZoneId
             };
 
             await repository.AddAsync(vendor);
@@ -152,6 +155,7 @@ namespace WarehouseManagement.Core.Services
             vendor.SystemNumber = model.SystemNumber;
             vendor.LastModifiedAt = DateTime.UtcNow;
             vendor.LastModifiedByUserId = userId;
+            vendor.DefaultZoneId = model.DefaultZoneId;
 
             repository.DeleteRange(vendor.VendorsMarkers);
 

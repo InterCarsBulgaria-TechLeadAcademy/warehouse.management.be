@@ -13,6 +13,8 @@ namespace WarehouseManagement.Core.DTOs.Vendor
         [StringLength(100, MinimumLength = 1)]
         public string SystemNumber { get; set; } = string.Empty;
 
+        public int? DefaultZoneId { get; set; }
+
         public ICollection<int> MarkerIds { get; set; } = new List<int>();
     }
 }

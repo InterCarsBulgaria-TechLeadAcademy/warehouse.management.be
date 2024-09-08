@@ -140,27 +140,6 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Vendors",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    SystemNumber = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vendors", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Zones",
                 columns: table => new
                 {
@@ -334,6 +313,57 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Vendors",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    SystemNumber = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    DefaultZoneId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    LastModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedByUserId = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vendors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vendors_Zones_DefaultZoneId",
+                        column: x => x.DefaultZoneId,
+                        principalTable: "Zones",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ZonesMarkers",
+                columns: table => new
+                {
+                    ZoneId = table.Column<int>(type: "int", nullable: false),
+                    MarkerId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ZonesMarkers", x => new { x.ZoneId, x.MarkerId });
+                    table.ForeignKey(
+                        name: "FK_ZonesMarkers_Markers_MarkerId",
+                        column: x => x.MarkerId,
+                        principalTable: "Markers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ZonesMarkers_Zones_ZoneId",
+                        column: x => x.ZoneId,
+                        principalTable: "Zones",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Deliveries",
                 columns: table => new
                 {
@@ -414,30 +444,6 @@ namespace WarehouseManagement.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_VendorsZones_Zones_ZoneId",
-                        column: x => x.ZoneId,
-                        principalTable: "Zones",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ZonesMarkers",
-                columns: table => new
-                {
-                    ZoneId = table.Column<int>(type: "int", nullable: false),
-                    MarkerId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ZonesMarkers", x => new { x.ZoneId, x.MarkerId });
-                    table.ForeignKey(
-                        name: "FK_ZonesMarkers_Markers_MarkerId",
-                        column: x => x.MarkerId,
-                        principalTable: "Markers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ZonesMarkers_Zones_ZoneId",
                         column: x => x.ZoneId,
                         principalTable: "Zones",
                         principalColumn: "Id",
@@ -558,85 +564,86 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 columns: new[] { "Id", "ActionName", "ControllerName", "CreatedAt", "CreatedByUserId", "DeletedAt", "DeletedByUserId", "IsDeleted", "LastModifiedAt", "LastModifiedByUserId" },
                 values: new object[,]
                 {
-                    { new Guid("00e3f5f5-97d0-493c-90a3-3a7cf8adf9bd"), "AllWithDeleted", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("054a66a8-8fca-4b94-86cb-e5559fa7b027"), "Edit", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("06b4a9c3-52bb-45d5-ba00-503878310c98"), "Restore", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("0876e417-f6be-4018-87b0-5263a9c02fa8"), "AddUserToRole", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("08f39727-5aa6-4ec3-8836-9bae540b095a"), "Restore", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("10b56ab4-9436-4e38-9e9f-bd63f6461a81"), "AllWithDeleted", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("1226cde4-8c42-46b4-9880-297a0b5a8fc3"), "GetById", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("1253074d-fd4d-4534-8c9b-06049c006a72"), "GetAllWithDeleted", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("12e14bd1-fe0a-4ca5-9b31-1aa3d1da5aab"), "AllWithDeleted", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("158804f9-c382-490e-9e44-46e275561519"), "Delete", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("1668837b-2dec-4964-94d9-9daa6456e8a8"), "Move", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("196a7170-8fc0-446c-a1fc-cc8da1f70f98"), "Restore", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("212492ec-8b5f-4d6c-858d-fd9f819e83f4"), "AllDeleted", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("22be0299-3e6a-4196-92b5-227f3d472119"), "Restore", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("264e6a14-e7e2-4f9e-8e3d-017c84e1d9bb"), "GetAll", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("2caf782c-01c9-4296-be66-824eefbdcaf4"), "Delete", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("2e5a213f-ab9c-4ee0-a636-c45b3bc99fef"), "StartProcessing", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("3b1545a4-6fcc-4fd6-ba9e-0e34f94578af"), "GetAll", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("3c11e187-437b-45bf-8caa-0e37285c3b6f"), "AllDeleted", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("3f9f0f89-712d-41ab-ba21-85bc80e1b1f5"), "GetById", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("410b385e-e757-4a0f-b078-acf5b2c0fd0b"), "GetAll", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("459fdfc6-ee7a-4743-9313-1053ddc5336b"), "Add", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("50fe8d2c-629c-4dcd-815f-99fd06065f69"), "Add", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("56530054-5033-4b2f-8be5-d0f8882f4c5b"), "NoDifferences", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("57960fd5-e0e4-4105-9080-58392715a056"), "GetAll", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("5982d2d0-a13c-4677-bf57-3101f207fda9"), "Edit", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("5cc63b02-72c9-42bf-8525-2a6d21174e1d"), "StartProcessing", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("62f6c21e-ebb5-4048-973b-8da69cd05a4f"), "Edit", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("67d22a57-4edd-4b98-bad0-613742c13192"), "Add", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("68812d08-339e-45e4-a7ad-973bb91f2db3"), "Entries", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("68df5521-10cf-496a-b344-b874eba79682"), "Edit", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("73e9bd2f-c14c-4630-8fe6-f9a2f1bf260c"), "Refresh", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("74923801-25bc-4401-b4a7-d3cf1794eb61"), "GetAll", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("74ccaec5-4f74-4b06-a104-822bd17aa111"), "Delete", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("7761c8ca-65d5-4820-8e9c-c05e68a33395"), "FinishProcessing", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("7ae10f2b-683b-40a7-a6df-4648e5bce1cd"), "All", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("8047493a-b861-4c3f-bee5-f907a079188c"), "Add", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("814a8084-265a-4cfa-9ece-167b17b3b4f1"), "SignUp", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("81b08fc1-d0a4-419e-9ea1-945bb8f61cde"), "GetById", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("85bbbd64-49e8-4274-977d-3f7d11887672"), "Split", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("86a55b61-7416-4721-b33d-295bb7e7526b"), "GetDeliveries", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("8bd90da1-b9f2-4263-b93e-a887a13dd7f8"), "Restore", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("8cb5cd6e-1240-470a-a299-033a69667431"), "GetHistory", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("8ddfa6d2-ee80-4e06-9c73-4ac03fa47b3d"), "GetVendor", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("9181982e-e34b-409d-8a01-c8de1716a37f"), "Delete", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("9617f591-839e-4ce1-a4cb-6b5bab1c3061"), "Add", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("9e34ab9f-cfee-42d8-bd66-1e45210511f9"), "GetById", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("a5bc4dfd-85fe-4730-8c94-3b593ebef8c0"), "GenerateBarcodePdf", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("a685edd2-7710-4337-bac8-1e2ef3fb9e4a"), "All", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ab7a2262-723e-4ca9-bff2-ad330cf67ca1"), "Restore", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ab8f1e49-4d2c-45ff-9ee4-f78d40cf0fb0"), "Edit", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("b06c59a6-df21-4436-b24f-74c3a853a0fe"), "Edit", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("b15f05f3-7b03-4557-b015-fe2a33c45891"), "Edit", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("b62d9453-f28e-4553-a886-20a5a1271057"), "GetAll", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("b6d91cec-79a5-40b1-97e8-cb2921c1c620"), "Delete", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("b94b6d16-96da-46c4-b11e-3705780f1e36"), "GetUserInfo", "User", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("bcc23b4c-7859-4a9b-9b8c-ee6b011e2d23"), "Restore", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("bcc9e281-c73d-46b2-9bd3-3635f3d52458"), "GetDelivery", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("bdcc7f49-78a6-40a4-9b02-85c1a1c11c8f"), "All", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("c2d99ac1-39f5-43f0-b3c2-ddfb1c5827e5"), "GetById", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ccb74a66-1eb7-48a0-9e97-27332ea1337b"), "Add", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ce296956-feba-43d8-b8e0-0aca5285e174"), "AllWithDeleted", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("d103d32a-ecae-4749-8e62-ffc80eeb67af"), "GetAll", "User", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("d3f64546-13d1-4d50-9f5f-f78941dd9364"), "Delete", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("e0548499-1dc7-400f-91e3-0e2ebe5eb15c"), "Delete", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("e2032701-057a-416d-9b26-cb31cb423c20"), "GetById", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("e38ab8e9-e548-46ab-be74-76e111f788df"), "All", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("e3944cab-e13e-4a02-bc10-a0440898837e"), "Edit", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("e59c8365-9e3b-4142-b2b9-4591055d3c1b"), "Delete", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("e84ca46e-2aa9-4c8f-b683-184a55ee3845"), "Create", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ec7c4587-b945-4e74-a29f-26ccc0a946c4"), "Add", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ee305deb-4f71-434c-a0e4-300acbe2faea"), "GetMarker", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("f3688312-0d05-4940-a88c-30c2ab562be9"), "SignIn", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("f6da031b-6ee2-4551-b893-425035b7bb6b"), "GetDeletedMarkers", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("fad5cdae-95b4-412b-9fa0-8484794f4e70"), "Approve", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("fb9fc971-14b1-443a-8a58-032134675c7e"), "AllWithDeleted", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ff055215-7454-437a-b593-96471525b1ae"), "Delete", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ff7b988b-f4c5-4fde-97cb-56afa5edeb34"), "Logout", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
-                    { new Guid("ffc7afa0-53ff-4eff-ac9e-7c628242cade"), "FinishProcessing", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null }
+                    { new Guid("036fbe38-a05b-441d-b340-079fb400bec9"), "GetHistory", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("0472a811-0eae-46a2-8547-b8cb0e486222"), "AllWithDeleted", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("05267eef-25b2-44ed-a942-d5a0dd91ac5f"), "Delete", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("05e5e54e-ea91-46de-9d2a-dd9e4f6169c2"), "AllWithDeleted", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("120c1003-e41d-4c1e-ba40-430221f89d68"), "AddUserToRole", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("12e4f247-1584-4387-8ee2-434b6e5ac245"), "NoDifferences", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("1401371e-938b-4bcd-9b67-6c9f82176aae"), "Restore", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("1691e077-0415-4d3f-9e87-20e1828a581c"), "Edit", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("18391c14-7164-462f-8774-8c39e55c4eaf"), "Edit", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("199fd0fa-5b02-4600-b423-b8ccd9477309"), "GetDeliveries", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("1afb462c-3110-45f3-b0dc-1c66d57ef1a7"), "GetAll", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("22b4665c-eb09-4395-8938-3139fc6c65e3"), "Add", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("26b4efac-5d66-412c-9d27-f4feb8d23dc9"), "Restore", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("2b6a5213-434f-4595-a86b-f9a926b6df69"), "Delete", "User", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("35f46d2c-f1a4-4410-8fdb-b534f272d9fa"), "Edit", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("3cab7050-f9c9-4074-91f7-0c6d6df0ae01"), "All", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("3e307bd0-3afc-459a-9a86-ac0f04a6b222"), "GetDelivery", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("42413eda-85af-48a5-8e28-108a2ff7b7e6"), "Restore", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("44e62a94-18b3-47c5-b850-51976877f427"), "Edit", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("4917e6c9-b153-42ec-b0d6-8d33484dc1e1"), "Delete", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("49bfc9ca-d833-4430-bb35-702dd4bcc365"), "GetMarker", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("4d007c7e-22ab-450a-9a8a-f577eca56a9d"), "Add", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("4dfdb549-3418-47a5-b0e4-0e0bcfd40da4"), "GetById", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("50018b07-8c79-4535-a7fa-81efa4521f79"), "All", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("5b3e8957-8808-4ce7-a047-8dfb75056c8d"), "GetById", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("5c9ce5e2-c1b6-45a5-93d5-3824a6c9bab3"), "SignIn", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("63a50e8d-4252-489f-beee-d250998b9316"), "GetVendor", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("685fd06d-f958-47d4-9515-c2b0b3a41d9b"), "AllWithDeleted", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("69c376e4-59cf-4e63-9e8d-620a95b4f820"), "GetAll", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("6b331c84-cc69-4fca-ab1e-16dcf99f3718"), "GetUserInfo", "User", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("6bb958fd-bff5-49df-b03d-b900b0782de0"), "Restore", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("6d7fc028-417d-499f-a641-805a5a3c19e7"), "AllDeleted", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("6dda8951-f302-49ad-bdc5-1de94cc1e014"), "Delete", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("6eab15e7-d2de-4a60-8b4f-2ffd3cc23161"), "Edit", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("6ec0dd51-5e77-4d3c-b1a7-3e5a2dcb2efb"), "GetById", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("6fe1fbc2-7302-4f67-a384-4ed85fac6da1"), "AllDeleted", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("704b778c-3ce9-4ab0-a0ce-297c37103b05"), "Add", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("70ab4c71-8b1b-4dbf-a2c8-7772f23df95d"), "Split", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("71716e3a-7c0f-4800-8013-7d9d2a264d17"), "GetById", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("7339c1f9-8d21-4c95-9fc8-69f627de6560"), "Delete", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("7b47a22d-78cc-4d4c-847f-a81c4627be16"), "Delete", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("7c198f1d-7465-4a41-bb80-be9004ec8201"), "All", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("80e394c7-2fe7-463a-8b74-017ebffaf25a"), "GetAll", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("87c6ab03-0bb2-4d5a-a22c-c33b973d38a1"), "GetAll", "User", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("8d6c80e0-b4fe-4c13-8225-293461174729"), "Restore", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("913c675b-f7db-4097-9aae-05001a515ed4"), "Entries", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("9d0c67ed-02eb-4651-afdb-616ef5a986af"), "Edit", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("9dd79002-2511-42bc-8e4e-23bc1107270c"), "GetById", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("a0ba9264-2668-4da1-87c6-9ce32a0a1bd2"), "GetAllWithDeleted", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("a312b7aa-e482-4e0e-a235-458fc0312dba"), "GenerateBarcodePdf", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("a65a0a2d-841c-4527-9141-f76485e3168d"), "Refresh", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("ac506d7b-0a50-4480-86b0-4b869943b26b"), "Restore", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("aed430ea-90cb-49ba-a7dd-064e8bbc8ae2"), "AllWithDeleted", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("afb25ae2-df13-4cfa-a14a-5137bf5784a7"), "GetAll", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("b04da6ce-7abe-4424-831a-dbbc19e478de"), "Delete", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("b19ab4a7-7b6e-4d78-bab0-4b4cf9fe2c0e"), "Add", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("b1f26850-4a5e-45b2-bdfd-b921cea310e7"), "Delete", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("b48d8ad6-64ca-4305-a489-81c99dc3fa69"), "Restore", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("b61ee426-f26b-4cb4-9fe8-b1fe62e1ff00"), "SignUp", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("b6b79ebe-7468-44cf-b085-e38703e249c4"), "FinishProcessing", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("b8fe3b15-754e-4496-acd6-6b6b4eb50a6e"), "Edit", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("bb3c7f6e-7e46-4fae-8f59-24200b275010"), "Edit", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("bd304750-d66a-4ea5-9db6-6aca33789e55"), "Add", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("c3740cff-8052-4675-9781-fff2f3439a7e"), "StartProcessing", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("c999f1e5-d503-4997-93ef-503f48a8a5d5"), "Delete", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("cb92cd51-166e-48ae-8be5-2f26c1463ff0"), "FinishProcessing", "Difference", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("d075a354-415d-4ae9-b65b-a76e59429441"), "GetAll", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("d1e17dbe-5046-4067-9c2f-4ba64ed147e4"), "Logout", "Auth", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("d2314507-a4a3-46ff-b347-97dfdab0516d"), "GetAll", "Zone", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("d3542abf-ea63-4723-9a12-c6d74f3e5865"), "Create", "Role", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("d39fc343-3b5f-4e1a-b841-ca373fc0b26e"), "Add", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("d5bc1488-89c5-4b14-96bb-ebbc14de809c"), "StartProcessing", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("d82940c2-ce98-4e49-a3fa-26ccaa733c08"), "GetById", "RoutePermission", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("e04b73d9-92e3-464b-b797-bd867ca23f77"), "Move", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("e750a09d-ac49-4228-b25b-63d3fb88762c"), "All", "Vendor", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("f24ea4f1-f95f-4a59-8617-755b1a92f1fe"), "GetDeletedMarkers", "Marker", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("f5e166b2-a7e7-4ed8-b202-3fb9ef97f402"), "AllWithDeleted", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("f5f40be4-0de1-400e-aa64-aadeb36b174a"), "Approve", "Delivery", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("f600d2ea-7d91-442d-8eb3-80d9ab4b800e"), "Add", "Entry", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null },
+                    { new Guid("fc5794e9-2cd8-4763-a3aa-de159ac96e3a"), "Delete", "DifferenceType", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "", null, null, false, null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -729,6 +736,11 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 column: "RoutePermissionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Vendors_DefaultZoneId",
+                table: "Vendors",
+                column: "DefaultZoneId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VendorsMarkers_VendorId",
                 table: "VendorsMarkers",
                 column: "VendorId");
@@ -808,10 +820,10 @@ namespace WarehouseManagement.Infrastructure.Migrations
                 name: "Markers");
 
             migrationBuilder.DropTable(
-                name: "Zones");
+                name: "Vendors");
 
             migrationBuilder.DropTable(
-                name: "Vendors");
+                name: "Zones");
         }
     }
 }
