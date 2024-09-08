@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using WarehouseManagement.Api.Services.Contracts;
 using WarehouseManagement.Common.Enums;
@@ -281,7 +282,7 @@ public class DeliveryServiceTests
         var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var waitingEntryFinishedProcessingChange = history.Changes.First(c =>
-            c.EntityId == waitingEntry.Id && c.PropertyName == "FinishedProcessing"
+            c.EntityId == waitingEntry.Id && c.PropertyName == DeliveryHistoryEntityPropertyChange.FinishedProcessing
         );
 
         Assert.That(waitingEntryFinishedProcessingChange.From, Is.EqualTo(null));
@@ -312,7 +313,7 @@ public class DeliveryServiceTests
         var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var deliveryStatusChange = history.Changes.First(c =>
-            c.EntityId == delivery.Id && c.PropertyName == "Status"
+            c.EntityId == delivery.Id && c.PropertyName == DeliveryHistoryEntityPropertyChange.Status
         );
 
         Assert.That(deliveryStatusChange.From, Is.EqualTo(DeliveryStatus.Processing.ToString()));
@@ -334,7 +335,7 @@ public class DeliveryServiceTests
         var history = await deliveryService.GetHistoryAsync(delivery.Id);
 
         var deliveryFinishedProcessingChange = history.Changes.First(c =>
-            c.EntityId == delivery.Id && c.PropertyName == "FinishedProcessing"
+            c.EntityId == delivery.Id && c.PropertyName == DeliveryHistoryEntityPropertyChange.FinishedProcessing
         );
 
         Assert.That(deliveryFinishedProcessingChange.From, Is.EqualTo(null));
@@ -393,7 +394,7 @@ public class DeliveryServiceTests
         var history = await deliveryService.GetHistoryAsync(newDelivery.Id);
 
         var deliveryStatusChange = history.Changes.First(c =>
-            c.EntityId == newDelivery.Id && c.PropertyName == "Status"
+            c.EntityId == newDelivery.Id && c.PropertyName == DeliveryHistoryEntityPropertyChange.Status
         );
 
         Assert.That(deliveryStatusChange.From, Is.EqualTo(DeliveryStatus.Waiting.ToString()));
@@ -407,11 +408,12 @@ public class DeliveryServiceTests
     {
         await entryService.FinishProcessingAsync(processingEntry.Id);
 
+        // TODO: FIX TEST
         var entityChangeDateTime = (
             await dbContext.EntityChanges.FirstAsync(change =>
                 int.Parse(change.EntityId) == processingEntry.Id
             )
-        ).ChangedAt;
+        ).ChangedAt.ToString(CultureInfo.InvariantCulture);
 
         var history = await deliveryService.GetHistoryAsync(delivery.Id);
         var processingEntryFinishedDateTime = history

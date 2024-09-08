@@ -1,3 +1,4 @@
+using WarehouseManagement.Common.Enums;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs.Delivery;
 
@@ -5,23 +6,14 @@ namespace WarehouseManagement.Core.Factories;
 
 public class DeliveryChangeFactory : IDeliveryChangeFactory
 {
-    public DeliveryChangeDto CreateDeliveryChangeDto(int entityId, string propertyName, string entityName, string? from, string? to, DateTime changeDate)
+    public DeliveryChangeDto CreateDeliveryChangeDto(int entityId, DeliveryHistoryEntityPropertyChange propertyName, DeliveryHistoryChangeType entityName, string? from, string? to, DateTime changeDate)
     {
-        if (entityName == "Delivery")
+        return entityName switch
         {
-            return new DeliveryChange(entityId, propertyName, from, to, changeDate);
-        }
-
-        if (entityName == "Difference")
-        {
-            return new DifferenceChange(entityId, propertyName, from, to, changeDate);
-        }
-
-        if (entityName == "Entry")
-        {
-            return new EntryChange(entityId, propertyName, from, to, changeDate);
-        }
-
-        throw new InvalidOperationException("Invalid entity name.");
+            DeliveryHistoryChangeType.Delivery => new DeliveryChange(entityId, propertyName, from, to, changeDate),
+            DeliveryHistoryChangeType.Difference => new DifferenceChange(entityId, propertyName, from, to, changeDate),
+            DeliveryHistoryChangeType.Entry => new EntryChange(entityId, propertyName, from, to, changeDate),
+            _ => throw new InvalidOperationException("Invalid entity name.")
+        };
     }
 }

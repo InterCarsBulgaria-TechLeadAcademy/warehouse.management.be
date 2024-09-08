@@ -6,7 +6,7 @@ namespace WarehouseManagement.Core.Factories;
 
 public class DifferenceChange : DeliveryChangeDto
 {
-    public DifferenceChange(int entityId, string propertyName, string? from, string? to, DateTime changeDate)
+    public DifferenceChange(int entityId, DeliveryHistoryEntityPropertyChange propertyName, string? from, string? to, DateTime changeDate)
     {
         EntityId = entityId;
         PropertyName = propertyName;
@@ -17,12 +17,12 @@ public class DifferenceChange : DeliveryChangeDto
         ChangeDate = UtcNowDateTimeStringFormatted.GetUtcNow(changeDate);
     }
 
-    private static LogType GetLogType(string propertyName)
+    private static LogType GetLogType(DeliveryHistoryEntityPropertyChange propertyName)
     {
         return propertyName switch
         {
-            "Status" => LogType.DifferenceStatusChange,
-            "AdminComment" => LogType.DifferenceAdminComment,
+            DeliveryHistoryEntityPropertyChange.Status => LogType.DifferenceStatusChange,
+            DeliveryHistoryEntityPropertyChange.AdminComment => LogType.DifferenceAdminComment,
             _ => LogType.Empty
         };
     }

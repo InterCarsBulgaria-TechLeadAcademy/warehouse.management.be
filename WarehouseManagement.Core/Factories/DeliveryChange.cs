@@ -6,7 +6,7 @@ namespace WarehouseManagement.Core.Factories;
 
 public class DeliveryChange : DeliveryChangeDto
 {
-    public DeliveryChange(int entityId, string propertyName, string? from, string? to, DateTime changeDate)
+    public DeliveryChange(int entityId, DeliveryHistoryEntityPropertyChange propertyName, string? from, string? to, DateTime changeDate)
     {
         EntityId = entityId;
         PropertyName = propertyName;
@@ -17,13 +17,13 @@ public class DeliveryChange : DeliveryChangeDto
         ChangeDate = UtcNowDateTimeStringFormatted.GetUtcNow(changeDate);
     }
 
-    private static LogType GetLogType(string propertyName)
+    private static LogType GetLogType(DeliveryHistoryEntityPropertyChange propertyName)
     {
         return propertyName switch
         {
-            "StartedProcessing" => LogType.Empty,
-            "FinishedProcessing" => LogType.Empty,
-            "Status" => LogType.DeliveryStatusChange,
+            DeliveryHistoryEntityPropertyChange.StartedProcessing => LogType.Empty,
+            DeliveryHistoryEntityPropertyChange.FinishedProcessing => LogType.Empty,
+            DeliveryHistoryEntityPropertyChange.Status => LogType.DeliveryStatusChange,
             _ => LogType.Empty
         };
     }

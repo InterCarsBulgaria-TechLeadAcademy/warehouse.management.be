@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using WarehouseManagement.Common.Enums;
 
 namespace WarehouseManagement.Core.DTOs.Delivery;
@@ -6,7 +7,7 @@ public class DeliveryChangeDto
 {
     public int EntityId { get; set; }
 
-    public string PropertyName { get; set; } = null!;
+    public DeliveryHistoryEntityPropertyChange PropertyName { get; set; }
 
     public string From { get; set; } = string.Empty;
 
@@ -17,4 +18,10 @@ public class DeliveryChangeDto
     public LogType LogType { get; set; }
 
     public string ChangeDate { get; set; } = string.Empty;
+
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public void UpdateChangedValuesFromItems<T>(IQueryable<T> items)
+    {
+        return;
+    }
 }

@@ -5,7 +5,6 @@ using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
-using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
@@ -339,27 +338,23 @@ public class DeliveryService : IDeliveryService
             Changes = changes
                 .Select(change =>
                 {
+                    Enum.TryParse(change.EntityName, out DeliveryHistoryChangeType changeType);
+                    Enum.TryParse(change.PropertyName, out DeliveryHistoryEntityPropertyChange propertyName);
+                    
                     var deliveryChange = deliveryChangeFactory.CreateDeliveryChangeDto(
                         int.Parse(change.EntityId),
-                        change.PropertyName,
-                        change.EntityName,
+                        propertyName,
+                        changeType,
                         change.NewValue,
                         change.OldValue,
                         change.ChangedAt
                     );
 
-                    if (deliveryChange.LogType != LogType.ZoneChange) return deliveryChange;
-                    
-                    // Use a method?
-                    deliveryChange.From = repository
-                        .AllReadOnly<Zone>()
-                        .FirstOrDefault(z => z.Id == int.Parse(change.OldValue!))
-                        ?.Name ?? string.Empty;
-
-                    deliveryChange.To = repository
-                        .AllReadOnly<Zone>()
-                        .FirstOrDefault(z => z.Id == int.Parse(change.NewValue!))
-                        ?.Name ?? string.Empty;
+                    if (deliveryChange.LogType == LogType.ZoneChange)
+                    {
+                        var zones = repository.AllReadOnly<Zone>();
+                        deliveryChange.UpdateChangedValuesFromItems(zones);
+                    }
 
                     return deliveryChange;
                 })
