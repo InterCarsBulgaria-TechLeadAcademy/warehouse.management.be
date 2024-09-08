@@ -6,5 +6,6 @@ public class VendorDetailsDto
     public string Name { get; set; } = string.Empty;
     public string SystemNumber { get; set; } = string.Empty;
     public string CreatedAt { get; set; } = string.Empty;
+    public int? DefaultZoneId { get; set; }
     public ICollection<VendorMarkerDto> Markers { get; set; } = new HashSet<VendorMarkerDto>();
 }
