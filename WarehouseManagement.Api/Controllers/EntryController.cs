@@ -142,6 +142,9 @@ namespace WarehouseManagement.Api.Controllers
         public async Task<IActionResult> Move(int id, [FromBody] int newZoneId)
         {
             await entryService.MoveAsync(id, newZoneId, User.Id());
+            
+            var entry = await entryService.GetByIdAsync(id);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryDetails.Id);
 
             return Ok(EntryMovedSuccessfully);
         }
@@ -153,6 +156,9 @@ namespace WarehouseManagement.Api.Controllers
         public async Task<IActionResult> Split(int id, [FromBody] EntrySplitDto splitDto)
         {
             await entryService.SplitAsync(id, splitDto, User.Id());
+            
+            var entry = await entryService.GetByIdAsync(id);
+            await deliveryService.ChangeDeliveryStatusIfNeeded(entry.DeliveryDetails.Id);
 
             return Ok(EntrySplitSuccessfully);
         }

@@ -5,11 +5,11 @@ using WarehouseManagement.Common.Statuses;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
-using WarehouseManagement.Core.DTOs.Entry;
 using WarehouseManagement.Core.Extensions;
 using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using WarehouseManagement.Common.Utilities;
+using WarehouseManagement.Core.Factories;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Core.Services;
@@ -319,56 +319,53 @@ public class DeliveryService : IDeliveryService
     public async Task<DeliveryHistoryDto> GetHistoryAsync(int id)
     {
         var delivery = await RetrieveByIdAsync(id);
-
-        var relatedEntriesIds = await repository
-            .AllReadOnly<Entry>()
-            .Where(e => e.DeliveryId == delivery.Id)
-            .Select(e => e.Id)
-            .ToListAsync();
-
+        
         var changes = await repository.AllReadOnly<EntityChange>().ToListAsync();
 
         changes = changes
             .Where(change =>
                 int.Parse(change.EntityId) == delivery.Id
-                || relatedEntriesIds.Any(id => id == int.Parse(change.EntityId))
+                || delivery.Entries.Any(e => e.Id == int.Parse(change.EntityId))
+                || delivery.Differences.Any(d => d.Id == int.Parse(change.EntityId))
             )
             .ToList();
+        
+        DeliveryChangeFactory deliveryChangeFactory = new();
 
         var deliveryHistory = new DeliveryHistoryDto
         {
             Id = delivery.Id,
             Changes = changes
-                .Select(change => new DeliveryHistoryDto.Change
+                .Select(change =>
                 {
-                    EntityId = int.Parse(change.EntityId),
-                    PropertyName = change.PropertyName,
-                    From = change.OldValue!,
-                    To = change.NewValue!,
-                    Type =
-                        change.EntityName == "Delivery"
-                            ? DeliveryHistoryChangeType.Delivery
-                            : DeliveryHistoryChangeType.Entry,
-                    LogType =
-                        (
-                            change.PropertyName == "StartedProcessing"
-                            || change.PropertyName == "FinishedProcessing"
-                        )
-                        && change.EntityName == "Entry"
-                            ? LogType.EntryStatusChange
-                            : change.PropertyName == "Status" && change.EntityName == "Delivery"
-                                ? LogType.DeliveryStatusChange
-                                : change.PropertyName == "ZoneId"
-                                    ? LogType.ZoneChange
-                                    : LogType.Split, // May be refactored based on the Move functionality
-                    ChangeDate = change.ChangedAt
+                    Enum.TryParse(change.EntityName, out DeliveryHistoryChangeType changeType);
+                    Enum.TryParse(change.PropertyName, out DeliveryHistoryEntityPropertyChange propertyName);
+                    
+                    var deliveryChange = deliveryChangeFactory.CreateDeliveryChangeDto(
+                        int.Parse(change.EntityId),
+                        propertyName,
+                        changeType,
+                        change.NewValue,
+                        change.OldValue,
+                        change.ChangedAt
+                    );
+
+                    if (deliveryChange.LogType == LogType.ZoneChange)
+                    {
+                        var zones = repository.AllReadOnly<Zone>();
+                        deliveryChange.UpdateChangedValuesFromItems(zones);
+                    }
+
+                    return deliveryChange;
                 })
+                .Where(c => c.LogType != LogType.Empty)
+                .OrderByDescending(c => c.ChangeDate)
                 .ToList()
         };
 
         return deliveryHistory;
     }
-
+    
     public async Task ChangeDeliveryStatusIfNeeded(int id)
     {
         var delivery = await RetrieveByIdAsync(id);
@@ -388,6 +385,7 @@ public class DeliveryService : IDeliveryService
         var delivery = await repository
             .All<Delivery>()
             .Include(d => d.Entries)
+            .Include(d => d.Differences)
             .FirstOrDefaultAsync(d => d.Id == id);
 
         if (delivery == null)
