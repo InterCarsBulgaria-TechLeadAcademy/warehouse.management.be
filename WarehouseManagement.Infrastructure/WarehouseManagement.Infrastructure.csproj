@@ -21,4 +21,8 @@
     <ProjectReference Include="..\WarehouseManagement.Common\WarehouseManagement.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
