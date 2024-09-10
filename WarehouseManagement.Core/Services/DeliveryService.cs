@@ -11,6 +11,7 @@ using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using WarehouseManagement.Common.Utilities;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
+using WarehouseManagement.Core.DTOs.Requests;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -81,15 +82,18 @@ public class DeliveryService : IDeliveryService
         return delivery;
     }
 
-    public async Task<PageDto<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams)
+    public async Task<PageDto<DeliveryDto>> GetAllAsync(PaginationParameters paginationParams, DeliveryRequest request)
     {
         Expression<Func<Delivery, bool>> filter = v =>
             EF.Functions.Like(v.ReceptionNumber, $"%{paginationParams.SearchQuery}%")
             || EF.Functions.Like(v.SystemNumber, $"%{paginationParams.SearchQuery}%")
             || EF.Functions.Like(v.TruckNumber, $"%{paginationParams.SearchQuery}%");
 
-        var deliveries = await repository
-            .AllReadOnly<Delivery>()
+        var query = BuildQuery(request, false);
+
+        var count = await query.CountAsync();
+
+        var deliveries = await query
             .Paginate(paginationParams, filter)
             .Select(d => new DeliveryDto()
             {
@@ -119,15 +123,74 @@ public class DeliveryService : IDeliveryService
             })
             .ToListAsync();
 
-        var totalItems = repository.AllReadOnly<Delivery>().Count();
-
         return new PageDto<DeliveryDto>()
         {
-            Count = totalItems,
+            Count = count,
             Results = deliveries,
             HasPrevious = paginationParams.PageNumber > 1,
-            HasNext = paginationParams.PageNumber * paginationParams.PageSize < totalItems
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < count
         };
+    }
+
+    public async Task<PageDto<DeliveryDto>> GetAllDeletedAsync(PaginationParameters paginationParams, DeliveryRequest request)
+    {
+        var query = BuildQuery(request, true);
+
+        var count = await query.CountAsync();
+
+        var deliveries = await query
+            .Paginate(paginationParams, null)
+            .Select(d => new DeliveryDto()
+            {
+                Id = d.Id,
+                ReceptionNumber = d.ReceptionNumber,
+                SystemNumber = d.SystemNumber,
+                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
+                VendorName = d.Vendor.Name,
+                Status = d.Status.ToString(),
+                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
+                ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
+                Markers = d
+                    .DeliveriesMarkers.Select(dm => new DeliveryMarkerDto()
+                    {
+                        MarkerId = dm.MarkerId,
+                        MarkerName = dm.Marker.Name
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
+
+        return new PageDto<DeliveryDto>
+        {
+            Count = count,
+            Results = deliveries,
+            HasNext = paginationParams.PageNumber * paginationParams.PageSize < count,
+            HasPrevious = paginationParams.PageNumber > 1
+        };
+    }
+
+    private IQueryable<Delivery> BuildQuery(DeliveryRequest request, bool withDeleted)
+    {
+        IQueryable<Delivery> query;
+
+        if (withDeleted)
+        {
+            query = repository.AllWithDeleted<Delivery>();
+        }
+        else
+        {
+            query = repository.All<Delivery>();
+        }
+
+        if (request != null)
+        {
+            query = query.Where(d => d.Status == request.Status
+                && d.DeliveryTime >= request.StartDate
+                && d.DeliveryTime <= request.EndDate
+                && d.Vendor.Name == request.Vendor);
+        }
+
+        return query;
     }
 
     private static EntriesProcessingDetails GetEntriesProcessingDetails(ICollection<Entry> entries, bool isFinished)
@@ -254,34 +317,6 @@ public class DeliveryService : IDeliveryService
         repository.UnDelete(delivery);
 
         await repository.SaveChangesAsync();
-    }
-
-    public async Task<ICollection<DeliveryDto>> GetAllDeletedAsync()
-    {
-        var deliveries = await repository
-            .AllWithDeletedReadOnly<Delivery>()
-            .Where(d => d.IsDeleted)
-            .Select(d => new DeliveryDto()
-            {
-                Id = d.Id,
-                ReceptionNumber = d.ReceptionNumber,
-                SystemNumber = d.SystemNumber,
-                DeliveryTime = d.DeliveryTime.ToString("s") + "Z",
-                VendorName = d.Vendor.Name,
-                Status = d.Status.ToString(),
-                CreatedAt = UtcNowDateTimeStringFormatted.GetUtcNow(d.CreatedAt),
-                ApprovedOn = d.ApprovedOn.HasValue ? d.ApprovedOn.Value.ToString("s") + "Z" : null,
-                Markers = d
-                    .DeliveriesMarkers.Select(dm => new DeliveryMarkerDto()
-                    {
-                        MarkerId = dm.MarkerId,
-                        MarkerName = dm.Marker.Name
-                    })
-                    .ToList()
-            })
-            .ToListAsync();
-
-        return deliveries;
     }
 
     public async Task ApproveAsync(int id)

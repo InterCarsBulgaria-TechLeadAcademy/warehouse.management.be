@@ -4,6 +4,7 @@ using WarehouseManagement.Common.MessageConstants.Keys;
 using WarehouseManagement.Core.Contracts;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.DTOs.Delivery;
+using WarehouseManagement.Core.DTOs.Requests;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
 
 namespace WarehouseManagement.Api.Controllers;
@@ -44,10 +45,20 @@ public class DeliveryController : ControllerBase
     [ProducesResponseType(200, Type = typeof(PageDto<DeliveryDto>))]
     [ProducesResponseType(401)]
     public async Task<IActionResult> GetDeliveries(
-        [FromQuery] PaginationParameters paginationParams
+        [FromQuery] PaginationParameters paginationParams,
+        [FromQuery] DeliveryRequest request
     )
     {
-        var model = await deliveryService.GetAllAsync(paginationParams);
+        var model = await deliveryService.GetAllAsync(paginationParams, request);
+
+        return Ok(model);
+    }
+
+    [HttpGet("all-deleted")]
+    [ProducesResponseType(200, Type = typeof(PageDto<DeliveryDto>))]
+    public async Task<IActionResult> AllDeleted([FromQuery] PaginationParameters paginationParameters, [FromQuery] DeliveryRequest request)
+    {
+        var model = await deliveryService.GetAllDeletedAsync(paginationParameters, request);
 
         return Ok(model);
     }
@@ -123,15 +134,6 @@ public class DeliveryController : ControllerBase
         await deliveryService.RestoreAsync(id);
 
         return Ok(DeliveryRestored);
-    }
-
-    [HttpGet("all-deleted")]
-    [ProducesResponseType(200, Type = typeof(IEnumerable<DeliveryDto>))]
-    public async Task<IActionResult> AllDeleted()
-    {
-        var model = await deliveryService.GetAllDeletedAsync();
-
-        return Ok(model);
     }
 
     [HttpGet("history/{id}")]
