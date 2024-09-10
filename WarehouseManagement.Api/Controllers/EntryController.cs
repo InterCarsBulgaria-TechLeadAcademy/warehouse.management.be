@@ -67,7 +67,10 @@ namespace WarehouseManagement.Api.Controllers
                 return BadRequest(EntryInvalidData);
             }
 
-            await entryService.CreateAsync(model, User.Id());
+            foreach (var entryModel in model)
+            {
+                await entryService.CreateAsync(entryModel, User.Id());
+            }
 
             return Ok(EntryCreatedSuccessfuly);
         }

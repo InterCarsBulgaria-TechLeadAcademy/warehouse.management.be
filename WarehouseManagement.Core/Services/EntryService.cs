@@ -23,20 +23,14 @@ public class EntryService : IEntryService
         this.repository = repository;
     }
 
-    public async Task CreateAsync(ICollection<EntryFormDto> model, string userId)
+    public async Task CreateAsync(EntryFormDto model, string userId)
     {
-        foreach (var entry in model)
+        if (!HasExactlyOneTypeSet(model))
         {
-            if (!HasExactlyOneTypeSet(entry))
-            {
-                throw new ArgumentException(EntryCanHaveOnlyOneTypeSet);
-            }
+            throw new ArgumentException(EntryCanHaveOnlyOneTypeSet);
         }
 
-        foreach (var entry in model)
-        {
-            await MapAndAddNewEntryAsync(entry, userId);
-        }
+        await MapAndAddNewEntryAsync(model, userId);
 
         await repository.SaveChangesAsync();
     }
