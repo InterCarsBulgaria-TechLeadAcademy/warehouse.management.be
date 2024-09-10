@@ -77,8 +77,11 @@ public class EntryService : IEntryService
 
     public async Task<PageDto<EntryDto>> GetAllAsync(PaginationParameters paginationParams, EntryStatuses[]? statuses = null)
     {
-        var query = BuildQuery(statuses)
-            .Paginate(paginationParams, null);
+        var query = BuildQuery(statuses);
+
+        var count = await query.CountAsync();
+            
+        query = query.Paginate(paginationParams, null);
 
         var entries = await query
             .Select(e => new EntryDto()
@@ -106,8 +109,6 @@ public class EntryService : IEntryService
             })
             .ToListAsync();
 
-        var count = repository.AllReadOnly<Entry>().Count();
-
         return new PageDto<EntryDto>
         {
             Count = count,
@@ -124,10 +125,13 @@ public class EntryService : IEntryService
     )
     {
         var query = BuildQuery(statuses)
-            .Paginate(paginationParams, null);
+            .Where(e => e.ZoneId == zoneId);
+
+        var count = await query.CountAsync();
+
+        query = query.Paginate(paginationParams, null);
 
         var entries = await query
-            .Where(e => e.ZoneId == zoneId)
             .Select(e => new EntryDto()
             {
                 Id = e.Id,
@@ -151,8 +155,6 @@ public class EntryService : IEntryService
                 }
             })
             .ToListAsync();
-
-        var count = repository.AllReadOnly<Entry>().Count();
 
         return new PageDto<EntryDto>
         {
@@ -169,13 +171,16 @@ public class EntryService : IEntryService
         EntryStatuses[]? statuses = null
     )
     {
-        var query = BuildQuery(statuses, true)
-            .Paginate(paginationParams, null);
+        var query = BuildQuery(statuses, true);
 
         if (zoneId != null)
         {
             query = query.Where(e => e.ZoneId == zoneId);
         }
+
+        var count = await query.CountAsync();
+
+        query = query.Paginate(paginationParams, null);
 
         var entries = await query
             .Select(e => new EntryDto()
@@ -201,8 +206,6 @@ public class EntryService : IEntryService
                 }
             })
             .ToListAsync();
-
-        var count = repository.AllReadOnly<Entry>().Count();
 
         return new PageDto<EntryDto>
         {
