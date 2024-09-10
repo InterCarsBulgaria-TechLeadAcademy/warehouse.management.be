@@ -21,4 +21,5 @@ public static class EntryMessageKey
     public const string EntryHasFinishedProcessingAndCannotBeMoved = "EntryHasFinishedProcessingAndCannotBeMoved";
     public const string EntryHasFinishedProcessingAndCannotBeSplit = "EntryHasFinishedProcessingAndCannotBeSplit";
     public const string InsufficientAmountToSplit = "InsufficientAmountToSplit";
+    public const string EntryCannoBeCreatedWithMoreResourcesThanAvailibleInTheDelivery = "EntryCannoBeCreatedWithMoreResourcesThanAvailibleInTheDelivery";
 }

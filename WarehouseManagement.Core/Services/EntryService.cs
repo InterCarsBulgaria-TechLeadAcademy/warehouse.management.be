@@ -6,11 +6,11 @@ using WarehouseManagement.Infrastructure.Data.Common;
 using WarehouseManagement.Infrastructure.Data.Models;
 using WarehouseManagement.Core.DTOs;
 using WarehouseManagement.Core.Extensions;
+using WarehouseManagement.Common.Utilities;
+using WarehouseManagement.Common.Enums;
 using static WarehouseManagement.Common.MessageConstants.Keys.EntryMessageKey;
 using static WarehouseManagement.Common.MessageConstants.Keys.ZoneMessageKeys;
 using static WarehouseManagement.Common.MessageConstants.Keys.DeliveryMessageKeys;
-using WarehouseManagement.Core.DTOs.Zone;
-using WarehouseManagement.Common.Utilities;
 
 namespace WarehouseManagement.Core.Services;
 
@@ -476,10 +476,10 @@ public class EntryService : IEntryService
         return count == 1;
     }
 
-    private async Task MapAndAddNewEntryAsync(EntryFormDto entry, string userId)
+    private async Task MapAndAddNewEntryAsync(EntryFormDto entryModel, string userId)
     {
-        var delivery = await repository.GetByIdAsync<Delivery>(entry.DeliveryId);
-        var zone = await repository.GetByIdAsync<Zone>(entry.ZoneId);
+        var delivery = await repository.GetByIdAsync<Delivery>(entryModel.DeliveryId);
+        var zone = await repository.GetByIdAsync<Zone>(entryModel.ZoneId);
 
         if (delivery == null)
         {
@@ -491,45 +491,68 @@ public class EntryService : IEntryService
             throw new KeyNotFoundException(ZoneWithIdNotFound);
         }
 
-        Entry newEntry;
-
-        if (entry.Pallets > 0)
+        if (!HasDeliveryEnoughResources(delivery, entryModel.Pallets, ResourceKind.Pallets)
+            || !HasDeliveryEnoughResources(delivery, entryModel.Packages, ResourceKind.Packages)
+            || !HasDeliveryEnoughResources(delivery, entryModel.Pieces, ResourceKind.Pieces))
         {
-            newEntry = new Entry()
+            throw new InvalidOperationException(EntryCannoBeCreatedWithMoreResourcesThanAvailibleInTheDelivery);
+        }
+
+        Entry entry;
+
+        if (entryModel.Pallets > 0)
+        {
+            entry = new Entry()
             {
-                Pallets = entry.Pallets,
+                Pallets = entryModel.Pallets,
                 Packages = 0,
                 Pieces = 0,
                 CreatedByUserId = userId,
-                DeliveryId = entry.DeliveryId,
-                ZoneId = entry.ZoneId,
+                DeliveryId = entryModel.DeliveryId,
+                ZoneId = entryModel.ZoneId,
             };
         }
-        else if (entry.Packages > 0)
+        else if (entryModel.Packages > 0)
         {
-            newEntry = new Entry()
+            entry = new Entry()
             {
                 Pallets = 0,
-                Packages = entry.Packages,
+                Packages = entryModel.Packages,
                 Pieces = 0,
                 CreatedByUserId = userId,
-                DeliveryId = entry.DeliveryId,
-                ZoneId = entry.ZoneId,
+                DeliveryId = entryModel.DeliveryId,
+                ZoneId = entryModel.ZoneId,
             };
         }
         else
         {
-            newEntry = new Entry()
+            entry = new Entry()
             {
                 Pallets = 0,
                 Packages = 0,
-                Pieces = entry.Pieces,
+                Pieces = entryModel.Pieces,
                 CreatedByUserId = userId,
-                DeliveryId = entry.DeliveryId,
-                ZoneId = entry.ZoneId,
+                DeliveryId = entryModel.DeliveryId,
+                ZoneId = entryModel.ZoneId,
             };
         }
 
-        await repository.AddAsync(newEntry);
+        await repository.AddAsync(entry);
+    }
+
+    private bool HasDeliveryEnoughResources(Delivery delivery, int requiredResourcesForNewEntry, ResourceKind resource)
+    {
+        if (resource == ResourceKind.Pallets)
+        {
+            return delivery.Pallets >= requiredResourcesForNewEntry;
+        }
+        else if (resource == ResourceKind.Packages)
+        {
+            return delivery.Packages >= requiredResourcesForNewEntry;
+        }
+        else
+        {
+            return delivery.Pieces >= requiredResourcesForNewEntry;
+        }
     }
 }
