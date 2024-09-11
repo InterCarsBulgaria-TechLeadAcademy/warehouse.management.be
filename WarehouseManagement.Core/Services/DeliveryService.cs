@@ -113,7 +113,13 @@ public class DeliveryService : IDeliveryService
                 EntriesFinishedProcessingDetails = GetEntriesProcessingDetails(d.Entries, true),
                 EntriesWaitingProcessingDetails = GetEntriesProcessingDetails(d.Entries, false),
                 EntriesFinishedProcessing = d.Entries.Count(e => e.FinishedProcessing.HasValue),
-                EntriesWaitingProcessing = d.Entries.Count(e => !e.FinishedProcessing.HasValue)
+                EntriesWaitingProcessing = d.Entries.Count(e => !e.FinishedProcessing.HasValue),
+                DifferencesFinishedProcessing = d.Differences.Count(d =>
+                    d.Status == DifferenceStatus.Finished
+                ),
+                DifferencesWaitingProcessing = d.Differences.Count(d =>
+                    d.Status == DifferenceStatus.Processing || d.Status == DifferenceStatus.Waiting
+                ),
             })
             .ToListAsync();
 
@@ -275,7 +281,7 @@ public class DeliveryService : IDeliveryService
                         MarkerId = dm.MarkerId,
                         MarkerName = dm.Marker.Name
                     })
-                    .ToList()
+                    .ToList(),
             })
             .ToListAsync();
 
